@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { trackEvent } from "@/lib/analytics";
 import { formatPrice, type PlanPriceKind } from "@/data/plans";
+import { findCoupon, computeCouponDiscount, formatCouponDiscount } from "@/data/coupons";
 
 /** 公式LINE（予約相談） */
 const LINE_URL = "https://lin.ee/5z6HX4S";
@@ -60,6 +61,7 @@ function buildMessage(v: {
   instagram: string;
   story: boolean;
   totalText: string;
+  couponText: string;
 }): string {
   return `【KEY PHOTO 宮古島 ご予約・お問い合わせ】
 
@@ -96,7 +98,7 @@ ${formatInstagram(v.instagram)}
 
 ━━━━━━━━━━━━━━━━
 💴 お会計（概算）：
-${v.totalText}
+${v.totalText}${v.couponText ? `\n🎟 クーポン：${v.couponText}` : ""}
 ※お支払いは「現地にて現金決済のみ」となります。
 （最終金額はLINEにてご確定します）
 ━━━━━━━━━━━━━━━━
@@ -145,6 +147,7 @@ export function BookingForm({
   const [location, setLocation] = useState(false);
   const [instagram, setInstagram] = useState("");
   const [story, setStory] = useState(false);
+  const [couponInput, setCouponInput] = useState("");
   const [status, setStatus] = useState<"idle" | "copied" | "error">("idle");
   // コピー／コピー失敗の操作対象だったメッセージ。現在のメッセージと違えば「古い」状態とみなす。
   const [actedMessage, setActedMessage] = useState("");
@@ -158,7 +161,8 @@ export function BookingForm({
   const pickupAmount = pickup ? pickupPrice : 0;
   const staffNominationAmount = staffNomination ? staffNominationPrice : 0;
 
-  const total: number | null = useMemo(() => {
+  // 割引前の小計。quote（プロポーズ等）は null。
+  const subtotal: number | null = useMemo(() => {
     if (!selectedPlan) return null;
     if (selectedPlan.kind === "perPerson") {
       return (
@@ -173,6 +177,22 @@ export function BookingForm({
     }
     return null; // quote（プロポーズ等）
   }, [selectedPlan, adultsNum, childrenNum, pickupAmount, staffNominationAmount]);
+
+  // ───── クーポン ─────
+  const coupon = useMemo(() => findCoupon(couponInput), [couponInput]);
+  // 入力はあるがクーポンが見つからない＝無効
+  const couponInvalid = couponInput.trim() !== "" && !coupon;
+  // 小計が出る（＝概算が計算できる）プランでのみ割引を適用する
+  const discountAmount = useMemo(() => {
+    if (!coupon || subtotal == null) return 0;
+    return computeCouponDiscount(coupon, {
+      subtotal,
+      headcount: adultsNum + childrenNum,
+    });
+  }, [coupon, subtotal, adultsNum, childrenNum]);
+
+  // 割引後の最終合計。
+  const total: number | null = subtotal == null ? null : subtotal - discountAmount;
 
   // 表示・送信用の合計テキスト
   const totalText = useMemo(() => {
@@ -198,6 +218,9 @@ export function BookingForm({
     if (staffNomination) {
       lines.push(`スタッフ指名 +${formatPrice(staffNominationPrice)}（稲田）`);
     }
+    if (coupon && discountAmount > 0) {
+      lines.push(`クーポン（${coupon.code}） -${formatPrice(discountAmount)}`);
+    }
     return lines;
   }, [
     selectedPlan,
@@ -207,7 +230,18 @@ export function BookingForm({
     pickupPrice,
     staffNomination,
     staffNominationPrice,
+    coupon,
+    discountAmount,
   ]);
+
+  // LINEメッセージ用のクーポン記載テキスト。
+  const couponText = useMemo(() => {
+    if (!coupon) return "";
+    if (discountAmount > 0) return formatCouponDiscount(coupon, discountAmount);
+    // 見積りプラン等、概算が出ない場合はコードのみ記載（見積り時に適用）
+    if (subtotal == null) return `${coupon.code}（お見積り時に適用）`;
+    return "";
+  }, [coupon, discountAmount, subtotal]);
 
   const message = useMemo(
     () =>
@@ -226,6 +260,7 @@ export function BookingForm({
         instagram,
         story,
         totalText,
+        couponText,
       }),
     [
       date,
@@ -242,6 +277,7 @@ export function BookingForm({
       instagram,
       story,
       totalText,
+      couponText,
     ],
   );
 
@@ -264,6 +300,7 @@ export function BookingForm({
     if (typeof s.location === "boolean") setLocation(s.location);
     if (typeof s.instagram === "string") setInstagram(s.instagram);
     if (typeof s.story === "boolean") setStory(s.story);
+    if (typeof s.coupon === "string") setCouponInput(s.coupon);
   }
   useEffect(() => {
     try {
@@ -304,6 +341,7 @@ export function BookingForm({
           location,
           instagram,
           story,
+          coupon: couponInput,
         }),
       );
     } catch {
@@ -323,6 +361,7 @@ export function BookingForm({
     location,
     instagram,
     story,
+    couponInput,
   ]);
 
   function handleClear() {
@@ -339,6 +378,7 @@ export function BookingForm({
     setLocation(false);
     setInstagram("");
     setStory(false);
+    setCouponInput("");
     setStatus("idle");
     setActedMessage("");
     try {
@@ -385,7 +425,11 @@ export function BookingForm({
     setActedMessage(message);
     setStatus(ok ? "copied" : "error");
     // CV計測：予約文のコピー
-    trackEvent("booking_copy", { plan: plan || "未選択", success: ok });
+    trackEvent("booking_copy", {
+      plan: plan || "未選択",
+      success: ok,
+      coupon: coupon?.code ?? "なし",
+    });
   }
 
   return (
@@ -615,6 +659,41 @@ export function BookingForm({
               ストーリーへのタグ付けOK
             </label>
           </div>
+
+          {/* クーポン */}
+          <div>
+            <label htmlFor="coupon" className="mb-1.5 block text-sm font-medium text-zinc-200">
+              クーポンコード（任意）
+            </label>
+            <input
+              id="coupon"
+              type="text"
+              value={couponInput}
+              onChange={(e) => setCouponInput(e.target.value)}
+              placeholder="お持ちの方は入力"
+              autoComplete="off"
+              autoCapitalize="off"
+              autoCorrect="off"
+              spellCheck={false}
+              aria-invalid={couponInvalid}
+              className={inputClass}
+            />
+            <div aria-live="polite" className="mt-1.5 min-h-[1.25rem] text-xs">
+              {coupon && discountAmount > 0 && (
+                <p className="font-medium text-emerald-300">
+                  適用：{coupon.code} −{formatPrice(discountAmount)}
+                </p>
+              )}
+              {coupon && discountAmount === 0 && subtotal == null && (
+                <p className="text-amber-200">
+                  このプランは概算が出ないため、お見積り時に適用します
+                </p>
+              )}
+              {couponInvalid && (
+                <p className="text-rose-300">クーポンが見つかりません</p>
+              )}
+            </div>
+          </div>
         </div>
 
         {/* お会計（概算） */}
@@ -709,6 +788,7 @@ export function BookingForm({
                 trackEvent("open_official_line", {
                   plan: plan || "未選択",
                   copied: effectiveStatus === "copied",
+                  coupon: coupon?.code ?? "なし",
                 })
               }
               className={`flex h-14 w-full items-center justify-center gap-2 rounded-lg text-base font-bold transition-all ${

@@ -2,6 +2,7 @@ import { getPlans, type PlanSlug } from "@/data/plans";
 import { getPosts } from "@/data/posts";
 import { testimonials } from "@/data/testimonials";
 import { galleryImages } from "@/data/images";
+import { coupons, normalizeCode } from "@/data/coupons";
 
 /**
  * データ品質の自動チェック。
@@ -95,6 +96,25 @@ export function validateData(): string[] {
   galleryImages.forEach((img, i) => {
     if (!img.alt) errors.push(`galleryImages[${i}]: alt が空です`);
   });
+
+  // ── クーポン ──
+  const seenCoupon = new Set<string>();
+  for (const c of coupons) {
+    const at = `coupons/${c.code || "(空)"}`;
+    if (!c.code) errors.push(`${at}: code が空です`);
+    const key = normalizeCode(c.code);
+    if (key && seenCoupon.has(key))
+      errors.push(`${at}: code が重複しています（正規化後）`);
+    seenCoupon.add(key);
+    if (!c.label) errors.push(`${at}: label が空です`);
+    const d = c.discount;
+    if (d.kind === "percent") {
+      if (!(d.rate > 0 && d.rate <= 100))
+        errors.push(`${at}: discount.rate は0〜100の範囲にしてください`);
+    } else if (!(d.amount > 0)) {
+      errors.push(`${at}: discount.amount が不正です`);
+    }
+  }
 
   return errors;
 }
