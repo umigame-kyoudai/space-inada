@@ -2,7 +2,15 @@ import { siteConfig, absoluteUrl, mapLink } from "./seo";
 import { getPriceRange, formatPrice, type Plan } from "@/data/plans";
 import type { Post } from "@/data/posts";
 import type { Testimonial } from "@/data/testimonials";
-import { postImage } from "@/data/images";
+import {
+  aboutPortrait,
+  planImage,
+  postImage,
+  type ImageAsset,
+} from "@/data/images";
+
+/** 代表者の安定ID。LocalBusiness / Person / Article author を同一エンティティに統合する */
+const FOUNDER_ID = `${siteConfig.url}/#founder`;
 
 /**
  * 構造化データ (JSON-LD) ビルダー。
@@ -76,9 +84,11 @@ export function localBusinessJsonLd(): Json {
     ...(siteConfig.contact.telephone
       ? { telephone: siteConfig.contact.telephone }
       : {}),
+    ...(siteConfig.contact.email ? { email: siteConfig.contact.email } : {}),
     ...(siteConfig.sameAs.length ? { sameAs: siteConfig.sameAs } : {}),
     founder: {
       "@type": "Person",
+      "@id": FOUNDER_ID,
       name: siteConfig.author.name,
     },
   };
@@ -89,18 +99,21 @@ export function personJsonLd(): Json {
   return {
     "@context": "https://schema.org",
     "@type": "Person",
+    "@id": FOUNDER_ID,
     name: siteConfig.author.name,
     jobTitle: siteConfig.author.role,
+    url: absoluteUrl("/about"),
+    ...(aboutPortrait.src ? { image: absoluteUrl(aboutPortrait.src) } : {}),
     worksFor: {
-      "@type": "Organization",
-      name: siteConfig.name,
-      url: siteConfig.url,
+      "@id": `${siteConfig.url}/#business`,
     },
   };
 }
 
 /** プラン詳細：Service */
 export function serviceJsonLd(plan: Plan): Json {
+  const cover = planImage(plan);
+
   return {
     "@context": "https://schema.org",
     "@type": "Service",
@@ -108,6 +121,7 @@ export function serviceJsonLd(plan: Plan): Json {
     name: plan.seo.title,
     description: plan.seo.description,
     url: absoluteUrl(`/plans/${plan.slug}`),
+    ...(cover.src ? { image: absoluteUrl(cover.src) } : {}),
     areaServed: siteConfig.contact.areaServed,
     provider: {
       "@type": "LocalBusiness",
@@ -121,6 +135,7 @@ export function serviceJsonLd(plan: Plan): Json {
             price: plan.priceFrom,
             priceCurrency: "JPY",
             availability: "https://schema.org/InStock",
+            url: absoluteUrl(`/booking?plan=${plan.slug}`),
           },
         }
       : {}),
@@ -155,11 +170,14 @@ export function articleJsonLd(post: Post): Json {
     description: post.excerpt,
     url,
     mainEntityOfPage: url,
+    inLanguage: "ja-JP",
+    keywords: post.keywords.join(","),
     datePublished: post.publishedAt,
     dateModified: post.updatedAt,
     image: absoluteUrl(coverImage.src ?? siteConfig.ogImage),
     author: {
       "@type": "Person",
+      "@id": FOUNDER_ID,
       name: siteConfig.author.name,
       url: absoluteUrl("/about"),
     },
@@ -171,6 +189,9 @@ export function articleJsonLd(post: Post): Json {
         "@type": "ImageObject",
         url: absoluteUrl("/icon.svg"),
       },
+    },
+    isPartOf: {
+      "@id": `${siteConfig.url}/#website`,
     },
   };
 }
@@ -248,6 +269,32 @@ export function howToJsonLd(post: Post): Json | null {
       name: s.name,
       text: s.text,
     })),
+  };
+}
+
+/** 撮影ギャラリー：ImageGallery（画像検索・ライセンス表示の補強） */
+export function imageGalleryJsonLd(images: ImageAsset[]): Json {
+  return {
+    "@context": "https://schema.org",
+    "@type": "ImageGallery",
+    name: `撮影ギャラリー｜${siteConfig.name}`,
+    url: absoluteUrl("/gallery"),
+    inLanguage: "ja-JP",
+    publisher: {
+      "@id": `${siteConfig.url}/#business`,
+    },
+    image: images.flatMap((img) =>
+      img.src
+        ? [
+            {
+              "@type": "ImageObject",
+              contentUrl: absoluteUrl(img.src),
+              caption: img.alt,
+              creditText: siteConfig.name,
+            },
+          ]
+        : [],
+    ),
   };
 }
 

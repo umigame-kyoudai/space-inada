@@ -23,7 +23,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const base = siteConfig.url;
   const plans = getPlans();
   const posts = getPosts();
-  const siteUpdatedAt = new Date("2026-06-07");
+  // 静的ページの最終更新日。サイト全体に関わる変更（デザイン・文言・機能）を入れたら更新する
+  const siteUpdatedAt = new Date("2026-07-07");
   const planUpdatedAt = new Date(
     Math.max(...plans.map((plan) => new Date(plan.updatedAt).getTime())),
   );
@@ -125,7 +126,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
     url: `${base}/plans/${p.slug}`,
     lastModified: new Date(p.updatedAt),
     changeFrequency: "monthly",
-    priority: 0.8,
+    // 近日公開プランは内容が薄いため、公開済みプランよりクロール優先度を下げる
+    priority: p.comingSoon ? 0.5 : 0.8,
     images: planImages(p).flatMap((image) =>
       image.src ? [imageUrl(image.src)] : [],
     ),

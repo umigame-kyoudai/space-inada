@@ -56,6 +56,8 @@ export const siteConfig = {
   /** 既定 OG 画像（buildMetadata の各ページOG・JSON-LD 用の安定パス）。
       トップは app/opengraph-image.jpg がファイル規約で自動付与する */
   ogImage: "/og/og-default.jpg",
+  /** 既定 OG 画像の代替テキスト（og:image:alt / twitter:image:alt） */
+  ogImageAlt: "宮古島の満天の星空と天の川｜KEY PHOTO 宮古島",
   twitter: {
     card: "summary_large_image" as const,
     site: "", // TODO: @アカウント
@@ -68,12 +70,18 @@ type BuildMetadataInput = {
   description?: string;
   /** ルート相対パス（"/plans" など）。canonical / og:url の算出に使う */
   path: string;
-  /** OG 画像を差し替える場合のルート相対 or 絶対URL */
-  images?: string[];
+  /** OG 画像を差し替える場合のルート相対 or 絶対URL（alt 付きも可） */
+  images?: (string | { url: string; alt: string })[];
   /** 検索結果に出したくないページは true */
   noindex?: boolean;
   /** og:type（記事は "article"） */
   type?: "website" | "article";
+  /** type: "article" のとき OG に article:published_time / modified_time / author / tag を出す */
+  article?: {
+    publishedTime: string;
+    modifiedTime?: string;
+    tags?: string[];
+  };
   /** このルート自身の opengraph-image.tsx を使う場合 true（既定のルートOGを付与しない） */
   ownOgImage?: boolean;
 };
@@ -89,6 +97,7 @@ export function buildMetadata({
   images,
   noindex,
   type = "website",
+  article,
   ownOgImage = false,
 }: BuildMetadataInput): Metadata {
   const canonical = path;
@@ -100,13 +109,17 @@ export function buildMetadata({
     ? { images }
     : ownOgImage
       ? {}
-      : { images: [siteConfig.ogImage] };
+      : {
+          images: [{ url: siteConfig.ogImage, alt: siteConfig.ogImageAlt }],
+        };
 
   return {
     title,
     description,
     alternates: {
       canonical,
+      // 全ページの <head> からフィードを発見できるようにする（クローラ・RSSリーダー向け）
+      types: { "application/rss+xml": "/feed.xml" },
     },
     robots: noindex
       ? { index: false, follow: false }
@@ -128,6 +141,14 @@ export function buildMetadata({
       title: typeof title === "string" ? title : title?.absolute,
       description,
       locale: siteConfig.locale,
+      ...(type === "article" && article
+        ? {
+            publishedTime: article.publishedTime,
+            modifiedTime: article.modifiedTime ?? article.publishedTime,
+            authors: [siteConfig.author.name],
+            ...(article.tags?.length ? { tags: article.tags } : {}),
+          }
+        : {}),
       ...imageOverride,
     },
     twitter: {

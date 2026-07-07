@@ -4,6 +4,8 @@ import { Section } from "@/components/ui/Section";
 import { Breadcrumbs } from "@/components/layout/Breadcrumbs";
 import { CtaBooking } from "@/components/sections/CtaBooking";
 import { GalleryMasonry } from "@/components/sections/GalleryMasonry";
+import { JsonLd } from "@/components/seo/JsonLd";
+import { imageGalleryJsonLd } from "@/lib/jsonld";
 import { galleryImages } from "@/data/images";
 
 export const metadata: Metadata = buildMetadata({
@@ -16,6 +18,7 @@ export const metadata: Metadata = buildMetadata({
 export default function GalleryPage() {
   return (
     <Section>
+      <JsonLd data={imageGalleryJsonLd(galleryImages)} />
       <Breadcrumbs items={[{ name: "撮影ギャラリー", path: "/gallery" }]} />
 
       <h1 className="cosmic-title mt-6 text-3xl font-bold sm:text-4xl">
