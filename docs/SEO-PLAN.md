@@ -25,6 +25,7 @@
 計画書内に出てくる `location` / `premium` は、現時点では未実装の候補です。追加する場合は `src/data/plans.ts` にデータを足すと、一覧・詳細・sitemap・内部リンクへ反映される設計です。
 
 現在実装済みのブログ記事:
+- `miyakojima-stargazing-spots`
 - `miyakojima-starry-sky-season`
 - `milky-way-miyakojima`
 - `propose-photo-miyakojima`
@@ -33,6 +34,7 @@
 - `couple-photo-spot-miyakojima`
 - `anniversary-photo-miyakojima`
 - `rain-weather-policy-miyakojima`
+- `what-to-wear-starry-photo`（2026-07-07 追加。カバー画像は `/images/blog/what-to-wear-starry-photo.jpg` を用意したら `src/data/images.ts` の `POST_IMAGE_SRC` に追記）
 
 ---
 
