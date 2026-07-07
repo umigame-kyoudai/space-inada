@@ -23,9 +23,9 @@ const steps = [
 export default async function BookingPage({
   searchParams,
 }: {
-  searchParams: Promise<{ plan?: string }>;
+  searchParams: Promise<{ plan?: string; from?: string }>;
 }) {
-  const { plan } = await searchParams;
+  const { plan, from } = await searchParams;
   const planOptions = getBookablePlans().map((p) => ({
     slug: p.slug,
     name: p.name,
@@ -68,6 +68,7 @@ export default async function BookingPage({
         defaultPlan={plan}
         pickupPrice={pickupPrice}
         staffNominationPrice={staffNominationPrice}
+        from={from}
       />
     </Section>
   );

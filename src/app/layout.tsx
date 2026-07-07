@@ -7,6 +7,7 @@ import { Footer } from "@/components/layout/Footer";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { localBusinessJsonLd, websiteJsonLd } from "@/lib/jsonld";
 import { GoogleAnalytics } from "@/components/analytics/GoogleAnalytics";
+import { WebVitals } from "@/components/analytics/WebVitals";
 import { FloatingBookingButton } from "@/components/booking/FloatingBookingButton";
 import { ScrollProgress } from "@/components/layout/ScrollProgress";
 
@@ -91,6 +92,7 @@ export default function RootLayout({
         <Footer />
         <FloatingBookingButton />
         <GoogleAnalytics />
+        <WebVitals />
       </body>
     </html>
   );

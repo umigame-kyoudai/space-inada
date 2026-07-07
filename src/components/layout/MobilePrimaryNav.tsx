@@ -27,7 +27,7 @@ const primaryPages = [
       ]
     : []),
   {
-    href: "/booking",
+    href: "/booking?from=mobile-nav",
     label: "予約",
     match: (path: string) => path.startsWith("/booking"),
   },

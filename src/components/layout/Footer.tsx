@@ -37,7 +37,7 @@ export function Footer() {
           <p className="text-sm font-semibold text-teal-100">サイト</p>
           <ul className="mt-3 space-y-2 text-sm">
             <li>
-              <Link href="/booking" className="font-semibold text-amber-300 hover:text-teal-200">
+              <Link href="/booking?from=footer" className="font-semibold text-amber-300 hover:text-teal-200">
                 ご予約・相談（LINE）
               </Link>
             </li>

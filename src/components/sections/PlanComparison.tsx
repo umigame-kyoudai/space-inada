@@ -19,7 +19,7 @@ function PlanActions({ plan, compact = false }: { plan: Plan; compact?: boolean 
         詳細を見る
       </Link>
       <Link
-        href={`/booking?plan=${plan.slug}`}
+        href={`/booking?plan=${plan.slug}&from=plan-comparison`}
         className="inline-flex min-h-10 items-center justify-center rounded-lg border border-amber-200/70 bg-amber-300 px-2 font-bold text-zinc-950 transition-colors hover:bg-teal-200"
       >
         予約する

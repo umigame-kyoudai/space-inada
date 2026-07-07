@@ -76,11 +76,13 @@ export default async function PlanDetailPage({ params }: Props) {
             こちらのプランは現在準備中です。公開までしばらくお待ちください。
             公式LINEにご登録いただくと、公開・先行案内をいち早くお届けします。
           </p>
-          <Button href="/booking">公式LINEで先行案内を受け取る</Button>
+          <Button href="/booking?from=plan-detail">公式LINEで先行案内を受け取る</Button>
         </div>
       ) : (
         <div className="mt-6">
-          <Button href={`/booking?plan=${plan.slug}`}>このプランを予約する</Button>
+          <Button href={`/booking?plan=${plan.slug}&from=plan-detail`}>
+            このプランを予約する
+          </Button>
         </div>
       )}
 

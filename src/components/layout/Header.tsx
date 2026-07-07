@@ -39,7 +39,7 @@ export function Header() {
         </nav>
         <div className="flex items-center gap-1.5">
           <Link
-            href="/booking"
+            href="/booking?from=header"
             className="hidden h-10 items-center rounded-lg border border-amber-300/70 bg-amber-300 px-5 text-sm font-semibold text-zinc-950 shadow-lg shadow-amber-300/10 transition-all hover:bg-teal-200 sm:inline-flex"
           >
             予約する

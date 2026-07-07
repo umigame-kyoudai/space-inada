@@ -129,8 +129,14 @@ export function Hero() {
         <p className="text-sm font-semibold tracking-[0.4em] text-amber-200 drop-shadow-[0_0_18px_rgba(251,191,36,0.5)] sm:text-base">
           KEY PHOTO 宮古島
         </p>
-        <h1 className="mt-6 text-4xl font-black leading-tight tracking-wide text-white drop-shadow-[0_2px_36px_rgba(4,8,28,0.7)] sm:text-6xl lg:text-7xl">
-          星は、記憶を照らす。
+        {/* SEO: h1 に主要KW（宮古島の星空フォト）を含める。ブランドコピーは大きく、KW行は小さく上に */}
+        <h1 className="mt-6">
+          <span className="block text-sm font-semibold tracking-[0.32em] text-teal-100 drop-shadow-[0_1px_16px_rgba(4,8,28,0.8)] sm:text-base">
+            宮古島の星空フォト・記念日撮影
+          </span>
+          <span className="mt-4 block text-4xl font-black leading-tight tracking-wide text-white drop-shadow-[0_2px_36px_rgba(4,8,28,0.7)] sm:text-6xl lg:text-7xl">
+            星は、記憶を照らす。
+          </span>
         </h1>
 
         <p className="mx-auto mt-6 max-w-xl text-sm leading-relaxed text-slate-200 drop-shadow-[0_1px_18px_rgba(4,8,28,0.75)] sm:text-base">
@@ -140,7 +146,7 @@ export function Hero() {
 
         <div className="mt-9 flex flex-wrap items-center justify-center gap-3">
           <Link
-            href="/booking"
+            href="/booking?from=hero"
             className="inline-flex h-12 items-center justify-center rounded-lg border border-amber-200/70 bg-amber-300 px-7 text-sm font-bold text-zinc-950 shadow-lg shadow-amber-300/20 transition-colors hover:bg-teal-200"
           >
             予約・相談する

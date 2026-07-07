@@ -28,6 +28,8 @@ type Props = {
   pickupPrice: number;
   /** スタッフ指名料 */
   staffNominationPrice: number;
+  /** CV計測用の流入元（?from= の値。hero / header / floating / cta など） */
+  from?: string;
 };
 
 function formatDate(v: string): string {
@@ -130,6 +132,7 @@ export function BookingForm({
   defaultPlan,
   pickupPrice,
   staffNominationPrice,
+  from,
 }: Props) {
   const defaultPlanName =
     planOptions.find((p) => p.slug === defaultPlan)?.name ?? "";
@@ -429,6 +432,7 @@ export function BookingForm({
       plan: plan || "未選択",
       success: ok,
       coupon: coupon?.code ?? "なし",
+      from: from || "direct",
     });
   }
 
@@ -789,6 +793,7 @@ export function BookingForm({
                   plan: plan || "未選択",
                   copied: effectiveStatus === "copied",
                   coupon: coupon?.code ?? "なし",
+                  from: from || "direct",
                 })
               }
               className={`flex h-14 w-full items-center justify-center gap-2 rounded-lg text-base font-bold transition-all ${

@@ -12,6 +12,8 @@ export function CtaBooking({
   text?: string;
   bookingHref?: string;
 }) {
+  // CV計測: どのCTAから予約フォームに来たかを from で識別する
+  const trackedHref = `${bookingHref}${bookingHref.includes("?") ? "&" : "?"}from=cta`;
   return (
     <div className="cosmic-panel relative overflow-hidden rounded-lg p-8 text-center sm:p-12">
       <div className="pointer-events-none absolute inset-x-8 top-0 h-px bg-gradient-to-r from-transparent via-amber-200/70 to-transparent" />
@@ -20,7 +22,7 @@ export function CtaBooking({
         {text}
       </p>
       <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
-        <Button href={bookingHref}>LINEで予約・相談する</Button>
+        <Button href={trackedHref}>LINEで予約・相談する</Button>
         <Button href="/faq" variant="outline">
           よくある質問
         </Button>

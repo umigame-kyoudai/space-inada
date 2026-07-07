@@ -14,7 +14,7 @@ export function FloatingBookingButton() {
 
   return (
     <Link
-      href="/booking"
+      href="/booking?from=floating"
       onClick={() => trackEvent("floating_booking_click", { from: pathname })}
       aria-label="LINEで予約・相談する"
       className="fixed bottom-5 right-4 z-50 flex h-14 items-center gap-2 rounded-lg border border-[#052e16]/30 bg-[#06C755] px-6 text-sm font-bold text-[#052e16] shadow-lg shadow-[#06C755]/30 transition-transform hover:scale-105 sm:right-6"

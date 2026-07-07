@@ -35,7 +35,7 @@ export default function NotFound() {
 
       <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
         <Button href="/">トップへ戻る</Button>
-        <Button href="/booking" variant="outline">
+        <Button href="/booking?from=not-found" variant="outline">
           LINEで予約・相談
         </Button>
       </div>
