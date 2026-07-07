@@ -1,13 +1,17 @@
 import Link from "next/link";
 import { Container } from "@/components/ui/Container";
 import { siteConfig } from "@/lib/seo";
+import { getTestimonials } from "@/data/testimonials";
 import { MobileMenu } from "./MobileMenu";
 import { MobilePrimaryNav } from "./MobilePrimaryNav";
 
 const nav = [
   { href: "/plans", label: "プラン" },
   { href: "/gallery", label: "ギャラリー" },
-  { href: "/voice", label: "お客様の声" },
+  // お客様の声は実際の声が1件以上あるときだけ表示（data/testimonials.ts に追加で自動復帰）
+  ...(getTestimonials().length > 0
+    ? [{ href: "/voice", label: "お客様の声" }]
+    : []),
   { href: "/about", label: "私たちについて" },
   { href: "/blog", label: "コラム" },
   { href: "/faq", label: "よくある質問" },

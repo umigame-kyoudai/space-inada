@@ -14,11 +14,7 @@ import { videoJsonLd } from "@/lib/jsonld";
 import { galleryImages, shootingVideo } from "@/data/images";
 import { getPlans } from "@/data/plans";
 import { getPosts } from "@/data/posts";
-import {
-  getTestimonials,
-  displayRating,
-  displayReviewCount,
-} from "@/data/testimonials";
+import { getTestimonials } from "@/data/testimonials";
 
 export const metadata: Metadata = buildMetadata({
   title: { absolute: `宮古島の星空フォト・記念日撮影｜${siteConfig.name}` },
@@ -202,25 +198,22 @@ export default function Home() {
         </div>
       </Section>
 
-      {/* お客様の声 */}
-      <Section className="cosmic-band">
-        <SectionHeading
-          title="お客様の声"
-          href="/voice"
-          reveal
-          subtitle={`★ ${displayRating} / 5・各サイト累計クチコミ ${displayReviewCount.toLocaleString()}件`}
-        />
-        <div className="mt-10 grid gap-5 sm:grid-cols-3">
-          {testimonials.map((t, i) => (
-            <div
-              key={`${t.name}-${t.date}`}
-              className={`reveal-up ${i === 1 ? "delay-100" : i === 2 ? "delay-200" : ""}`}
-            >
-              <TestimonialCard testimonial={t} />
-            </div>
-          ))}
-        </div>
-      </Section>
+      {/* お客様の声（実際の声が1件以上あるときだけ表示。data/testimonials.ts に追加すると自動で有効化） */}
+      {testimonials.length > 0 && (
+        <Section className="cosmic-band">
+          <SectionHeading title="お客様の声" href="/voice" reveal />
+          <div className="mt-10 grid gap-5 sm:grid-cols-3">
+            {testimonials.map((t, i) => (
+              <div
+                key={`${t.name}-${t.date}`}
+                className={`reveal-up ${i === 1 ? "delay-100" : i === 2 ? "delay-200" : ""}`}
+              >
+                <TestimonialCard testimonial={t} />
+              </div>
+            ))}
+          </div>
+        </Section>
+      )}
 
       {/* CTA */}
       <Section>

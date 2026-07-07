@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Section } from "@/components/ui/Section";
 import { Button } from "@/components/ui/Button";
+import { getTestimonials } from "@/data/testimonials";
 
 export const metadata: Metadata = {
   title: "ページが見つかりません",
@@ -11,7 +12,10 @@ export const metadata: Metadata = {
 const links = [
   { href: "/", label: "トップページ" },
   { href: "/plans", label: "撮影プラン" },
-  { href: "/voice", label: "お客様の声" },
+  // お客様の声は実際の声が1件以上あるときだけ表示（data/testimonials.ts に追加で自動復帰）
+  ...(getTestimonials().length > 0
+    ? [{ href: "/voice", label: "お客様の声" }]
+    : []),
   { href: "/blog", label: "星空フォトコラム" },
   { href: "/faq", label: "よくある質問" },
   { href: "/access", label: "アクセス" },

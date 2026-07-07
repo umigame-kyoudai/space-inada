@@ -1,6 +1,7 @@
 import { siteConfig, absoluteUrl } from "@/lib/seo";
 import { getPlans, planPriceLabel } from "@/data/plans";
 import { getPosts } from "@/data/posts";
+import { getTestimonials } from "@/data/testimonials";
 
 /**
  * llms.txt — AI検索・LLMクローラ向けのサイト概要（https://llmstxt.org/ 提案仕様）。
@@ -46,8 +47,7 @@ ${planLines}
 
 - [撮影プラン一覧](${absoluteUrl("/plans")}): 料金・内容の比較
 - [撮影ギャラリー](${absoluteUrl("/gallery")}): 実際の撮影作品
-- [お客様の声](${absoluteUrl("/voice")}): レビューと評価
-- [よくある質問](${absoluteUrl("/faq")}): 天候・服装・キャンセル等
+${getTestimonials().length > 0 ? `- [お客様の声](${absoluteUrl("/voice")}): レビューと評価\n` : ""}- [よくある質問](${absoluteUrl("/faq")}): 天候・服装・キャンセル等
 - [アクセス](${absoluteUrl("/access")}): 集合場所・送迎について
 - [代表について](${absoluteUrl("/about")}): 代表 ${siteConfig.author.name} のストーリー
 

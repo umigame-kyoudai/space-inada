@@ -2,6 +2,7 @@ import type { MetadataRoute } from "next";
 import { siteConfig } from "@/lib/seo";
 import { getPlans } from "@/data/plans";
 import { getPosts } from "@/data/posts";
+import { getTestimonials } from "@/data/testimonials";
 import {
   aboutPortrait,
   galleryImages,
@@ -76,12 +77,17 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.7,
       images: galleryImageUrls,
     },
-    {
-      url: `${base}/voice`,
-      lastModified: siteUpdatedAt,
-      changeFrequency: "monthly",
-      priority: 0.7,
-    },
+    // /voice は実際の声が0件の間 noindex のため sitemap からも除外（データ追加で自動復帰）
+    ...(getTestimonials().length > 0
+      ? ([
+          {
+            url: `${base}/voice`,
+            lastModified: siteUpdatedAt,
+            changeFrequency: "monthly",
+            priority: 0.7,
+          },
+        ] satisfies MetadataRoute.Sitemap)
+      : []),
     {
       url: `${base}/about`,
       lastModified: siteUpdatedAt,

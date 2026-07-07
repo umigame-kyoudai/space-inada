@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Container } from "@/components/ui/Container";
 import { siteConfig } from "@/lib/seo";
 import { getPlans } from "@/data/plans";
+import { getTestimonials } from "@/data/testimonials";
 
 /**
  * Footer は全ページ共通の内部リンクハブ兼 NAP 掲示（ローカルSEO）。
@@ -41,7 +42,9 @@ export function Footer() {
               </Link>
             </li>
             <li><Link href="/gallery" className="hover:text-teal-200">撮影ギャラリー</Link></li>
-            <li><Link href="/voice" className="hover:text-teal-200">お客様の声</Link></li>
+            {getTestimonials().length > 0 && (
+              <li><Link href="/voice" className="hover:text-teal-200">お客様の声</Link></li>
+            )}
             <li><Link href="/about" className="hover:text-teal-200">私たちについて</Link></li>
             <li><Link href="/blog" className="hover:text-teal-200">コラム</Link></li>
             <li><Link href="/faq" className="hover:text-teal-200">よくある質問</Link></li>

@@ -2,34 +2,36 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { getTestimonials } from "@/data/testimonials";
 
 const primaryPages = [
-  { href: "/", index: "01", label: "ホーム", match: (path: string) => path === "/" },
+  { href: "/", label: "ホーム", match: (path: string) => path === "/" },
   {
     href: "/plans",
-    index: "02",
     label: "プラン",
     match: (path: string) => path.startsWith("/plans"),
   },
   {
     href: "/gallery",
-    index: "03",
     label: "写真",
     match: (path: string) => path.startsWith("/gallery"),
   },
-  {
-    href: "/voice",
-    index: "04",
-    label: "口コミ",
-    match: (path: string) => path.startsWith("/voice"),
-  },
+  // 口コミは実際の声が1件以上あるときだけ表示（data/testimonials.ts に追加で自動復帰）
+  ...(getTestimonials().length > 0
+    ? [
+        {
+          href: "/voice",
+          label: "口コミ",
+          match: (path: string) => path.startsWith("/voice"),
+        },
+      ]
+    : []),
   {
     href: "/booking",
-    index: "05",
     label: "予約",
     match: (path: string) => path.startsWith("/booking"),
   },
-];
+].map((item, i) => ({ ...item, index: String(i + 1).padStart(2, "0") }));
 
 export function MobilePrimaryNav() {
   const pathname = usePathname() ?? "/";
@@ -37,7 +39,9 @@ export function MobilePrimaryNav() {
   return (
     <nav
       aria-label="主要ページ"
-      className="grid h-12 grid-cols-5 border-t border-teal-200/10 bg-[#03040a]/94 md:hidden"
+      className={`grid h-12 border-t border-teal-200/10 bg-[#03040a]/94 md:hidden ${
+        primaryPages.length === 5 ? "grid-cols-5" : "grid-cols-4"
+      }`}
     >
       {primaryPages.map((item) => {
         const active = item.match(pathname);
