@@ -20,10 +20,12 @@
 
 ## 2. Google Search Console
 
-- [ ] https://search.google.com/search-console でプロパティ登録
-  - HTMLタグ確認の場合: 発行された content 値を Vercel の環境変数
-    `NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION` に設定（コード対応済み・再デプロイで反映）
-- [ ] サイトマップ送信: `https://space-inada.com/sitemap.xml`
+- [x] プロパティ登録済み（ドメインプロパティ `space-inada.com`・DNS認証済み。
+  `NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION` の設定は不要）
+- [ ] サイトマップ送信: 左メニュー「サイトマップ」から `sitemap.xml` と `feed.xml` を送信
+  （2026-07-08 時点でインデックス登録済み1ページのみ＝未送信が最大のボトルネック）
+- [ ] URL検査で主要ページのインデックス登録をリクエスト
+  （優先: `/` → `/plans` → `/booking` → 各プラン → 新着記事。1日の上限に注意）
 - [ ] 月1回の定点観測:
   - 「検索パフォーマンス」で表示回数・クリックの伸びているクエリを確認 → 次の記事テーマに反映
   - 「拡張」でFAQ・パンくず・レビューのリッチリザルトのエラー有無を確認
