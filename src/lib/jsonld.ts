@@ -274,6 +274,10 @@ export function howToJsonLd(post: Post): Json | null {
 
 /** 撮影ギャラリー：ImageGallery（画像検索・ライセンス表示の補強） */
 export function imageGalleryJsonLd(images: ImageAsset[]): Json {
+  // Search Console「画像メタデータ」の推奨4項目（creator / copyrightNotice /
+  // license / acquireLicensePage）。ライセンス先はギャラリー内の説明セクション。
+  const licensePage = absoluteUrl("/gallery#image-license");
+
   return {
     "@context": "https://schema.org",
     "@type": "ImageGallery",
@@ -291,6 +295,14 @@ export function imageGalleryJsonLd(images: ImageAsset[]): Json {
               contentUrl: absoluteUrl(img.src),
               caption: img.alt,
               creditText: siteConfig.name,
+              creator: {
+                "@type": "Person",
+                "@id": FOUNDER_ID,
+                name: siteConfig.author.name,
+              },
+              copyrightNotice: `© ${siteConfig.name}`,
+              license: licensePage,
+              acquireLicensePage: licensePage,
             },
           ]
         : [],
