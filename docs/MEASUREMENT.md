@@ -8,8 +8,8 @@
 | Google Analytics 4 | サイト内の行動（訪問数・遷移・予約CV） | analytics.google.com |
 | web_vitals イベント | 実ユーザーの表示速度（LCP/CLS/INP） | GA4 内のイベントとして届く |
 
-> ⚠️ **前提**: GA4 は Vercel に `NEXT_PUBLIC_GA_ID`（G- で始まる測定ID）を設定するまで動かない。
-> 作成手順は `docs/ENV.md` 参照。設定するまで GA4・web_vitals は計測ゼロのまま。
+> ⚠️ **前提**: GA4 は Vercel に `NEXT_PUBLIC_GA_MEASUREMENT_ID`（G- で始まる測定ID）を設定するまで動かない。
+> 作成手順は `docs/ENV.md` 参照。設定済みでも開発ビルド・Vercelプレビュー・localhost では送信しない。
 
 ---
 
@@ -19,37 +19,58 @@
 検索に表示される（SC: 表示回数）
   → クリックされる（SC: クリック数・CTR）
     → サイトを見る（GA4: セッション）
-      → 予約フォームに到達（GA4: /booking の page_view）
-        → LINEを開く（GA4: open_official_line イベント）＝ 実質CV
+      → 予約フォームに到達（GA4: /booking の page_view・form_start）
+        → LINEを開く（GA4: line_click イベント）＝ 実質CV
 ```
 
 どこで数字が細るかを見れば、次にやるべき改善が決まる（§4の判断表）。
 
 ## 2. 実装済みのGA4イベント一覧
 
-| イベント名 | 意味 | パラメータ |
+全イベントに `page_path` / `page_title` が自動付与される。個人情報（氏名・電話番号・メール・フォーム入力内容）は送信しない。
+
+| イベント名 | 意味 | 主なパラメータ |
 |---|---|---|
-| `page_view` | ページ閲覧（クライアント遷移含む） | page_path（?from= も含まれる） |
-| `booking_copy` | 予約文をコピー（CV一歩手前） | plan / success / coupon / **from** |
-| `open_official_line` | 公式LINEを開いた（**実質CV**） | plan / copied / coupon / **from** |
-| `floating_booking_click` | フローティングボタンのクリック | from（クリック時のページ） |
+| `page_view` | ページ閲覧（クライアント遷移含む） | page_path（?from= や UTM も含まれる） |
+| `reservation_click` | 予約ボタンのクリック（/booking への導線すべて） | button_name（下表） / link_url / plan_name |
+| `plan_click` | プラン詳細への導線クリック | button_name / link_url / plan_name |
+| `form_start` | 予約フォームの入力開始（最初のフィールド操作） | plan_name / from |
+| `form_submit` | 予約文のコピー成功＝フォーム完了（CV一歩手前） | plan_name / coupon / from |
+| `line_click` | 公式LINEを開いた（**実質CV**） | plan_name / copied / coupon / from / link_url |
+| `instagram_click` | Instagramリンクのクリック | button_name / link_url |
+| `phone_click` | 電話番号リンクのタップ | button_name / link_url |
 | `LCP` `CLS` `INP` `FCP` `TTFB` | 実ユーザーの表示速度 | metric_value / metric_rating |
 
-GA4 で `open_official_line` と `booking_copy` を「キーイベント」に設定すること（管理 → イベント → キーイベントとしてマーク）。
+GA4 で `line_click` と `form_submit` を「キーイベント」に設定すること（管理 → イベント → キーイベントとしてマーク）。
 
-### from パラメータ（どのボタンから予約に来たか）
+### button_name（どのボタンがクリックされたか）
 
-| from の値 | 場所 |
+| button_name | 場所 |
 |---|---|
-| `hero` | トップのファーストビュー |
+| `hero` / `hero_plans` | トップのファーストビュー（予約 / プラン一覧） |
 | `header` | ヘッダー右上の予約ボタン |
-| `mobile-menu` | モバイルのハンバーガーメニュー |
-| `mobile-nav` | モバイル下部の固定タブ |
+| `mobile_menu` | モバイルのハンバーガーメニュー |
+| `mobile_nav` | モバイル下部の固定タブ |
 | `floating` | 右下のフローティングLINEボタン |
 | `cta` | 各ページ末尾のCTAパネル |
-| `plan-detail` | プラン詳細の予約ボタン |
-| `plan-comparison` | プラン比較表の予約ボタン |
-| `footer` / `not-found` / `direct` | フッター / 404 / 直接アクセス |
+| `plan_card` | プラン一覧・関連プランのカード |
+| `plan_detail` / `plan_detail_related` | プラン詳細の予約ボタン / 他プランのチップ |
+| `plan_comparison` | プラン比較表（詳細 / 予約） |
+| `footer` / `not_found` | フッター / 404 |
+| `booking_form` / `copy` | 予約フォームのLINEボタン / コピーボタン |
+
+予約ボタン経由の `/booking?from=...` パラメータ（hero / header / footer など）は
+`form_start` `form_submit` `line_click` の `from` として引き継がれる。
+
+### 計測の追加方法
+
+リンク・ボタンなら属性を書くだけでよい（`ClickTracker.tsx` が document で一括計測）:
+
+```tsx
+<Link href="..." data-ga-event="reservation_click" data-ga-button="場所名" data-ga-plan="プラン名（任意）">
+```
+
+クリック以外は `trackEvent("イベント名", { ... })`（`src/lib/analytics.ts`）。
 
 ## 3. 月次チェックルーチン（毎月1日・30分）
 
@@ -58,7 +79,7 @@ GA4 で `open_official_line` と `booking_copy` を「キーイベント」に�
    - 「クエリ」タブ: 表示回数が多いのにクリックが少ないクエリを3つ拾う
 2. **SC → ページ（インデックス作成）**: 登録済みページ数が26前後あるか
 3. **GA4 → レポート → エンゲージメント → イベント**:
-   - `open_official_line` の件数と、探索レポートで from 別・plan 別の内訳
+   - `line_click` の件数と、探索レポートで from 別・plan_name 別の内訳
 4. **GA4 → web_vitals**: LCP の metric_rating で poor の割合
 5. 結果を下の記録表に1行追記 → §4の判断表と照らして翌月の改善を1つ決める
 
@@ -83,7 +104,7 @@ GA4 で `open_official_line` と `booking_copy` を「キーイベント」に�
 ## 5. 目安となる初期目標（3ヶ月後）
 
 - SC: 表示回数 5,000/月・クリック 100/月・CTR 2%以上
-- GA4: `open_official_line` 30件/月
+- GA4: `line_click` 30件/月
 - CWV: LCP「good」が75%以上（モバイル）
 
 数字に届かなくても焦らない。**どの段階で細っているか**を特定して、そこだけ直すのがこのハンドブックの目的。

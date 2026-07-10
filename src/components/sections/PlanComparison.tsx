@@ -14,12 +14,18 @@ function PlanActions({ plan, compact = false }: { plan: Plan; compact?: boolean 
     <div className={`grid grid-cols-2 gap-2 ${compact ? "text-[11px]" : "text-xs"}`}>
       <Link
         href={`/plans/${plan.slug}`}
+        data-ga-event="plan_click"
+        data-ga-button="plan_comparison"
+        data-ga-plan={plan.name}
         className="inline-flex min-h-10 items-center justify-center rounded-lg border border-teal-200/25 bg-slate-950/35 px-2 font-semibold text-teal-100 transition-colors hover:border-teal-200/60 hover:bg-teal-300/10"
       >
         詳細を見る
       </Link>
       <Link
         href={`/booking?plan=${plan.slug}&from=plan-comparison`}
+        data-ga-event="reservation_click"
+        data-ga-button="plan_comparison"
+        data-ga-plan={plan.name}
         className="inline-flex min-h-10 items-center justify-center rounded-lg border border-amber-200/70 bg-amber-300 px-2 font-bold text-zinc-950 transition-colors hover:bg-teal-200"
       >
         予約する

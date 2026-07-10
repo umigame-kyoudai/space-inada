@@ -6,7 +6,7 @@
 | 変数名 | 用途 | 例 | 必須 |
 |---|---|---|---|
 | `NEXT_PUBLIC_SITE_URL` | 本番ドメイン。canonical / OG / sitemap / JSON-LD の絶対URLに使用 | `https://example.com` | 公開時必須 |
-| `NEXT_PUBLIC_GA_ID` | Google Analytics 4 の測定ID。未設定ならGAは読み込まれない | `G-XXXXXXXXXX` | 計測時 |
+| `NEXT_PUBLIC_GA_MEASUREMENT_ID` | Google Analytics 4 の測定ID。未設定ならGAは読み込まれない。設定済みでも開発ビルド・Vercelプレビュー・localhost では送信しない | `G-XXXXXXXXXX` | 計測時 |
 | `NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION` | Search Console「HTMLタグ」確認用トークン（`content` の値のみ） | `abcd1234...` | 登録時 |
 | `NEXT_PUBLIC_ENABLE_REVIEW_SCHEMA` | `/voice` のレビュー構造化データ（Review/AggregateRating）を出力するか。**本物の評価に差し替えるまでは未設定（OFF）のまま** | `true` | 任意 |
 | `NEXT_PUBLIC_MAP_EMBED_URL` | `/access` のGoogleマップ埋め込みURL。未設定なら対応エリア（宮古島市）を自動表示。確定住所のピンに変えたい場合に設定 | `https://www.google.com/maps/embed?pb=...` | 任意 |
@@ -15,7 +15,7 @@
 
 ```bash
 NEXT_PUBLIC_SITE_URL=https://example.com
-NEXT_PUBLIC_GA_ID=G-XXXXXXXXXX
+NEXT_PUBLIC_GA_MEASUREMENT_ID=G-XXXXXXXXXX
 NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION=（Search Consoleで発行されるmetaタグのcontent値）
 ```
 
@@ -27,14 +27,12 @@ NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION=（Search Consoleで発行されるmetaタ�
 
 ### Google Analytics 4
 1. [GA4](https://analytics.google.com/) でプロパティを作成し、**測定ID**（`G-` から始まる）を取得。
-2. `NEXT_PUBLIC_GA_ID` に設定して再ビルド／再デプロイ。
-3. 実装済みの計測:
-   - **ページビュー**: App Router のクライアント遷移を含めて手動送信（`GoogleAnalytics.tsx`）。
-   - **CVイベント**: 予約フォームで
-     - `booking_copy`（送信文のコピー、`plan` / `success` 付き）
-     - `open_official_line`（公式LINEを開く、`plan` / `copied` 付き）
-   - 追加イベントは `trackEvent("name", { ... })`（`src/lib/analytics.ts`）で送れる。
-4. GA4 で `booking_copy` / `open_official_line` を「キーイベント（コンバージョン）」に設定すると、予約導線の成果を計測できる。
+2. `NEXT_PUBLIC_GA_MEASUREMENT_ID` に設定して再ビルド／再デプロイ。
+3. 実装済みの計測（イベントの全一覧は `docs/MEASUREMENT.md`）:
+   - **ページビュー**: App Router のクライアント遷移を含めて手動送信（`GoogleAnalytics.tsx`）。UTM付きURLの流入情報も保持される。
+   - **CVイベント**: `reservation_click` / `line_click` / `form_start` / `form_submit` / `plan_click` / `instagram_click` / `phone_click`
+   - リンク・ボタンへの追加は `data-ga-event` / `data-ga-button` / `data-ga-plan` 属性を書くだけ（`ClickTracker.tsx` が拾う）。それ以外は `trackEvent("name", { ... })`（`src/lib/analytics.ts`）。
+4. GA4 で `line_click` / `form_submit` を「キーイベント（コンバージョン）」に設定すると、予約導線の成果を計測できる。
 
 ### Search Console
 1. [Search Console](https://search.google.com/search-console) でプロパティを追加。

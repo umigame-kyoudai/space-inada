@@ -50,6 +50,12 @@ export function MobilePrimaryNav() {
           <Link
             key={item.href}
             href={item.href}
+            data-ga-event={
+              item.href.startsWith("/booking") ? "reservation_click" : undefined
+            }
+            data-ga-button={
+              item.href.startsWith("/booking") ? "mobile_nav" : undefined
+            }
             aria-current={active ? "page" : undefined}
             className={`relative flex min-w-0 flex-col items-center justify-center gap-0.5 transition-colors ${
               active

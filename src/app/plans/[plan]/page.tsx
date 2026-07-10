@@ -76,11 +76,23 @@ export default async function PlanDetailPage({ params }: Props) {
             こちらのプランは現在準備中です。公開までしばらくお待ちください。
             公式LINEにご登録いただくと、公開・先行案内をいち早くお届けします。
           </p>
-          <Button href="/booking?from=plan-detail">公式LINEで先行案内を受け取る</Button>
+          <Button
+            href="/booking?from=plan-detail"
+            gaEvent="reservation_click"
+            gaButton="plan_detail"
+            gaPlan={plan.name}
+          >
+            公式LINEで先行案内を受け取る
+          </Button>
         </div>
       ) : (
         <div className="mt-6">
-          <Button href={`/booking?plan=${plan.slug}&from=plan-detail`}>
+          <Button
+            href={`/booking?plan=${plan.slug}&from=plan-detail`}
+            gaEvent="reservation_click"
+            gaButton="plan_detail"
+            gaPlan={plan.name}
+          >
             このプランを予約する
           </Button>
         </div>
@@ -153,6 +165,9 @@ export default async function PlanDetailPage({ params }: Props) {
             <Link
               key={p.slug}
               href={`/plans/${p.slug}`}
+              data-ga-event="plan_click"
+              data-ga-button="plan_detail_related"
+              data-ga-plan={p.name}
               className="rounded-lg border border-teal-200/15 bg-slate-950/40 px-4 py-2 text-sm text-zinc-300 hover:border-amber-200/60 hover:text-amber-100"
             >
               {p.name}

@@ -147,12 +147,16 @@ export function Hero() {
         <div className="mt-9 flex flex-wrap items-center justify-center gap-3">
           <Link
             href="/booking?from=hero"
+            data-ga-event="reservation_click"
+            data-ga-button="hero"
             className="inline-flex h-12 items-center justify-center rounded-lg border border-amber-200/70 bg-amber-300 px-7 text-sm font-bold text-zinc-950 shadow-lg shadow-amber-300/20 transition-colors hover:bg-teal-200"
           >
             予約・相談する
           </Link>
           <Link
             href="/plans"
+            data-ga-event="plan_click"
+            data-ga-button="hero_plans"
             className="inline-flex h-12 items-center justify-center rounded-lg border border-teal-200/40 bg-slate-950/45 px-7 text-sm font-semibold text-white backdrop-blur transition-colors hover:border-amber-200/70 hover:text-amber-100"
           >
             撮影プランを見る

@@ -22,7 +22,9 @@ export function CtaBooking({
         {text}
       </p>
       <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
-        <Button href={trackedHref}>LINEで予約・相談する</Button>
+        <Button href={trackedHref} gaEvent="reservation_click" gaButton="cta">
+          LINEで予約・相談する
+        </Button>
         <Button href="/faq" variant="outline">
           よくある質問
         </Button>

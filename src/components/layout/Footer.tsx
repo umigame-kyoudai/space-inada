@@ -9,6 +9,7 @@ import { getTestimonials } from "@/data/testimonials";
  */
 export function Footer() {
   const plans = getPlans();
+  const instagramUrl = siteConfig.sameAs.find((u) => u.includes("instagram.com"));
   return (
     <footer className="mt-auto border-t border-teal-200/10 bg-[#03040a]/95 text-zinc-400">
       <Container className="grid gap-10 py-14 sm:grid-cols-2 lg:grid-cols-4">
@@ -25,7 +26,13 @@ export function Footer() {
           <ul className="mt-3 space-y-2 text-sm">
             {plans.map((p) => (
               <li key={p.slug}>
-                <Link href={`/plans/${p.slug}`} className="hover:text-teal-200">
+                <Link
+                  href={`/plans/${p.slug}`}
+                  data-ga-event="plan_click"
+                  data-ga-button="footer"
+                  data-ga-plan={p.name}
+                  className="hover:text-teal-200"
+                >
                   {p.name}
                 </Link>
               </li>
@@ -37,7 +44,12 @@ export function Footer() {
           <p className="text-sm font-semibold text-teal-100">サイト</p>
           <ul className="mt-3 space-y-2 text-sm">
             <li>
-              <Link href="/booking?from=footer" className="font-semibold text-amber-300 hover:text-teal-200">
+              <Link
+                href="/booking?from=footer"
+                data-ga-event="reservation_click"
+                data-ga-button="footer"
+                className="font-semibold text-amber-300 hover:text-teal-200"
+              >
                 ご予約・相談（LINE）
               </Link>
             </li>
@@ -58,7 +70,17 @@ export function Footer() {
             <p>対応エリア：{siteConfig.contact.areaServed}</p>
             <p>営業時間：{siteConfig.hours.opens}〜{siteConfig.hours.closes}</p>
             {siteConfig.contact.telephone ? (
-              <p>TEL：{siteConfig.contact.telephone}</p>
+              <p>
+                TEL：
+                <a
+                  href={`tel:${siteConfig.contact.telephone}`}
+                  data-ga-event="phone_click"
+                  data-ga-button="footer"
+                  className="hover:text-teal-200"
+                >
+                  {siteConfig.contact.telephone}
+                </a>
+              </p>
             ) : null}
             <p>
               Email：
@@ -66,6 +88,21 @@ export function Footer() {
                 {siteConfig.contact.email}
               </a>
             </p>
+            {instagramUrl ? (
+              <p>
+                Instagram：
+                <a
+                  href={instagramUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  data-ga-event="instagram_click"
+                  data-ga-button="footer"
+                  className="hover:text-teal-200"
+                >
+                  @{instagramUrl.split("/").filter(Boolean).pop()}
+                </a>
+              </p>
+            ) : null}
           </address>
         </div>
       </Container>

@@ -72,7 +72,7 @@ npm run start
 | 変数名 | 用途 |
 |---|---|
 | `NEXT_PUBLIC_SITE_URL` | canonical / OG / sitemap / JSON-LD の本番URL |
-| `NEXT_PUBLIC_GA_ID` | GA4 測定ID |
+| `NEXT_PUBLIC_GA_MEASUREMENT_ID` | GA4 測定ID |
 | `NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION` | Search Console 確認用トークン |
 | `NEXT_PUBLIC_ENABLE_REVIEW_SCHEMA` | `/voice` の Review / AggregateRating 構造化データ出力 |
 | `NEXT_PUBLIC_MAP_EMBED_URL` | `/access` の Google Maps 埋め込みURL |

@@ -6,6 +6,10 @@ type Props = {
   children: ReactNode;
   variant?: "primary" | "outline";
   className?: string;
+  /** GA4 クリック計測（ClickTracker が data-ga-* 属性を拾う） */
+  gaEvent?: string;
+  gaButton?: string;
+  gaPlan?: string;
 };
 
 const base =
@@ -18,9 +22,23 @@ const variants = {
     "border border-teal-200/35 bg-slate-950/40 text-white hover:border-amber-200/70 hover:bg-white/[0.08] hover:text-amber-100",
 };
 
-export function Button({ href, children, variant = "primary", className = "" }: Props) {
+export function Button({
+  href,
+  children,
+  variant = "primary",
+  className = "",
+  gaEvent,
+  gaButton,
+  gaPlan,
+}: Props) {
   return (
-    <Link href={href} className={`${base} ${variants[variant]} ${className}`}>
+    <Link
+      href={href}
+      data-ga-event={gaEvent}
+      data-ga-button={gaButton}
+      data-ga-plan={gaPlan}
+      className={`${base} ${variants[variant]} ${className}`}
+    >
       {children}
     </Link>
   );

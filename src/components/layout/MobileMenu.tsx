@@ -83,6 +83,8 @@ export function MobileMenu({ items }: { items: NavItem[] }) {
 
             <Link
               href="/booking?from=mobile-menu"
+              data-ga-event="reservation_click"
+              data-ga-button="mobile_menu"
               onClick={() => setOpen(false)}
               className="mt-8 flex h-14 items-center justify-center rounded-lg border border-amber-300/70 bg-amber-300 text-base font-bold text-zinc-950 shadow-lg shadow-amber-300/15"
             >

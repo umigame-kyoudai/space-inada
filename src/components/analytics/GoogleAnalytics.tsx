@@ -1,13 +1,16 @@
 "use client";
 
 import Script from "next/script";
-import { Suspense, useEffect } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
-import { GA_ID } from "@/lib/analytics";
+import { GA_MEASUREMENT_ID, gaPush, isGaEnabled, trackEvent } from "@/lib/analytics";
+import { ClickTracker } from "./ClickTracker";
 
 /**
  * App Router ではクライアント遷移で自動ページビューが飛ばないため、
- * pathname / searchParams の変化を監視して page_view を手動送信する。
+ * config を send_page_view: false にした上で pathname / searchParams の
+ * 変化を監視して page_view を手動送信する（初回表示も遷移もこの1経路のみ＝二重計測なし）。
+ * page_location に完全なURLを渡すので、UTM パラメータや参照元もそのまま計測される。
  * useSearchParams は Suspense 境界が必須。
  */
 function PageviewTracker() {
@@ -15,13 +18,8 @@ function PageviewTracker() {
   const searchParams = useSearchParams();
 
   useEffect(() => {
-    if (!GA_ID || typeof window.gtag !== "function") return;
-    const query = searchParams.toString();
-    const url = query ? `${pathname}?${query}` : pathname;
-    window.gtag("event", "page_view", {
-      page_path: url,
+    trackEvent("page_view", {
       page_location: window.location.href,
-      page_title: document.title,
     });
   }, [pathname, searchParams]);
 
@@ -29,23 +27,36 @@ function PageviewTracker() {
 }
 
 export function GoogleAnalytics() {
-  if (!GA_ID) return null;
+  // localhost 判定に window が必要なため、マウント後に有効化する
+  // （SSRとクライアントの描画差異＝ハイドレーション不一致を避ける）。
+  const [enabled, setEnabled] = useState(false);
+
+  useEffect(() => {
+    if (!isGaEnabled()) return;
+    // gtag.js のロードを待たずに dataLayer へ直接キューする。
+    // この効果は子（PageviewTracker 等）のマウントより先に実行されるので、
+    // config が必ず最初のイベントより前に積まれる。
+    window.gtag = gaPush;
+    gaPush("js", new Date());
+    gaPush("config", GA_MEASUREMENT_ID, { send_page_view: false });
+    // マウント後に一度だけクライアント環境を判定して有効化する正規パターン
+    // （SSRと初回描画は無効→ハイドレーション安全）
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setEnabled(true);
+  }, []);
+
+  if (!enabled) return null;
 
   return (
     <>
       <Script
-        src={`https://www.googletagmanager.com/gtag/js?id=${GA_ID}`}
+        src={`https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`}
         strategy="afterInteractive"
       />
-      <Script id="ga-init" strategy="afterInteractive">
-        {`window.dataLayer = window.dataLayer || [];
-function gtag(){dataLayer.push(arguments);}
-gtag('js', new Date());
-gtag('config', '${GA_ID}', { send_page_view: false });`}
-      </Script>
       <Suspense fallback={null}>
         <PageviewTracker />
       </Suspense>
+      <ClickTracker />
     </>
   );
 }

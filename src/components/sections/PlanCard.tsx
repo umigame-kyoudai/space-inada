@@ -11,6 +11,9 @@ export function PlanCard({ plan }: { plan: Plan }) {
   return (
     <Link
       href={`/plans/${plan.slug}`}
+      data-ga-event="plan_click"
+      data-ga-button="plan_card"
+      data-ga-plan={plan.name}
       className="cosmic-panel cosmic-panel-hover group flex h-full flex-col overflow-hidden rounded-2xl"
     >
       <div className="cosmic-photo-stage relative aspect-[16/9] w-full overflow-hidden sm:aspect-[16/10]">

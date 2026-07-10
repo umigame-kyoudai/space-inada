@@ -157,6 +157,18 @@ export function BookingForm({
 
   const previewRef = useRef<HTMLTextAreaElement>(null);
 
+  // CV計測: フォーム開始（最初のフィールド操作で1回だけ送る）
+  const formStartedRef = useRef(false);
+  function handleFormStart() {
+    if (formStartedRef.current) return;
+    formStartedRef.current = true;
+    trackEvent("form_start", {
+      form_name: "booking",
+      plan_name: plan || "未選択",
+      from: from || "direct",
+    });
+  }
+
   // ───── お会計（概算）の計算 ─────
   const selectedPlan = planOptions.find((p) => p.name === plan);
   const adultsNum = Math.max(0, parseInt(adults, 10) || 0);
@@ -427,13 +439,17 @@ export function BookingForm({
     }
     setActedMessage(message);
     setStatus(ok ? "copied" : "error");
-    // CV計測：予約文のコピー
-    trackEvent("booking_copy", {
-      plan: plan || "未選択",
-      success: ok,
-      coupon: coupon?.code ?? "なし",
-      from: from || "direct",
-    });
+    // CV計測：予約文のコピー成功＝フォーム完了（このフォームの「送信」に相当）
+    // ※氏名・電話番号などの入力内容は送らない
+    if (ok) {
+      trackEvent("form_submit", {
+        form_name: "booking",
+        button_name: "copy",
+        plan_name: plan || "未選択",
+        coupon: coupon?.code ?? "なし",
+        from: from || "direct",
+      });
+    }
   }
 
   return (
@@ -441,6 +457,7 @@ export function BookingForm({
       {/* 入力フォーム（カード） */}
       <form
         onSubmit={(e) => e.preventDefault()}
+        onFocus={handleFormStart}
         className="cosmic-panel min-w-0 max-w-full rounded-lg p-6 sm:p-8"
       >
         <h2 className="text-lg font-bold text-white">予約内容を入力</h2>
@@ -789,8 +806,11 @@ export function BookingForm({
               target="_blank"
               rel="noopener noreferrer"
               onClick={() =>
-                trackEvent("open_official_line", {
-                  plan: plan || "未選択",
+                // CV計測：公式LINEを開いた（実質CV）
+                trackEvent("line_click", {
+                  button_name: "booking_form",
+                  link_url: LINE_URL,
+                  plan_name: plan || "未選択",
                   copied: effectiveStatus === "copied",
                   coupon: coupon?.code ?? "なし",
                   from: from || "direct",
