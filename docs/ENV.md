@@ -29,7 +29,7 @@ NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION=（Search Consoleで発行されるmetaタ�
 1. [GA4](https://analytics.google.com/) でプロパティを作成し、**測定ID**（`G-` から始まる）を取得。
 2. `NEXT_PUBLIC_GA_MEASUREMENT_ID` に設定して再ビルド／再デプロイ。
 3. 実装済みの計測（イベントの全一覧は `docs/MEASUREMENT.md`）:
-   - **ページビュー**: App Router のクライアント遷移を含めて手動送信（`GoogleAnalytics.tsx`）。UTM付きURLの流入情報も保持される。
+   - **ページビュー**: 初回は gtag、App Router のクライアント遷移は GA4 拡張計測（履歴イベント）が自動送信。UTM付きURLの流入情報も保持される。拡張計測はONのままにすること。
    - **CVイベント**: `reservation_click` / `line_click` / `form_start` / `form_submit` / `plan_click` / `instagram_click` / `phone_click`
    - リンク・ボタンへの追加は `data-ga-event` / `data-ga-button` / `data-ga-plan` 属性を書くだけ（`ClickTracker.tsx` が拾う）。それ以外は `trackEvent("name", { ... })`（`src/lib/analytics.ts`）。
 4. GA4 で `line_click` / `form_submit` を「キーイベント（コンバージョン）」に設定すると、予約導線の成果を計測できる。

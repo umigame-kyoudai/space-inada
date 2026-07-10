@@ -31,7 +31,7 @@
 
 | イベント名 | 意味 | 主なパラメータ |
 |---|---|---|
-| `page_view` | ページ閲覧（クライアント遷移含む） | page_path（?from= や UTM も含まれる） |
+| `page_view` | ページ閲覧。初回は gtag、クライアント遷移は GA4 拡張計測（履歴イベント）が自動送信。**拡張計測はONのままにすること** | page_location（?from= や UTM も含まれる） |
 | `reservation_click` | 予約ボタンのクリック（/booking への導線すべて） | button_name（下表） / link_url / plan_name |
 | `plan_click` | プラン詳細への導線クリック | button_name / link_url / plan_name |
 | `form_start` | 予約フォームの入力開始（最初のフィールド操作） | plan_name / from |
