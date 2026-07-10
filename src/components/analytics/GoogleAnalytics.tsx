@@ -13,15 +13,24 @@ import { ClickTracker } from "./ClickTracker";
  * page_location に完全なURLを渡すので、UTM パラメータや参照元もそのまま計測される。
  * useSearchParams は Suspense 境界が必須。
  */
+// 直近に送った page_view のURL。動的ルートへの遷移では searchParams の
+// オブジェクト同一性が変わって effect が再実行されることがあるため、
+// モジュール変数で同一URLへの二重送信を確実に防ぐ（再マウントにも耐える）。
+let lastTrackedUrl: string | null = null;
+
 function PageviewTracker() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
+  const query = searchParams.toString();
 
   useEffect(() => {
+    const url = query ? `${pathname}?${query}` : pathname;
+    if (url === lastTrackedUrl) return;
+    lastTrackedUrl = url;
     trackEvent("page_view", {
       page_location: window.location.href,
     });
-  }, [pathname, searchParams]);
+  }, [pathname, query]);
 
   return null;
 }
