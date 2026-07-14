@@ -68,7 +68,7 @@ export function Footer() {
           <p className="text-sm font-semibold text-teal-100">お問い合わせ</p>
           <address className="mt-3 space-y-1 text-sm not-italic">
             <p>対応エリア：{siteConfig.contact.areaServed}</p>
-            <p>営業時間：{siteConfig.hours.opens}〜{siteConfig.hours.closes}</p>
+            <p>撮影時間：{siteConfig.hours.label}</p>
             {siteConfig.contact.telephone ? (
               <p>
                 TEL：

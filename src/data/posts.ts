@@ -170,7 +170,7 @@ export const posts: Post[] = [
           {
             href: "/access",
             label: "対応エリア・集合場所の案内",
-            description: "撮影場所を予約後に案内する理由",
+            description: "撮影場所を当日に案内する理由",
           },
           {
             href: "https://miyako-guide.net/about/weather/",

@@ -2,7 +2,13 @@ import type { Metadata } from "next";
 import { buildMetadata, siteConfig } from "@/lib/seo";
 import { Section } from "@/components/ui/Section";
 import { Breadcrumbs } from "@/components/layout/Breadcrumbs";
-import { getPriceRange, formatPrice } from "@/data/plans";
+import {
+  getPriceRange,
+  getPickupPrice,
+  formatPrice,
+  INADA_NOMINATION_PRICE,
+  LATE_NIGHT_FEES,
+} from "@/data/plans";
 
 export const metadata: Metadata = buildMetadata({
   title: "特定商取引法に基づく表記",
@@ -20,6 +26,7 @@ export const metadata: Metadata = buildMetadata({
  */
 export default function LegalPage() {
   const range = getPriceRange();
+  const pickupPrice = getPickupPrice();
   const priceText = range
     ? `各撮影プランごとに表示します（${formatPrice(range.min)}〜${formatPrice(range.max)}・税込、一部プランは個別見積り）。詳細は各プランページをご確認ください。`
     : "各撮影プランごとに表示します。詳細は各プランページをご確認ください。";
@@ -54,15 +61,15 @@ export default function LegalPage() {
     },
     {
       term: "商品代金以外の必要料金",
-      desc: "撮影地までの交通費・送迎費が別途必要となる場合があります。事前にご案内します。",
+      desc: `送迎（3名まで）${formatPrice(pickupPrice)}、稲田のカメラマン指名${formatPrice(INADA_NOMINATION_PRICE)}、深夜料金（0:00〜0:59は1人${formatPrice(LATE_NIGHT_FEES.midnight)}、1:00以降は1人${formatPrice(LATE_NIGHT_FEES.afterOne)}）など、選択内容や撮影時間に応じて追加料金がかかります。最終金額はLINEでご案内します。`,
     },
     {
       term: "お支払い方法",
-      desc: "事前のお振込、または当日のお支払い（ご予約時にご案内します）。",
+      desc: "撮影当日の現地現金決済のみです。",
     },
     {
       term: "お支払い時期",
-      desc: "ご予約確定時、または撮影当日（プランによります）。",
+      desc: "撮影当日にお支払いいただきます。",
     },
     {
       term: "役務の提供時期",

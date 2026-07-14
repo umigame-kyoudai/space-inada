@@ -12,7 +12,7 @@ import { absoluteUrl } from "@/lib/seo";
 export const metadata: Metadata = buildMetadata({
   title: "撮影プラン一覧",
   description:
-    "宮古島の星空フォト撮影プラン。カジュアル・スタンダード・ファミリー・クリエイティブ・プロポーズと送迎などのオプション。料金と内容をご紹介します。",
+    "宮古島の星空フォト撮影プラン。カジュアル・スタンダード・ファミリー・クリエイティブ・プロポーズと送迎・カメラマン指名・深夜料金をご紹介します。",
   path: "/plans",
 });
 
@@ -65,10 +65,10 @@ export default function PlansPage() {
         <PlanComparison plans={plans.filter((p) => !p.comingSoon)} />
       </div>
 
-      {/* オプション */}
-      <h2 className="mt-20 text-2xl font-bold text-teal-100">オプション</h2>
+      {/* オプション・追加料金 */}
+      <h2 className="mt-20 text-2xl font-bold text-teal-100">オプション・追加料金</h2>
       <p className="mt-3 text-sm text-zinc-400">
-        プランに追加できるオプションです。ご予約時にあわせてご相談ください。
+        ご予約時に選べるオプションと、撮影時間に応じてかかる追加料金です。
       </p>
       <div className="mt-6 grid gap-5 sm:grid-cols-2">
         {options.map((opt) => (
@@ -79,7 +79,9 @@ export default function PlansPage() {
             <div className="flex items-baseline justify-between gap-3">
               <h3 className="text-lg font-bold text-white">{opt.name}</h3>
               <span className="text-base font-bold text-amber-200">
-                {opt.priceFrom ? `${formatPrice(opt.priceFrom)}〜` : opt.priceNote}
+                {typeof opt.priceFrom === "number"
+                  ? `${formatPrice(opt.priceFrom)}${opt.priceSuffix ?? "〜"}`
+                  : opt.priceNote}
               </span>
             </div>
             <ul className="mt-3 space-y-1 text-sm text-zinc-400">

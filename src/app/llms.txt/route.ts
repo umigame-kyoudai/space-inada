@@ -34,7 +34,7 @@ export function GET() {
 
 - 事業内容: 宮古島（沖縄県宮古島市）での星空フォト・記念日・カップル・家族・プロポーズの出張撮影
 - 代表: ${siteConfig.author.name}（${siteConfig.author.role}）
-- 営業: ${siteConfig.hours.description}（${siteConfig.hours.opens}〜${siteConfig.hours.closes}）
+- 撮影時間: ${siteConfig.hours.label}（${siteConfig.hours.description}）
 - 連絡先: ${siteConfig.contact.email} / ${siteConfig.contact.telephone}
 - 予約: ${absoluteUrl("/booking")}
 - Instagram: ${siteConfig.sameAs.join(", ")}

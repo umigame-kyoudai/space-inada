@@ -3,7 +3,12 @@ import { buildMetadata } from "@/lib/seo";
 import { Section } from "@/components/ui/Section";
 import { Breadcrumbs } from "@/components/layout/Breadcrumbs";
 import { BookingForm } from "@/components/booking/BookingForm";
-import { getBookablePlans, planPriceKind, getPickupPrice } from "@/data/plans";
+import {
+  getBookablePlans,
+  planPriceKind,
+  getPickupPrice,
+  INADA_NOMINATION_PRICE,
+} from "@/data/plans";
 
 export const metadata: Metadata = buildMetadata({
   title: "予約フォーム",
@@ -34,7 +39,7 @@ export default async function BookingPage({
     childPrice: p.childPrice ?? null,
   }));
   const pickupPrice = getPickupPrice();
-  const staffNominationPrice = 2000;
+  const staffNominationPrice = INADA_NOMINATION_PRICE;
 
   return (
     <Section>

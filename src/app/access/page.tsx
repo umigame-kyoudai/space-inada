@@ -7,7 +7,7 @@ import { CtaBooking } from "@/components/sections/CtaBooking";
 export const metadata: Metadata = buildMetadata({
   title: "アクセス・集合場所",
   description:
-    "宮古島の星空フォト撮影の集合場所・送迎についてのご案内。撮影スポットは天候と月齢で変わるため、ご予約後に最適な集合場所をお伝えします。",
+    "宮古島の星空フォト撮影の集合場所・送迎についてのご案内。撮影スポットは天候と月齢で変わるため、撮影当日に最適な集合場所をお伝えします。",
   path: "/access",
 });
 
@@ -24,7 +24,7 @@ export default function AccessPage() {
         宮古島内の各エリアから撮影スポットへご案内します。
       </p>
 
-      {/* 対応エリア・営業時間 */}
+      {/* 対応エリア・撮影時間 */}
       <dl className="mt-8 grid gap-4 sm:grid-cols-3">
         <div className="cosmic-panel rounded-lg p-5">
           <dt className="text-xs text-zinc-500">対応エリア</dt>
@@ -33,9 +33,9 @@ export default function AccessPage() {
           </dd>
         </div>
         <div className="cosmic-panel rounded-lg p-5">
-          <dt className="text-xs text-zinc-500">営業時間</dt>
+          <dt className="text-xs text-zinc-500">撮影時間</dt>
           <dd className="mt-1 text-base font-semibold text-white">
-            {siteConfig.hours.opens}〜{siteConfig.hours.closes}
+            {siteConfig.hours.label}
           </dd>
           <p className="mt-1 text-xs text-zinc-500">{siteConfig.hours.description}</p>
         </div>
@@ -58,7 +58,7 @@ export default function AccessPage() {
           />
         </div>
         <p className="mt-3 text-xs text-zinc-500">
-          ※地図は対応エリア（{siteConfig.contact.locality}）の目安です。具体的な集合場所は予約後にご案内します。
+          ※地図は対応エリア（{siteConfig.contact.locality}）の目安です。具体的な集合場所は撮影当日にLINEでご案内します。
           {" "}
           <a
             href={mapLink()}
@@ -75,19 +75,19 @@ export default function AccessPage() {
         <section>
           <h2 className="text-2xl font-bold text-teal-100">集合場所について</h2>
           <p className="mt-4 leading-relaxed text-zinc-300">
-            集合場所は、ご予約いただいたプランと当日のコンディションに合わせて個別にご案内します。
+            集合場所は、ご予約いただいたプランと当日のコンディションに合わせて、撮影当日にLINEで個別にご案内します。
             ご宿泊先やご希望エリアを事前にお知らせいただければ、移動の負担が少ないスポットを選定します。
           </p>
         </section>
 
         <section>
           <h2 className="text-2xl font-bold text-teal-100">
-            なぜ撮影スポットを予約後にご案内するのか
+            なぜ撮影スポットを当日にご案内するのか
           </h2>
           <p className="mt-4 leading-relaxed text-zinc-300">
             宮古島の星空が最も美しく見える場所は、その日の天候・月齢・風向きで変わります。
             また、貴重な自然環境を守るため、撮影地のマナーやキャパシティにも配慮しています。
-            こうした理由から、最適なスポットは予約確定後に個別でお伝えしています。
+            こうした理由から、最適なスポットは撮影当日にLINEで個別にお伝えしています。
           </p>
         </section>
 

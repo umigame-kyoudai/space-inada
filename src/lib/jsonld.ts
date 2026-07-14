@@ -66,21 +66,7 @@ export function localBusinessJsonLd(): Json {
       ? { priceRange: `${formatPrice(range.min)}〜${formatPrice(range.max)}` }
       : {}),
     currenciesAccepted: "JPY",
-    paymentAccepted: "現金, 銀行振込",
-    openingHoursSpecification: {
-      "@type": "OpeningHoursSpecification",
-      dayOfWeek: [
-        "Monday",
-        "Tuesday",
-        "Wednesday",
-        "Thursday",
-        "Friday",
-        "Saturday",
-        "Sunday",
-      ],
-      opens: siteConfig.hours.opens,
-      closes: siteConfig.hours.closes,
-    },
+    paymentAccepted: "現金",
     ...(siteConfig.contact.telephone
       ? { telephone: siteConfig.contact.telephone }
       : {}),

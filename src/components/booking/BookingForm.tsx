@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { trackEvent } from "@/lib/analytics";
-import { formatPrice, type PlanPriceKind } from "@/data/plans";
+import { formatPrice, LATE_NIGHT_FEES, type PlanPriceKind } from "@/data/plans";
 import { findCoupon, computeCouponDiscount, formatCouponDiscount } from "@/data/coupons";
 import { teamMembers } from "@/data/team";
 
@@ -103,7 +103,7 @@ ${v.stay}
 送迎：${v.pickup ? `希望する（+${formatPrice(v.pickupPrice)}）` : "なし"}
 カメラマン指名：${staffNominationText}
 場所指定：${v.location ? "希望する（応相談）" : "なし"}
-深夜料金：${v.lateNightConsent ? "0:00〜0:59は+¥1,000/人、1:00以降は+¥2,000/人を了承済み" : "未確認"}
+深夜料金：${v.lateNightConsent ? `0:00〜0:59は+${formatPrice(LATE_NIGHT_FEES.midnight)}/人、1:00以降は+${formatPrice(LATE_NIGHT_FEES.afterOne)}/人を了承済み` : "未確認"}
 
 ⑨ Instagram（任意）：
 ${formatInstagram(v.instagram)}
@@ -114,6 +114,7 @@ ${formatInstagram(v.instagram)}
 ${v.totalText}${v.couponText ? `\n🎟 クーポン：${v.couponText}` : ""}
 ※お支払いは「現地にて現金決済のみ」となります。
 （最終金額はLINEにてご確定します）
+※深夜料金は上記の概算に含まれていません。撮影時間の確定後、必要な場合は加算します。
 ━━━━━━━━━━━━━━━━
 【送信後のご案内】
 内容を確認後、24時間以内にスタッフからLINEでご連絡します。
@@ -696,7 +697,7 @@ export function BookingForm({
               ⚠️ 深夜料金について
             </p>
             <p id="late-night-fee-description" className="mt-1">
-              0:00〜0:59の撮影はお一人につき＋¥1,000、1:00以降の撮影はお一人につき＋¥2,000の追加料金がかかります。
+              0:00〜0:59の撮影はお一人につき＋{formatPrice(LATE_NIGHT_FEES.midnight)}、1:00以降の撮影はお一人につき＋{formatPrice(LATE_NIGHT_FEES.afterOne)}の追加料金がかかります。
             </p>
             <label className="mt-3 flex items-start gap-3 rounded-lg border border-amber-200/25 bg-[#050814]/60 p-3 text-sm text-zinc-200">
               <input
@@ -800,7 +801,7 @@ export function BookingForm({
             💴 お支払いは「現地にて現金決済のみ」です。
           </p>
           <p className="mt-1 text-xs text-zinc-500">
-            ※上記は概算です。最終金額はLINEで確定します。
+            ※上記の概算には深夜料金は含まれていません。撮影時間の確定後、LINEで最終金額をご案内します。
           </p>
         </div>
 

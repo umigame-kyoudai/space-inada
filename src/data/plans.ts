@@ -197,14 +197,40 @@ export type PlanOption = {
   name: string;
   detail: string[];
   priceFrom?: number;
+  /** priceFrom の後ろに付ける文字。未指定は「〜」、空文字なら固定料金。 */
+  priceSuffix?: string;
   priceNote?: string;
 };
+
+export const INADA_NOMINATION_PRICE = 2000;
+
+export const LATE_NIGHT_FEES = {
+  midnight: 1000,
+  afterOne: 2000,
+} as const;
 
 export const planOptions: PlanOption[] = [
   {
     name: "送迎",
     detail: ["行き帰り安心！3名まで", "※4名からは要相談"],
     priceFrom: 6000,
+    priceSuffix: "",
+  },
+  {
+    name: "カメラマン指名",
+    detail: [
+      `稲田を指名 +${formatPrice(INADA_NOMINATION_PRICE)}`,
+      "Toon・Shoの指名は無料",
+    ],
+    priceNote: `${formatPrice(0)}〜${formatPrice(INADA_NOMINATION_PRICE)}`,
+  },
+  {
+    name: "深夜料金",
+    detail: [
+      `0:00〜0:59 +${formatPrice(LATE_NIGHT_FEES.midnight)}／人`,
+      `1:00以降 +${formatPrice(LATE_NIGHT_FEES.afterOne)}／人`,
+    ],
+    priceNote: "時間帯により加算",
   },
   {
     name: "場所指定",
