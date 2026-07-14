@@ -204,7 +204,7 @@ export const planOptions: PlanOption[] = [
   {
     name: "送迎",
     detail: ["行き帰り安心！3名まで", "※4名からは要相談"],
-    priceFrom: 5000,
+    priceFrom: 6000,
   },
   {
     name: "場所指定",
@@ -253,7 +253,7 @@ export function planPriceKind(plan: Plan): PlanPriceKind {
 
 /** 送迎オプションの料金（予約フォームの合計計算に使う）。 */
 export function getPickupPrice(): number {
-  return planOptions.find((o) => o.name === "送迎")?.priceFrom ?? 5000;
+  return planOptions.find((o) => o.name === "送迎")?.priceFrom ?? 6000;
 }
 
 /** カード等で使う価格の表示文字列（近日公開→「近日公開」、未設定→「詳細はお問い合わせ」）。 */

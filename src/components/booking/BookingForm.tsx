@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { trackEvent } from "@/lib/analytics";
 import { formatPrice, type PlanPriceKind } from "@/data/plans";
 import { findCoupon, computeCouponDiscount, formatCouponDiscount } from "@/data/coupons";
+import { teamMembers } from "@/data/team";
 
 /** 公式LINE（予約相談） */
 const LINE_URL = "https://lin.ee/5z6HX4S";
@@ -58,13 +59,22 @@ function buildMessage(v: {
   hotel: string;
   stay: string;
   pickup: boolean;
-  staffNomination: boolean;
+  pickupPrice: number;
+  staffName: string;
+  staffNominationPrice: number;
   location: boolean;
+  lateNightConsent: boolean;
   instagram: string;
   story: boolean;
   totalText: string;
   couponText: string;
 }): string {
+  const staffNominationText = !v.staffName
+    ? "なし（おまかせ）"
+    : v.staffName === "稲田"
+      ? `稲田（+${formatPrice(v.staffNominationPrice)}）`
+      : `${v.staffName}（指名料¥0）`;
+
   return `【KEY PHOTO 宮古島 ご予約・お問い合わせ】
 
 ① 撮影希望日：
@@ -90,9 +100,10 @@ ${v.hotel}
 ${v.stay}
 
 ⑧ オプション：
-送迎：${v.pickup ? "希望する（+¥5,000）" : "なし"}
-スタッフ指名：${v.staffNomination ? "希望する（稲田 +¥2,000）" : "なし"}
+送迎：${v.pickup ? `希望する（+${formatPrice(v.pickupPrice)}）` : "なし"}
+カメラマン指名：${staffNominationText}
 場所指定：${v.location ? "希望する（応相談）" : "なし"}
+深夜料金：${v.lateNightConsent ? "0:00〜0:59は+¥1,000/人、1:00以降は+¥2,000/人を了承済み" : "未確認"}
 
 ⑨ Instagram（任意）：
 ${formatInstagram(v.instagram)}
@@ -104,15 +115,10 @@ ${v.totalText}${v.couponText ? `\n🎟 クーポン：${v.couponText}` : ""}
 ※お支払いは「現地にて現金決済のみ」となります。
 （最終金額はLINEにてご確定します）
 ━━━━━━━━━━━━━━━━
-⚠️【集合場所について】
-最高の星空スポットで撮影するため、集合場所は当日の風や星の位置に合わせてこちらで調整し、"当日"にLINEにてご連絡します。楽しみにお待ちください！
-
-※旅行スケジュールの関係で早めに場所を知りたい方はご相談ください🤲
-
-🍴【夜ご飯のおすすめタイミング】
-撮影時間と被らないよう、晩御飯は"早めの時間"か"撮影後の遅い時間"にとるのがおすすめです！
-
-深夜までやっているおすすめの夜ご飯屋さんは、画面下のメニューバーからいつでも確認できます✨
+【送信後のご案内】
+内容を確認後、24時間以内にスタッフからLINEでご連絡します。
+ご希望日の月齢や星の位置を事前に確認し、最適な撮影時間をご提案します。
+集合場所は、その日の雲や風などの星空コンディションを確認したうえで、当日にご案内します。
 ━━━━━━━━━━━━━━━━`;
 }
 
@@ -146,8 +152,9 @@ export function BookingForm({
   const [hotel, setHotel] = useState("");
   const [stay, setStay] = useState("");
   const [pickup, setPickup] = useState(false);
-  const [staffNomination, setStaffNomination] = useState(false);
+  const [staffName, setStaffName] = useState("");
   const [location, setLocation] = useState(false);
+  const [lateNightConsent, setLateNightConsent] = useState(false);
   const [instagram, setInstagram] = useState("");
   const [story, setStory] = useState(false);
   const [couponInput, setCouponInput] = useState("");
@@ -155,6 +162,7 @@ export function BookingForm({
   // コピー／コピー失敗の操作対象だったメッセージ。現在のメッセージと違えば「古い」状態とみなす。
   const [actedMessage, setActedMessage] = useState("");
 
+  const formRef = useRef<HTMLFormElement>(null);
   const previewRef = useRef<HTMLTextAreaElement>(null);
 
   // CV計測: フォーム開始（最初のフィールド操作で1回だけ送る）
@@ -174,7 +182,7 @@ export function BookingForm({
   const adultsNum = Math.max(0, parseInt(adults, 10) || 0);
   const childrenNum = Math.max(0, parseInt(children, 10) || 0);
   const pickupAmount = pickup ? pickupPrice : 0;
-  const staffNominationAmount = staffNomination ? staffNominationPrice : 0;
+  const staffNominationAmount = staffName === "稲田" ? staffNominationPrice : 0;
 
   // 割引前の小計。quote（プロポーズ等）は null。
   const subtotal: number | null = useMemo(() => {
@@ -230,8 +238,10 @@ export function BookingForm({
       lines.push(`${selectedPlan.name} 1組 ${formatPrice(selectedPlan.basePrice ?? 0)}`);
     }
     if (pickup) lines.push(`送迎 +${formatPrice(pickupPrice)}`);
-    if (staffNomination) {
-      lines.push(`スタッフ指名 +${formatPrice(staffNominationPrice)}（稲田）`);
+    if (staffName === "稲田") {
+      lines.push(`カメラマン指名 +${formatPrice(staffNominationPrice)}（稲田）`);
+    } else if (staffName) {
+      lines.push(`カメラマン指名 ¥0（${staffName}）`);
     }
     if (coupon && discountAmount > 0) {
       lines.push(`クーポン（${coupon.code}） -${formatPrice(discountAmount)}`);
@@ -243,7 +253,7 @@ export function BookingForm({
     childrenNum,
     pickup,
     pickupPrice,
-    staffNomination,
+    staffName,
     staffNominationPrice,
     coupon,
     discountAmount,
@@ -270,8 +280,11 @@ export function BookingForm({
         hotel,
         stay,
         pickup,
-        staffNomination,
+        pickupPrice,
+        staffName,
+        staffNominationPrice,
         location,
+        lateNightConsent,
         instagram,
         story,
         totalText,
@@ -287,8 +300,11 @@ export function BookingForm({
       hotel,
       stay,
       pickup,
-      staffNomination,
+      pickupPrice,
+      staffName,
+      staffNominationPrice,
       location,
+      lateNightConsent,
       instagram,
       story,
       totalText,
@@ -311,8 +327,16 @@ export function BookingForm({
     if (typeof s.hotel === "string") setHotel(s.hotel);
     if (typeof s.stay === "string") setStay(s.stay);
     if (typeof s.pickup === "boolean") setPickup(s.pickup);
-    if (typeof s.staffNomination === "boolean") setStaffNomination(s.staffNomination);
+    if (typeof s.staffName === "string") {
+      setStaffName(s.staffName);
+    } else if (s.staffNomination === true) {
+      // 旧形式の保存データは「稲田指名」として引き継ぐ。
+      setStaffName("稲田");
+    }
     if (typeof s.location === "boolean") setLocation(s.location);
+    if (typeof s.lateNightConsent === "boolean") {
+      setLateNightConsent(s.lateNightConsent);
+    }
     if (typeof s.instagram === "string") setInstagram(s.instagram);
     if (typeof s.story === "boolean") setStory(s.story);
     if (typeof s.coupon === "string") setCouponInput(s.coupon);
@@ -352,8 +376,9 @@ export function BookingForm({
           hotel,
           stay,
           pickup,
-          staffNomination,
+          staffName,
           location,
+          lateNightConsent,
           instagram,
           story,
           coupon: couponInput,
@@ -372,8 +397,9 @@ export function BookingForm({
     hotel,
     stay,
     pickup,
-    staffNomination,
+    staffName,
     location,
+    lateNightConsent,
     instagram,
     story,
     couponInput,
@@ -389,8 +415,9 @@ export function BookingForm({
     setHotel("");
     setStay("");
     setPickup(false);
-    setStaffNomination(false);
+    setStaffName("");
     setLocation(false);
+    setLateNightConsent(false);
     setInstagram("");
     setStory(false);
     setCouponInput("");
@@ -421,7 +448,13 @@ export function BookingForm({
     return ok;
   }
 
+  function validateRequiredFields(): boolean {
+    return formRef.current?.reportValidity() ?? false;
+  }
+
   async function handleCopy() {
+    if (!validateRequiredFields()) return;
+
     let ok = false;
     try {
       if (
@@ -456,6 +489,7 @@ export function BookingForm({
     <div className="mt-10 grid min-w-0 max-w-full touch-pan-y gap-8 overflow-x-clip overscroll-x-none lg:grid-cols-2">
       {/* 入力フォーム（カード） */}
       <form
+        ref={formRef}
         onSubmit={(e) => e.preventDefault()}
         onFocus={handleFormStart}
         className="cosmic-panel min-w-0 max-w-full rounded-lg p-6 sm:p-8"
@@ -476,7 +510,7 @@ export function BookingForm({
               type="date"
               value={date}
               onChange={(e) => setDate(e.target.value)}
-              aria-required
+              required
               className={`${inputClass} [color-scheme:dark]`}
             />
           </div>
@@ -490,7 +524,7 @@ export function BookingForm({
               id="plan"
               value={plan}
               onChange={(e) => setPlan(e.target.value)}
-              aria-required
+              required
               className={`${inputClass} [color-scheme:dark]`}
             >
               <option value="">選択してください</option>
@@ -514,7 +548,7 @@ export function BookingForm({
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="山田 太郎"
-              aria-required
+              required
               className={inputClass}
             />
           </div>
@@ -562,7 +596,7 @@ export function BookingForm({
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
               placeholder="090-1234-5678"
-              aria-required
+              required
               className={inputClass}
             />
           </div>
@@ -615,20 +649,33 @@ export function BookingForm({
                   +{formatPrice(pickupPrice)}
                 </span>
               </label>
-              <label className="flex min-w-0 items-center justify-between gap-2 rounded-lg border border-teal-200/15 bg-[#050814]/60 px-4 py-3 text-sm text-zinc-200">
-                <span className="flex min-w-0 items-center gap-2">
-                  <input
-                    type="checkbox"
-                    checked={staffNomination}
-                    onChange={(e) => setStaffNomination(e.target.checked)}
-                    className="h-4 w-4 rounded border-teal-200/20 bg-[#050814] accent-teal-300"
-                  />
-                  スタッフ指名料（稲田）
-                </span>
-                <span className="shrink-0 text-amber-200">
-                  +{formatPrice(staffNominationPrice)}
-                </span>
-              </label>
+              <div className="rounded-lg border border-teal-200/15 bg-[#050814]/60 px-4 py-3">
+                <label
+                  htmlFor="staff-name"
+                  className="mb-2 block text-sm font-medium text-zinc-200"
+                >
+                  カメラマン指名
+                </label>
+                <select
+                  id="staff-name"
+                  value={staffName}
+                  onChange={(e) => setStaffName(e.target.value)}
+                  className={`${inputClass} [color-scheme:dark]`}
+                >
+                  <option value="">指名なし（おまかせ） ¥0</option>
+                  <option value="稲田">
+                    稲田を指名 +{formatPrice(staffNominationPrice)}
+                  </option>
+                  {teamMembers.map((member) => (
+                    <option key={member.name} value={member.name}>
+                      {member.name}を指名 ¥0
+                    </option>
+                  ))}
+                </select>
+                <p className="mt-2 text-xs text-zinc-400">
+                  稲田の指名のみ＋{formatPrice(staffNominationPrice)}、その他のカメラマンは指名料無料です。
+                </p>
+              </div>
               <label className="flex min-w-0 items-center justify-between gap-2 rounded-lg border border-teal-200/15 bg-[#050814]/60 px-4 py-3 text-sm text-zinc-200">
                 <span className="flex min-w-0 items-center gap-2">
                   <input
@@ -645,17 +692,26 @@ export function BookingForm({
           </fieldset>
 
           <div className="rounded-lg border border-amber-200/20 bg-amber-300/5 p-4 text-sm leading-relaxed text-zinc-300">
-            <p className="font-semibold text-amber-100">⚠️ お知らせ</p>
-            <p className="mt-2">
-              ※カメラマンは複数います。カメラマンを確実に指定したい場合は、指名料＋¥2,000でご指定ください。
+            <p className="font-semibold text-amber-100">
+              ⚠️ 深夜料金について
             </p>
-            <p className="mt-1">※現在は稲田が対応します。クオリティに差はありません。</p>
-            <p className="mt-3 font-semibold text-amber-100">⚠️</p>
-            <p className="mt-1">
-              深夜0時以降の撮影は＋¥1,000/人、深夜1時以降の撮影は＋¥2,000/人となります。ご了承ください。
+            <p id="late-night-fee-description" className="mt-1">
+              0:00〜0:59の撮影はお一人につき＋¥1,000、1:00以降の撮影はお一人につき＋¥2,000の追加料金がかかります。
             </p>
-            <p className="mt-3 font-semibold text-amber-100">指名カメラマン</p>
-            <p className="mt-1">・稲田</p>
+            <label className="mt-3 flex items-start gap-3 rounded-lg border border-amber-200/25 bg-[#050814]/60 p-3 text-sm text-zinc-200">
+              <input
+                type="checkbox"
+                checked={lateNightConsent}
+                onChange={(e) => setLateNightConsent(e.target.checked)}
+                required
+                aria-describedby="late-night-fee-description"
+                className="mt-0.5 h-4 w-4 shrink-0 rounded border-teal-200/20 bg-[#050814] accent-teal-300"
+              />
+              <span>
+                深夜帯になった場合の追加料金について了承しました
+                <RequiredBadge />
+              </span>
+            </label>
           </div>
 
           <div>
@@ -805,7 +861,11 @@ export function BookingForm({
               href={LINE_URL}
               target="_blank"
               rel="noopener noreferrer"
-              onClick={() =>
+              onClick={(e) => {
+                if (!validateRequiredFields()) {
+                  e.preventDefault();
+                  return;
+                }
                 // CV計測：公式LINEを開いた（実質CV）
                 trackEvent("line_click", {
                   button_name: "booking_form",
@@ -814,8 +874,8 @@ export function BookingForm({
                   copied: effectiveStatus === "copied",
                   coupon: coupon?.code ?? "なし",
                   from: from || "direct",
-                })
-              }
+                });
+              }}
               className={`flex h-14 w-full items-center justify-center gap-2 rounded-lg text-base font-bold transition-all ${
                 effectiveStatus === "copied"
                   ? "scale-[1.02] bg-[#06C755] text-white shadow-lg shadow-[#06C755]/30 animate-pulse"
