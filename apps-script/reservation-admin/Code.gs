@@ -29,6 +29,20 @@ const REQUIRED_FIELDS = Object.freeze([
   ['lateFee', '深夜料金への同意'],
 ]);
 
+const PLAN_PRICES = Object.freeze({
+  'カジュアルプラン': { kind: 'perPerson', adult: 7000, child: 3000 },
+  'スタンダードプラン': { kind: 'perPerson', adult: 9000, child: 5000 },
+  'ファミリープラン': { kind: 'perGroup', amount: 18000, maxParticipants: 10 },
+  'クリエイティブプラン': { kind: 'perGroup', amount: 28000 },
+});
+
+const OPTION_PRICES = Object.freeze({
+  pickup: 6000,
+  inadaNomination: 2000,
+  midnightPerPerson: 1000,
+  afterOnePerPerson: 2000,
+});
+
 function doGet() {
   return HtmlService.createTemplateFromFile('Index')
     .evaluate()
@@ -62,16 +76,16 @@ function saveReservation(payload) {
 
   const parsed = parseBookingText_(rawText);
   const booking = Object.assign({}, parsed, sanitizeBookingPayload_(payload.booking || {}));
-  const candidateTimes = normalizeCandidateTimes_(payload.candidateTimes);
-  const initialStatus = payload.status === '時間提案済み' && candidateTimes.some(Boolean)
-    ? '時間提案済み'
-    : '未返信';
+  const confirmedTime = normalizeTimeValue_(payload.confirmedTime);
   const missing = getMissingFields_(booking);
   if (missing.length) {
     throw new Error('必須項目が不足しています：' + missing.join('、'));
   }
   if (getClosureSet_().has(booking.shootDate)) {
     throw new Error(booking.shootDate + 'は満月期間の撮影休止日です。日程を確認してください。');
+  }
+  if (!confirmedTime) {
+    throw new Error('確定する撮影開始時間を選択してください。');
   }
 
   const lock = LockService.getScriptLock();
@@ -81,6 +95,7 @@ function saveReservation(payload) {
     const now = new Date();
     const id = createReservationId_(now);
     const staff = getStaffName_();
+    assertSlotAvailable_(booking.shootDate, confirmedTime, id);
     const row = [
       id,
       now,
@@ -99,12 +114,12 @@ function saveReservation(payload) {
       booking.lateFee,
       booking.instagram,
       booking.storyTag,
-      candidateTimes[0],
-      candidateTimes[1],
-      candidateTimes[2],
       '',
       '',
-      initialStatus,
+      '',
+      confirmedTime,
+      '',
+      '時間確定',
       now,
       staff,
       cleanText_(payload.memo),
@@ -112,9 +127,11 @@ function saveReservation(payload) {
       booking.preferredTimeWindow,
     ];
     sheet.appendRow(row);
+    const reservation = rowToReservation_(row, sheet.getLastRow());
+    syncConfirmedSlot_({}, reservation);
     appendLog_(staff, id, '予約取込', '', booking.name + ' / ' + booking.shootDate);
     return {
-      reservation: rowToReservation_(row, sheet.getLastRow()),
+      reservation: reservation,
       reservations: listReservations_(),
     };
   } finally {
@@ -196,29 +213,58 @@ function generateMessages(payload) {
   const reservation = normalizeReservationUpdate_(payload || {}, payload || {});
   const name = reservation.name || 'お客様';
   const dateLabel = formatDateLabel_(reservation.shootDate);
-  const candidates = reservation.candidateTimes.filter(Boolean);
-  const proposedList = candidates.length
-    ? candidates.map(function (time) { return '・' + time; }).join('\n')
-    : '・候補時間を選択してください';
-  const proposalFeeNotice = candidates.some(isLateNightTime_)
-    ? '\n\n※0:00〜0:59は＋1,000円／人、1:00以降の深夜帯は＋2,000円／人です。'
-    : '';
-  const confirmationFeeNotice = isLateNightTime_(reservation.confirmedTime)
-    ? '\n※深夜料金が別途かかります。0時台は＋1,000円／人、1時以降の深夜帯は＋2,000円／人です。'
+  const price = calculateConfirmedPrice_(reservation);
+  const participantCount = reservation.adults + reservation.children;
+  const participantLabel = '合計' + participantCount + '名' +
+    '（大人' + reservation.adults + '名・子ども' + reservation.children + '名）';
+  const genderBreakdown = formatGenderBreakdown_(reservation.gender);
+  const pickupLabel = reservation.pickup || 'なし';
+  const photographerLabel = reservation.photographer || '指名なし（おまかせ）';
+  const confirmedTimeLabel = reservation.confirmedTime || '［確定時間］';
+  const couponLabel = extractCouponLabel_(reservation.rawText);
+  const lateFeeConsentLabel = isLateFeeConsentConfirmed_(reservation.lateFee)
+    ? '了承済み（0:00〜0:59は＋1,000円／人、1:00以降は＋2,000円／人）'
+    : (reservation.lateFee || '未確認');
+  const confirmedPriceLabel = price.total == null
+    ? '別途お見積り'
+    : formatCurrency_(price.total);
+  const lateNightPriceLine = price.lateNightFee > 0
+    ? '\n深夜料金：' + formatCurrency_(price.lateNightFee) +
+      '（' + participantCount + '名分・合計料金に含まれています）'
     : '';
 
   return {
-    proposal:
-      name + '様、ご予約ありがとうございます。\n\n' +
-      dateLabel + 'は、\n' + proposedList + '\nから撮影可能です。\n\n' +
-      'ご希望の時間をお知らせください。' + proposalFeeNotice + '\n\n' +
-      '集合場所は、その日の星空コンディションによって変わるため、撮影当日にこちらのLINEへお送りします。',
     confirmation:
       name + '様、ご返信ありがとうございます。\n\n' +
-      dateLabel + ' ' + (reservation.confirmedTime || '［確定時間］') +
-      'からの撮影でご予約を承りました。' + confirmationFeeNotice + '\n\n' +
-      'お支払いは当日、現地での現金決済となります。\n' +
-      '集合場所は、その日の星空コンディションによって変わるため、撮影当日にこちらのLINEへお送りします。',
+      '撮影時間が確定いたしましたので、下記の内容でご予約を確定いたします。\n' +
+      'お手数ですが、内容にお間違いがないかご確認をお願いいたします。\n\n' +
+      '【ご予約確定内容】\n' +
+      '撮影日：' + dateLabel + '\n' +
+      '撮影開始時間：' + confirmedTimeLabel + '\n' +
+      'ご希望時間帯：' + (reservation.preferredTimeWindow || '記入なし') + '\n' +
+      '撮影プラン：' + (reservation.plan || '［撮影プラン］') + '\n' +
+      '参加人数：' + participantLabel + '\n' +
+      genderBreakdown + '\n' +
+      'お名前：' + name + '様\n' +
+      '携帯番号：' + optionalLabel_(reservation.phone) + '\n' +
+      '宿泊施設名：' + optionalLabel_(reservation.hotel) + '\n' +
+      '滞在期間：' + optionalLabel_(reservation.stay) + '\n\n' +
+      '【オプション・確認事項】\n' +
+      '送迎：' + pickupLabel + '\n' +
+      'カメラマン：' + photographerLabel + '\n' +
+      'クーポン：' + couponLabel + '\n' +
+      '深夜料金：' + lateFeeConsentLabel + '\n' +
+      'Instagram：' + optionalLabel_(reservation.instagram) + '\n' +
+      'ストーリータグ付け：' + optionalLabel_(reservation.storyTag) + '\n\n' +
+      '【お支払い金額】\n' +
+      '合計料金：' + confirmedPriceLabel + lateNightPriceLine + '\n' +
+      'お支払い方法：撮影当日に現地での現金決済\n\n' +
+      '【集合場所について】\n' +
+      '集合場所は、当日の雲や風などの星空コンディションを確認したうえで、その日に最もきれいに撮影できる場所をご案内いたします。\n' +
+      '撮影当日にこちらのLINEへお送りしますので、必ずご確認をお願いいたします。\n\n' +
+      '撮影データは、撮影後24時間以内を目安にオンラインでお届けいたします。\n\n' +
+      '内容に間違いや変更がございましたら、このLINEへご連絡ください。\n' +
+      '当日はどうぞよろしくお願いいたします。',
     sameDay:
       name + '様、本日の撮影についてご案内します。\n\n' +
       '集合時間：' + (reservation.confirmedTime || '［確定時間］') + '\n' +
@@ -251,8 +297,8 @@ function parseBookingText_(rawText) {
     photographer: extractLabeledValue_(options, ['カメラマン指名', 'カメラマン']),
     locationRequest: extractLabeledValue_(options, ['場所指定', '撮影場所']),
     lateFee: extractLabeledValue_(options, ['深夜料金', '追加料金']),
-    instagram: extractLabeledValue_(instagram, ['Instagram', 'インスタグラム', 'アカウント']) || firstValue_(instagram),
-    storyTag: extractLabeledValue_(instagram, ['ストーリータグ', 'ストーリーでタグ付け', 'タグ付け']),
+    instagram: extractInstagramValue_(instagram),
+    storyTag: extractLabeledValue_(instagram, ['ストーリータグ付け', 'ストーリータグ', 'ストーリーでタグ付け', 'タグ付け']),
   };
 }
 
@@ -320,6 +366,17 @@ function extractLabeledValue_(text, labels) {
   return '';
 }
 
+function extractInstagramValue_(text) {
+  const labeled = extractLabeledValue_(text, ['Instagram', 'インスタグラム', 'アカウント']);
+  if (labeled) return labeled;
+  const line = cleanMultiline_(text).split('\n').map(function (item) {
+    return cleanText_(item);
+  }).find(function (item) {
+    return /^@[^\s]+/.test(item);
+  });
+  return line || '';
+}
+
 function sanitizeBookingPayload_(booking) {
   return {
     shootDate: parseDateKey_(booking.shootDate),
@@ -348,6 +405,7 @@ function normalizeReservationUpdate_(payload, fallback) {
     : (fallback.candidateTimes || []);
   return {
     id: cleanText_(payload.id || fallback.id),
+    rawText: cleanMultiline_(payload.rawText != null ? payload.rawText : fallback.rawText),
     shootDate: parseDateKey_(payload.shootDate || fallback.shootDate),
     preferredTimeWindow: cleanText_(
       payload.preferredTimeWindow != null
@@ -614,11 +672,90 @@ function normalizeTimeValue_(value) {
   return pad2_(hour) + ':' + pad2_(minute);
 }
 
-function isLateNightTime_(value) {
+function calculateConfirmedPrice_(reservation) {
+  const extractedBase = extractEstimatedTotal_(reservation.rawText);
+  const fallbackBase = calculateBasePrice_(reservation);
+  const base = extractedBase != null ? extractedBase : fallbackBase;
+  const rate = getLateNightRate_(reservation.confirmedTime);
+  const participantCount = Math.max(0, reservation.adults + reservation.children);
+  const lateNightFee = rate * participantCount;
+  return {
+    base: base,
+    lateNightFee: lateNightFee,
+    total: base == null ? null : base + lateNightFee,
+  };
+}
+
+function extractEstimatedTotal_(rawText) {
+  const text = normalizeDigits_(cleanMultiline_(rawText));
+  if (!text) return null;
+  const sectionMatch = text.match(/お会計（概算）\s*[:：]\s*\n?\s*(?:¥|￥)?\s*([0-9][0-9,]*)/);
+  if (!sectionMatch) return null;
+  const amount = Number(sectionMatch[1].replace(/,/g, ''));
+  return isNaN(amount) ? null : amount;
+}
+
+function extractCouponLabel_(rawText) {
+  const text = cleanMultiline_(rawText);
+  const match = text.match(/(?:🎟\s*)?クーポン\s*[:：]\s*([^\n]+)/);
+  return match ? cleanText_(match[1]) : '記入なし';
+}
+
+function formatGenderBreakdown_(value) {
+  const text = normalizeDigits_(cleanText_(value));
+  const adultMatch = text.match(/大人[^／/]*男性\s*(\d+)\s*人[^／/]*女性\s*(\d+)\s*人/);
+  const childMatch = text.match(/子ども[^／/]*男の子\s*(\d+)\s*人[^／/]*女の子\s*(\d+)\s*人/);
+  const lines = [];
+  if (adultMatch) {
+    lines.push('大人（16歳以上）：男性' + adultMatch[1] + '名・女性' + adultMatch[2] + '名');
+  }
+  if (childMatch) {
+    lines.push('子ども（0〜15歳）：男の子' + childMatch[1] + '名・女の子' + childMatch[2] + '名');
+  }
+  if (lines.length) return lines.join('\n');
+  return '参加者の性別内訳：' + optionalLabel_(value);
+}
+
+function isLateFeeConsentConfirmed_(value) {
+  const text = cleanText_(value);
+  return Boolean(text) && !/未確認|未同意|了承していない/.test(text) && /了承|同意|確認済/.test(text);
+}
+
+function optionalLabel_(value) {
+  return cleanText_(value) || '記入なし';
+}
+
+function calculateBasePrice_(reservation) {
+  const price = PLAN_PRICES[reservation.plan];
+  if (!price) return null;
+  const participantCount = reservation.adults + reservation.children;
+  if (price.maxParticipants && participantCount > price.maxParticipants) return null;
+
+  let amount = price.kind === 'perPerson'
+    ? reservation.adults * price.adult + reservation.children * price.child
+    : price.amount;
+  if (isPickupRequested_(reservation.pickup)) amount += OPTION_PRICES.pickup;
+  if (/稲田/.test(reservation.photographer)) amount += OPTION_PRICES.inadaNomination;
+  return amount;
+}
+
+function isPickupRequested_(value) {
+  const text = cleanText_(value);
+  if (!text || /なし|希望しない|不要/.test(text)) return false;
+  return /希望|あり|する/.test(text);
+}
+
+function getLateNightRate_(value) {
   const normalized = normalizeTimeValue_(value);
-  if (!normalized) return false;
+  if (!normalized) return 0;
   const hour = Number(normalized.slice(0, 2));
-  return hour >= 0 && hour < 6;
+  if (hour === 0) return OPTION_PRICES.midnightPerPerson;
+  if (hour >= 1 && hour < 6) return OPTION_PRICES.afterOnePerPerson;
+  return 0;
+}
+
+function formatCurrency_(value) {
+  return '¥' + Math.round(Number(value) || 0).toLocaleString('ja-JP');
 }
 
 function normalizeCandidateTimes_(values) {

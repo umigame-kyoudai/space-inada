@@ -417,25 +417,26 @@
             </div>
 
             <div class="intake-proposal">
-              <h2><span class="step">3</span>提案時間を選んで文章を作る</h2>
-              <p class="lead">24時間の中から、1分単位で候補時間を選べます。</p>
-              <div class="time-grid" style="margin-top: 14px;">
-                <div><label for="newCandidate1">候補時間①</label><input type="time" step="60" id="newCandidate1"></div>
-                <div><label for="newCandidate2">候補時間②</label><input type="time" step="60" id="newCandidate2"></div>
-                <div><label for="newCandidate3">候補時間③</label><input type="time" step="60" id="newCandidate3"></div>
+              <h2><span class="step">3</span>撮影時間を確定して文章を作る</h2>
+              <p class="lead">月齢・星の位置・予約状況を確認し、確定する撮影開始時間を1つ選びます。</p>
+              <div class="field-grid" style="margin-top: 14px;">
+                <div class="field">
+                  <label class="required" for="newConfirmedTime">確定する撮影開始時間</label>
+                  <input type="time" step="60" id="newConfirmedTime">
+                </div>
               </div>
-              <span class="hint">0時台は＋1,000円／人、1時以降の深夜帯は＋2,000円／人です。</span>
+              <span class="hint">24時間・1分単位で選べます。0時台は＋1,000円／人、1時以降の深夜帯は＋2,000円／人です。</span>
               <div class="message-card" style="margin-top: 15px; margin-bottom: 0;">
                 <div class="message-head">
-                  <h3>お客様へ送る時間提案文</h3>
-                  <button class="button small secondary copy-button" id="copyNewProposalButton" data-target="newProposalMessage" disabled>文章だけコピー</button>
+                  <h3>お客様へ送る予約確定文</h3>
+                  <button class="button small secondary copy-button" id="copyNewConfirmationButton" data-target="newConfirmationMessage" disabled>文章だけコピー</button>
                 </div>
-                <textarea id="newProposalMessage" readonly placeholder="予約内容を読み取り、候補時間を選ぶと文章が自動生成されます。"></textarea>
+                <textarea id="newConfirmationMessage" readonly placeholder="予約内容を読み取り、確定時間を選ぶと文章が自動生成されます。"></textarea>
               </div>
             </div>
             <div class="button-row">
-              <button class="button secondary" id="saveNewButton" disabled>予約だけ保存</button>
-              <button class="button dark" id="saveAndCopyButton" disabled>保存して提案文をコピー</button>
+              <button class="button secondary" id="saveNewButton" disabled>確定内容を保存</button>
+              <button class="button dark" id="saveAndCopyButton" disabled>保存して確定文をコピー</button>
             </div>
           </div>
         </div>
@@ -445,7 +446,7 @@
         <div class="page-head">
           <div>
             <h1>予約一覧</h1>
-            <p class="lead">予約を開くと、候補時間・確定時間・集合場所とLINE文章を編集できます。</p>
+            <p class="lead">予約を開くと、確定時間・集合場所とLINE文章を編集できます。</p>
           </div>
         </div>
         <div class="toolbar">
@@ -457,7 +458,7 @@
         <div class="table-wrap">
           <table>
             <thead>
-              <tr><th>撮影日</th><th>お客様</th><th>プラン</th><th>候補／確定時間</th><th>担当</th><th>ステータス</th><th>更新</th></tr>
+              <tr><th>撮影日</th><th>お客様</th><th>プラン</th><th>確定時間</th><th>担当</th><th>ステータス</th><th>更新</th></tr>
             </thead>
             <tbody id="reservationRows"></tbody>
           </table>
@@ -501,19 +502,9 @@
           </div>
 
           <div class="section-card">
-            <h3>時間を提案</h3>
-            <div class="time-grid">
-              <div><label for="candidate1">候補時間①</label><input type="time" step="60" id="candidate1"></div>
-              <div><label for="candidate2">候補時間②</label><input type="time" step="60" id="candidate2"></div>
-              <div><label for="candidate3">候補時間③</label><input type="time" step="60" id="candidate3"></div>
-            </div>
-            <span class="hint">24時間・1分単位で選択できます。0時台は＋1,000円／人、1時以降の深夜帯は＋2,000円／人です。</span>
-          </div>
-
-          <div class="section-card">
             <h3>確定内容・当日案内</h3>
             <div class="field-grid">
-              <div class="field"><label for="confirmedTime">確定時間</label><input type="time" step="60" id="confirmedTime"></div>
+              <div class="field"><label for="confirmedTime">確定した撮影開始時間</label><input type="time" step="60" id="confirmedTime"><span class="hint">24時間・1分単位で変更できます。</span></div>
               <div class="field"><label for="status">ステータス</label><select id="status"></select></div>
               <div class="field full"><label for="meetingPlace">集合場所</label><input id="meetingPlace" list="meetingPlaceList" placeholder="当日に決めた集合場所を入力"><datalist id="meetingPlaceList"></datalist><span class="hint">集合場所はその日の星空コンディションに合わせて決定します。</span></div>
               <div class="field full"><label for="memo">スタッフメモ</label><textarea id="memo"></textarea></div>
@@ -523,15 +514,11 @@
 
         <div>
           <div class="message-card">
-            <div class="message-head"><h3>① 時間提案の文章</h3><button class="button small primary copy-button" data-target="proposalMessage">コピー</button></div>
-            <textarea id="proposalMessage" readonly></textarea>
-          </div>
-          <div class="message-card">
-            <div class="message-head"><h3>② 予約確定の文章</h3><button class="button small primary copy-button" data-target="confirmationMessage">コピー</button></div>
+            <div class="message-head"><h3>① 予約確定の文章</h3><button class="button small primary copy-button" data-target="confirmationMessage">コピー</button></div>
             <textarea id="confirmationMessage" readonly></textarea>
           </div>
           <div class="message-card">
-            <div class="message-head"><h3>③ 当日案内の文章</h3><button class="button small primary copy-button" data-target="sameDayMessage">コピー</button></div>
+            <div class="message-head"><h3>② 当日案内の文章</h3><button class="button small primary copy-button" data-target="sameDayMessage">コピー</button></div>
             <textarea id="sameDayMessage" readonly></textarea>
           </div>
         </div>
@@ -599,25 +586,27 @@
         element.addEventListener('input', scheduleMessageRefresh);
         element.addEventListener('change', scheduleMessageRefresh);
       });
-      ['newShootDate','newPreferredTimeWindow','newPlan','newName','newGender','newPhone','newLateFee'].forEach((id) => {
+      [
+        'newShootDate','newPreferredTimeWindow','newPlan','newName','newGender','newPhone',
+        'newAdults','newChildren','newHotel','newStay','newPickup','newPhotographer',
+        'newLocationRequest','newLateFee','newInstagram','newStoryTag',
+      ].forEach((id) => {
         $(id).addEventListener('input', () => {
           updateNewRequiredStatus();
-          scheduleNewProposalRefresh();
+          scheduleNewConfirmationRefresh();
         });
         $(id).addEventListener('change', () => {
           updateNewRequiredStatus();
-          scheduleNewProposalRefresh();
+          scheduleNewConfirmationRefresh();
         });
       });
-      ['newCandidate1','newCandidate2','newCandidate3'].forEach((id) => {
-        $(id).addEventListener('input', () => {
-          updateNewRequiredStatus();
-          scheduleNewProposalRefresh();
-        });
-        $(id).addEventListener('change', () => {
-          updateNewRequiredStatus();
-          scheduleNewProposalRefresh();
-        });
+      $('newConfirmedTime').addEventListener('input', () => {
+        updateNewRequiredStatus();
+        scheduleNewConfirmationRefresh();
+      });
+      $('newConfirmedTime').addEventListener('change', () => {
+        updateNewRequiredStatus();
+        scheduleNewConfirmationRefresh();
       });
     }
 
@@ -649,7 +638,7 @@
         fillNewBooking(result.booking || {});
         state.parsed = true;
         updateNewRequiredStatus(result.isClosureDate);
-        refreshNewProposal();
+        refreshNewConfirmation();
         if (result.isClosureDate) {
           $('parseStatus').textContent = 'この日は満月期間の撮影休止日です。日程を変更してください。';
           $('parseStatus').className = 'parse-status warn';
@@ -678,6 +667,7 @@
       setValue('newLateFee', booking.lateFee);
       setValue('newInstagram', booking.instagram);
       setValue('newStoryTag', booking.storyTag);
+      setValue('newConfirmedTime', '');
     }
 
     function newBookingPayload() {
@@ -698,6 +688,7 @@
         lateFee: $('newLateFee').value,
         instagram: $('newInstagram').value,
         storyTag: $('newStoryTag').value,
+        confirmedTime: $('newConfirmedTime').value,
       };
     }
 
@@ -706,6 +697,7 @@
       const required = [
         ['shootDate','撮影希望日'], ['preferredTimeWindow','希望時間帯'], ['plan','希望プラン'], ['name','お名前'],
         ['gender','参加者の性別内訳'], ['phone','携帯番号'], ['lateFee','深夜料金への同意'],
+        ['confirmedTime','確定する撮影開始時間'],
       ];
       const missing = required.filter(([key]) => {
         const value = String(booking[key] || '').trim();
@@ -716,10 +708,9 @@
       });
       const closure = forceClosure === true || state.closureDates.has(booking.shootDate);
       const complete = state.parsed && missing.length === 0 && !closure;
-      const hasProposalTime = newProposalTimes().some(Boolean);
       $('saveNewButton').disabled = !complete;
-      $('saveAndCopyButton').disabled = !complete || !hasProposalTime;
-      $('copyNewProposalButton').disabled = !complete || !hasProposalTime;
+      $('saveAndCopyButton').disabled = !complete;
+      $('copyNewConfirmationButton').disabled = !complete;
       if (closure) {
         $('parseStatus').textContent = 'この日は満月期間の撮影休止日です。日程を変更してください。';
         $('parseStatus').className = 'parse-status warn';
@@ -735,52 +726,54 @@
       }
     }
 
-    function newProposalTimes() {
-      return [$('newCandidate1').value, $('newCandidate2').value, $('newCandidate3').value];
-    }
-
-    function scheduleNewProposalRefresh() {
+    function scheduleNewConfirmationRefresh() {
       clearTimeout(state.newMessageTimer);
-      state.newMessageTimer = setTimeout(refreshNewProposal, 180);
+      state.newMessageTimer = setTimeout(refreshNewConfirmation, 180);
     }
 
-    async function refreshNewProposal() {
+    async function refreshNewConfirmation() {
       if (!state.parsed) {
-        $('newProposalMessage').value = '';
+        $('newConfirmationMessage').value = '';
         return;
       }
       try {
         const messages = await server('generateMessages', Object.assign({}, newBookingPayload(), {
-          candidateTimes: newProposalTimes(),
-          status: '未返信',
+          rawText: $('rawText').value,
+          status: '時間確定',
         }));
-        $('newProposalMessage').value = messages.proposal || '';
+        $('newConfirmationMessage').value = messages.confirmation || '';
       } catch (error) {
         showToast(error.message, true);
       }
     }
 
-    async function saveNewReservation(markProposed) {
-      const proposalText = $('newProposalMessage').value;
-      if (markProposed) {
-        try {
-          await writeClipboard(proposalText, 'newProposalMessage');
-        } catch (error) {
-          return showToast(error.message, true, 7000);
-        }
-      }
+    async function saveNewReservation(copyConfirmation) {
       setLoading(true, '予約を保存しています…');
       try {
         const result = await server('saveReservation', {
           rawText: $('rawText').value,
           booking: newBookingPayload(),
-          candidateTimes: newProposalTimes(),
-          status: markProposed ? '時間提案済み' : '未返信',
+          confirmedTime: $('newConfirmedTime').value,
+          status: '時間確定',
         });
         state.reservations = result.reservations || [];
-        showToast(markProposed ? '予約を保存し、提案文をコピーしました。' : '予約を保存しました。');
+        let copyError = null;
+        if (copyConfirmation) {
+          try {
+            const messages = await server('generateMessages', result.reservation || {});
+            $('newConfirmationMessage').value = messages.confirmation || '';
+            await writeClipboard($('newConfirmationMessage').value, 'newConfirmationMessage');
+          } catch (error) {
+            copyError = error;
+          }
+        }
         clearIntake();
         showView('list');
+        if (copyError) {
+          showToast('予約は確定・保存済みです。文章は予約一覧から開いてコピーしてください。', true, 7000);
+        } else {
+          showToast(copyConfirmation ? '予約を確定し、確定文をコピーしました。' : '予約の確定内容を保存しました。');
+        }
       } catch (error) {
         showToast(error.message, true, 7000);
       } finally {
@@ -791,8 +784,8 @@
     function clearIntake() {
       $('rawText').value = '';
       ['newShootDate','newName','newPhone','newAdults','newChildren','newHotel','newStay','newPickup','newPhotographer','newLocationRequest','newLateFee','newInstagram','newStoryTag'].forEach((id) => setValue(id, ''));
-      ['newCandidate1','newCandidate2','newCandidate3'].forEach((id) => setValue(id, ''));
-      $('newProposalMessage').value = '';
+      setValue('newConfirmedTime', '');
+      $('newConfirmationMessage').value = '';
       $('newPlan').value = '';
       $('newPreferredTimeWindow').value = '';
       $('newGender').value = '';
@@ -851,9 +844,6 @@
       setValue('editLateFee', reservation.lateFee);
       setValue('editInstagram', reservation.instagram);
       setValue('editStoryTag', reservation.storyTag);
-      setValue('candidate1', timeInputValue(reservation.candidateTimes[0]));
-      setValue('candidate2', timeInputValue(reservation.candidateTimes[1]));
-      setValue('candidate3', timeInputValue(reservation.candidateTimes[2]));
       setValue('confirmedTime', timeInputValue(reservation.confirmedTime));
       setValue('meetingPlace', reservation.meetingPlace);
       setSelectValue('status', reservation.status);
@@ -863,8 +853,10 @@
     }
 
     function detailPayload() {
+      const selectedReservation = state.reservations.find((item) => item.id === state.selectedId) || {};
       return {
         id: state.selectedId,
+        rawText: selectedReservation.rawText || '',
         shootDate: $('editShootDate').value,
         preferredTimeWindow: $('editPreferredTimeWindow').value,
         plan: $('editPlan').value,
@@ -881,7 +873,7 @@
         lateFee: $('editLateFee').value,
         instagram: $('editInstagram').value,
         storyTag: $('editStoryTag').value,
-        candidateTimes: [$('candidate1').value, $('candidate2').value, $('candidate3').value],
+        candidateTimes: selectedReservation.candidateTimes || [],
         confirmedTime: $('confirmedTime').value,
         meetingPlace: $('meetingPlace').value,
         status: $('status').value,
@@ -912,7 +904,6 @@
     async function refreshMessages() {
       try {
         const messages = await server('generateMessages', detailPayload());
-        $('proposalMessage').value = messages.proposal || '';
         $('confirmationMessage').value = messages.confirmation || '';
         $('sameDayMessage').value = messages.sameDay || '';
       } catch (error) {
