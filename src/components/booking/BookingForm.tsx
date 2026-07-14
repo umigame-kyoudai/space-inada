@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { type Ref, useEffect, useMemo, useRef, useState } from "react";
 import { trackEvent } from "@/lib/analytics";
 import {
@@ -759,6 +760,28 @@ export function BookingForm({
               monthIndex={availabilityMonthIndex}
               onMonthChange={setAvailabilityMonthIndex}
             />
+            <div className="mt-4 rounded-xl border border-teal-200/20 bg-teal-200/[0.06] p-4">
+              <div className="flex items-start gap-3">
+                <span
+                  aria-hidden="true"
+                  className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-teal-200/15 text-base"
+                >
+                  📍
+                </span>
+                <div>
+                  <p className="text-sm font-bold text-teal-100">主な撮影候補地があります</p>
+                  <p className="mt-1 text-xs leading-relaxed text-zinc-300">
+                    前浜・友利博愛・白鳥岬周辺が主な候補です。最終的な集合場所は、その日の雲や風などを確認し、最もきれいに撮影できる場所を当日にLINEでご案内します。
+                  </p>
+                  <Link
+                    href="/access#shooting-locations"
+                    className="cosmic-link mt-2 inline-flex text-xs font-semibold underline underline-offset-4"
+                  >
+                    候補地と地図を確認する →
+                  </Link>
+                </div>
+              </div>
+            </div>
           </div>
 
           <fieldset>

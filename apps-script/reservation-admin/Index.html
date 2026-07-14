@@ -506,7 +506,7 @@
             <div class="field-grid">
               <div class="field"><label for="confirmedTime">確定した撮影開始時間</label><input type="time" step="60" id="confirmedTime"><span class="hint">24時間・1分単位で変更できます。</span></div>
               <div class="field"><label for="status">ステータス</label><select id="status"></select></div>
-              <div class="field full"><label for="meetingPlace">集合場所</label><input id="meetingPlace" list="meetingPlaceList" placeholder="当日に決めた集合場所を入力"><datalist id="meetingPlaceList"></datalist><span class="hint">集合場所はその日の星空コンディションに合わせて決定します。</span></div>
+              <div class="field full"><label for="meetingPlace">集合場所</label><select id="meetingPlace"></select><span class="hint">当日の星空コンディションを確認し、最適な場所を選択してください。選んだ場所のGoogleマップリンクが当日案内文へ自動で入ります。</span></div>
               <div class="field full"><label for="memo">スタッフメモ</label><textarea id="memo"></textarea></div>
             </div>
           </div>
@@ -619,7 +619,7 @@
       setSelect('editPreferredTimeWindow', preferredTimeWindows, '選択してください');
       setSelect('editPhotographer', state.settings.photographers, '選択してください');
       setSelect('status', state.settings.statuses, '選択してください');
-      $('meetingPlaceList').innerHTML = state.settings.meetingPlaces.map((value) => '<option value="' + escapeHtml(value) + '"></option>').join('');
+      setMeetingPlaceSelect(state.settings.meetingPlaces);
     }
 
     function showView(view) {
@@ -845,7 +845,7 @@
       setValue('editInstagram', reservation.instagram);
       setValue('editStoryTag', reservation.storyTag);
       setValue('confirmedTime', timeInputValue(reservation.confirmedTime));
-      setValue('meetingPlace', reservation.meetingPlace);
+      setSelectValue('meetingPlace', reservation.meetingPlace);
       setSelectValue('status', reservation.status);
       setValue('memo', reservation.memo);
       refreshMessages();
@@ -968,6 +968,16 @@
       $(id).innerHTML = '<option value="">' + escapeHtml(placeholder) + '</option>' +
         (values || []).map((value) => '<option value="' + escapeHtml(value) + '">' + escapeHtml(value) + '</option>').join('');
       if (current) setSelectValue(id, current);
+    }
+
+    function setMeetingPlaceSelect(values) {
+      const current = $('meetingPlace').value;
+      $('meetingPlace').innerHTML = '<option value="">選択してください</option>' +
+        (values || []).map((value) => {
+          const label = String(value || '').split('｜')[0] || value;
+          return '<option value="' + escapeHtml(value) + '">' + escapeHtml(label) + '</option>';
+        }).join('');
+      if (current) setSelectValue('meetingPlace', current);
     }
 
     function setSelectValue(id, value) {

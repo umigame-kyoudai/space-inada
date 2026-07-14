@@ -3,11 +3,12 @@ import { buildMetadata, siteConfig, mapEmbedUrl, mapLink } from "@/lib/seo";
 import { Section } from "@/components/ui/Section";
 import { Breadcrumbs } from "@/components/layout/Breadcrumbs";
 import { CtaBooking } from "@/components/sections/CtaBooking";
+import { shootingLocations } from "@/data/shootingLocations";
 
 export const metadata: Metadata = buildMetadata({
   title: "アクセス・集合場所",
   description:
-    "宮古島の星空フォト撮影の集合場所・送迎についてのご案内。撮影スポットは天候と月齢で変わるため、撮影当日に最適な集合場所をお伝えします。",
+    "宮古島の星空フォト撮影の集合場所・候補地・送迎についてのご案内。前浜・友利博愛・白鳥岬などから、当日に最適な撮影場所をお伝えします。",
   path: "/access",
 });
 
@@ -78,6 +79,53 @@ export default function AccessPage() {
             集合場所は、ご予約いただいたプランと当日のコンディションに合わせて、撮影当日にLINEで個別にご案内します。
             ご宿泊先やご希望エリアを事前にお知らせいただければ、移動の負担が少ないスポットを選定します。
           </p>
+        </section>
+
+        <section id="shooting-locations" className="scroll-mt-28">
+          <div className="flex flex-wrap items-end justify-between gap-3">
+            <div>
+              <p className="text-xs font-semibold tracking-[0.18em] text-amber-200">
+                SHOOTING LOCATION CANDIDATES
+              </p>
+              <h2 className="mt-2 text-2xl font-bold text-teal-100">主な撮影候補地</h2>
+            </div>
+            <span className="rounded-full border border-teal-200/20 bg-teal-200/[0.07] px-3 py-1 text-xs text-teal-100">
+              宮古島内の3エリア
+            </span>
+          </div>
+          <p className="mt-4 max-w-3xl leading-relaxed text-zinc-300">
+            通常は、前浜・友利博愛・白鳥岬周辺を主な候補として撮影しています。
+            事前に開催エリアの目安をご確認いただけますが、下記の場所で必ず開催するという意味ではありません。
+          </p>
+          <div className="mt-6 grid gap-4 sm:grid-cols-3">
+            {shootingLocations.map((location, index) => (
+              <article key={location.name} className="cosmic-panel rounded-xl p-5">
+                <div className="flex items-center justify-between gap-3">
+                  <span className="flex h-8 w-8 items-center justify-center rounded-full bg-amber-300 text-sm font-black text-zinc-950">
+                    {index + 1}
+                  </span>
+                  <span className="text-[11px] text-zinc-500">撮影候補地</span>
+                </div>
+                <h3 className="mt-5 text-lg font-bold text-white">{location.name}</h3>
+                <a
+                  href={location.mapUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="cosmic-link mt-3 inline-flex items-center gap-1 text-sm font-semibold underline underline-offset-4"
+                >
+                  Googleマップで確認
+                  <span aria-hidden="true">↗</span>
+                </a>
+              </article>
+            ))}
+          </div>
+          <div className="mt-5 rounded-xl border border-amber-200/25 bg-amber-300/[0.07] p-4">
+            <p className="text-sm font-bold text-amber-100">最終的な集合場所は撮影当日に決定します</p>
+            <p className="mt-1 text-sm leading-relaxed text-zinc-300">
+              雲の動き・風向き・月明かり・周辺の明るさを確認し、その日に最もきれいな星空を撮影できる場所をご案内します。
+              状況によっては、上記以外の場所をご案内することがあります。
+            </p>
+          </div>
         </section>
 
         <section>

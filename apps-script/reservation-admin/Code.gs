@@ -43,6 +43,12 @@ const OPTION_PRICES = Object.freeze({
   afterOnePerPerson: 2000,
 });
 
+const DEFAULT_MEETING_PLACES = Object.freeze([
+  '前浜｜https://maps.app.goo.gl/w5t9SFKB2XPkWXHU9?g_st=ic',
+  '友利博愛｜https://maps.app.goo.gl/cD3yeskG3Usnn5wPA?g_st=ic',
+  '白鳥岬｜https://maps.app.goo.gl/Fxq45hfTpmNtQxpU9?g_st=ic',
+]);
+
 function doGet() {
   return HtmlService.createTemplateFromFile('Index')
     .evaluate()
@@ -162,6 +168,9 @@ function updateReservation(payload) {
     if (statusNeedsConfirmedTime_(next.status) && !next.confirmedTime) {
       throw new Error('このステータスでは確定時間が必要です。');
     }
+    if (statusNeedsMeetingPlace_(next.status) && !next.meetingPlace) {
+      throw new Error('当日案内を送る前に、集合場所をプルダウンから選択してください。');
+    }
 
     if (next.confirmedTime && next.status !== 'キャンセル') {
       assertSlotAvailable_(next.shootDate, next.confirmedTime, id);
@@ -232,6 +241,7 @@ function generateMessages(payload) {
     ? '\n深夜料金：' + formatCurrency_(price.lateNightFee) +
       '（' + participantCount + '名分・合計料金に含まれています）'
     : '';
+  const meetingPlaceGuide = formatMeetingPlaceGuide_(reservation.meetingPlace);
 
   return {
     confirmation:
@@ -241,7 +251,6 @@ function generateMessages(payload) {
       '【ご予約確定内容】\n' +
       '撮影日：' + dateLabel + '\n' +
       '撮影開始時間：' + confirmedTimeLabel + '\n' +
-      'ご希望時間帯：' + (reservation.preferredTimeWindow || '記入なし') + '\n' +
       '撮影プラン：' + (reservation.plan || '［撮影プラン］') + '\n' +
       '参加人数：' + participantLabel + '\n' +
       genderBreakdown + '\n' +
@@ -260,16 +269,41 @@ function generateMessages(payload) {
       '合計料金：' + confirmedPriceLabel + lateNightPriceLine + '\n' +
       'お支払い方法：撮影当日に現地での現金決済\n\n' +
       '【集合場所について】\n' +
+      '主な撮影候補地：前浜・友利博愛・白鳥岬\n' +
+      '候補地の地図：https://space-inada.com/access#shooting-locations\n\n' +
       '集合場所は、当日の雲や風などの星空コンディションを確認したうえで、その日に最もきれいに撮影できる場所をご案内いたします。\n' +
       '撮影当日にこちらのLINEへお送りしますので、必ずご確認をお願いいたします。\n\n' +
       '撮影データは、撮影後24時間以内を目安にオンラインでお届けいたします。\n\n' +
       '内容に間違いや変更がございましたら、このLINEへご連絡ください。\n' +
       '当日はどうぞよろしくお願いいたします。',
     sameDay:
-      name + '様、本日の撮影についてご案内します。\n\n' +
+      name + '様、本日の星空フォト撮影についてご案内いたします。\n' +
+      '下記の内容をご確認のうえ、集合場所までお気をつけてお越しください。\n\n' +
+      '【本日の撮影案内】\n' +
+      '撮影日：' + dateLabel + '\n' +
       '集合時間：' + (reservation.confirmedTime || '［確定時間］') + '\n' +
-      '集合場所：' + (reservation.meetingPlace || '［集合場所］') + '\n\n' +
-      '足元にお気をつけてお越しください。変更がある場合は、このLINEへご連絡ください。',
+      '集合場所：' + meetingPlaceGuide + '\n\n' +
+      '【現地到着時のご注意】\n' +
+      '安全で最高の星空撮影を行うため、以下の2点をお守りください。\n\n' +
+      '1．安全に停車後、車のライトは必ず消灯してください\n' +
+      '光が漏れると星空の撮影に影響が出てしまいます。安全な場所へ停車したあと、ヘッドライトや車内灯を消し、周囲へのご配慮をお願いいたします。\n\n' +
+      '2．合図があるまで車内でお待ちください\n' +
+      '前のお客様の撮影が終了次第、スタッフからお声がけいたします。それまでは車内での待機をお願いいたします。\n\n' +
+      '【当日の開催判断について】\n' +
+      '星空撮影は雲の動きに左右されるため、天候が怪しい場合は、開催可否の判断を当日18:00頃に行います。\n\n' +
+      '※天候の心配がないと判断した場合、18:00頃のご連絡はいたしません。\n' +
+      '※中止の場合は、ほかの日程への振替も可能です。\n' +
+      '※中止のご連絡後に天候が回復した場合は、改めてご連絡する場合がございます。\n\n' +
+      '【当日の服装・準備】\n' +
+      '・服装：白い服や明るい色のお洋服は、夜の背景にとてもきれいに映えます。\n' +
+      '・足元：暗い場所を歩くため、歩きやすい靴がおすすめです。\n' +
+      '・防寒：夜の屋外は冷え込むことがあります。羽織るものを1枚お持ちいただくことをおすすめします。\n\n' +
+      '【緊急連絡について】\n' +
+      '当日の「道に迷った」「少し遅れそう」などのご連絡は、現場スタッフが直接確認できるショートメッセージ（SMS）がスムーズです。\n\n' +
+      '【当日の緊急連絡先】\n' +
+      '090-9279-9586（稲田）\n' +
+      '※SMSでのご連絡も可能です。\n\n' +
+      'それでは、本日はどうぞよろしくお願いいたします。',
   };
 }
 
@@ -498,7 +532,7 @@ function getSettings_() {
     statuses: columnValues_(values, 2),
     slotStatuses: columnValues_(values, 3),
     photographers: columnValues_(values, 4),
-    meetingPlaces: columnValues_(values, 5),
+    meetingPlaces: Array.from(new Set(DEFAULT_MEETING_PLACES.concat(columnValues_(values, 5)))),
   };
 }
 
@@ -586,6 +620,10 @@ function getMissingFields_(booking) {
 
 function statusNeedsConfirmedTime_(status) {
   return ['時間確定', '当日案内済み', '撮影完了'].indexOf(status) !== -1;
+}
+
+function statusNeedsMeetingPlace_(status) {
+  return ['当日案内済み', '撮影完了'].indexOf(status) !== -1;
 }
 
 function summarizeReservation_(reservation) {
@@ -723,6 +761,16 @@ function isLateFeeConsentConfirmed_(value) {
 
 function optionalLabel_(value) {
   return cleanText_(value) || '記入なし';
+}
+
+function formatMeetingPlaceGuide_(value) {
+  const text = cleanText_(value);
+  if (!text) return '［集合場所］';
+  const separatorIndex = text.indexOf('｜');
+  if (separatorIndex === -1) return text;
+  const name = cleanText_(text.slice(0, separatorIndex));
+  const url = cleanText_(text.slice(separatorIndex + 1));
+  return name + (url ? '\nGoogleマップ：' + url : '');
 }
 
 function calculateBasePrice_(reservation) {
