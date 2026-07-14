@@ -27,6 +27,8 @@ export type Plan = {
   priceUnit?: string;
   /** 子供（0〜15才）料金。"/人" プランのみ。予約フォームの合計計算に使う。 */
   childPrice?: number;
+  /** 1組料金に含まれる最大参加人数。超える場合は要相談。 */
+  maxParticipants?: number;
   /** 料金内訳の各行 */
   pricingDetail: string[];
   /** 撮影時間（分）。未設定なら「応相談」 */
@@ -44,6 +46,9 @@ export type Plan = {
   /** 近日公開（ティザー）。true なら料金・予約は出さず「近日公開」表示にする。 */
   comingSoon?: boolean;
 };
+
+export const DELIVERY_TIME_LABEL = "撮影後24時間以内";
+export const FAMILY_MAX_PARTICIPANTS = 10;
 
 export const plans: Plan[] = [
   {
@@ -104,11 +109,16 @@ export const plans: Plan[] = [
     forWhom: ["家族", "三世代", "グループ"],
     priceFrom: 18000,
     priceUnit: "/組",
-    pricingDetail: ["1組 ¥18,000", "※ソロショットなし"],
+    maxParticipants: FAMILY_MAX_PARTICIPANTS,
+    pricingDetail: [
+      `1組 ¥18,000（${FAMILY_MAX_PARTICIPANTS}名まで）`,
+      `※${FAMILY_MAX_PARTICIPANTS + 1}名以上は要相談`,
+      "※ソロショットなし",
+    ],
     durationMin: 20,
     deliveryCount: "約10枚",
     features: [
-      "家族みんなを一緒に撮影",
+      `${FAMILY_MAX_PARTICIPANTS}名まで家族みんなを一緒に撮影`,
       "星空を背景にした集合カット",
       "お子様連れも安心",
     ],
@@ -116,7 +126,7 @@ export const plans: Plan[] = [
     seo: {
       title: "ファミリープラン｜宮古島の家族星空フォト",
       description:
-        "宮古島の星空を背景に家族写真を残すプラン。1組¥18,000、約20分の撮影で家族みんなの思い出を一枚に。お子様連れも安心です。",
+        `宮古島の星空を背景に家族写真を残すプラン。${FAMILY_MAX_PARTICIPANTS}名まで1組¥18,000、約20分の撮影で家族みんなの思い出を一枚に。お子様連れも安心です。`,
     },
     updatedAt: "2026-06-06",
   },

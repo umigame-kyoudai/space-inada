@@ -12,7 +12,7 @@ import { VideoPlayer } from "@/components/media/VideoPlayer";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { videoJsonLd } from "@/lib/jsonld";
 import { galleryImages, shootingVideo } from "@/data/images";
-import { getPlans } from "@/data/plans";
+import { DELIVERY_TIME_LABEL, getPlans } from "@/data/plans";
 import { getPosts } from "@/data/posts";
 import { getTestimonials } from "@/data/testimonials";
 
@@ -56,7 +56,7 @@ const journey = [
   {
     step: "04",
     title: "旅の余韻ごと納品",
-    text: "撮影後はオンラインでデータをお渡し。旅行のあとも、宮古島の夜を何度でも見返せます。",
+    text: `${DELIVERY_TIME_LABEL}にオンラインでデータをお渡し。旅行中から、宮古島の夜を何度でも見返せます。`,
   },
 ];
 

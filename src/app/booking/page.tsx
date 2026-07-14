@@ -37,6 +37,7 @@ export default async function BookingPage({
     kind: planPriceKind(p),
     basePrice: p.priceFrom ?? null,
     childPrice: p.childPrice ?? null,
+    maxParticipants: p.maxParticipants ?? null,
   }));
   const pickupPrice = getPickupPrice();
   const staffNominationPrice = INADA_NOMINATION_PRICE;

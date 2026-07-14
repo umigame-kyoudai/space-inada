@@ -11,7 +11,12 @@ import { planImages, proposalBookingVideo } from "@/data/images";
 import { CtaBooking } from "@/components/sections/CtaBooking";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { serviceJsonLd } from "@/lib/jsonld";
-import { getPlan, getPlans, planPriceLabel } from "@/data/plans";
+import {
+  DELIVERY_TIME_LABEL,
+  getPlan,
+  getPlans,
+  planPriceLabel,
+} from "@/data/plans";
 
 type Props = { params: Promise<{ plan: string }> };
 
@@ -122,6 +127,11 @@ export default async function PlanDetailPage({ params }: Props) {
         <div className="cosmic-panel rounded-lg p-5">
           <dt className="text-xs text-zinc-500">納品</dt>
           <dd className="mt-1 text-base font-semibold text-white">{plan.deliveryCount}</dd>
+          {!plan.comingSoon && (
+            <p className="mt-1 text-xs font-medium text-amber-100/80">
+              {DELIVERY_TIME_LABEL}
+            </p>
+          )}
         </div>
       </dl>
 

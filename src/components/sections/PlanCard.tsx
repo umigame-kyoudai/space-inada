@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { planPriceLabel, type Plan } from "@/data/plans";
+import { DELIVERY_TIME_LABEL, planPriceLabel, type Plan } from "@/data/plans";
 import { ImageSlot } from "@/components/media/ImageSlot";
 import { planImages } from "@/data/images";
 
@@ -89,6 +89,11 @@ export function PlanCard({ plan }: { plan: Plan }) {
             <dd className="mt-1 text-sm font-semibold leading-snug text-white">
               {plan.deliveryCount}
             </dd>
+            {!plan.comingSoon && (
+              <p className="mt-1 text-[10px] text-amber-100/70">
+                {DELIVERY_TIME_LABEL}
+              </p>
+            )}
           </div>
         </dl>
 

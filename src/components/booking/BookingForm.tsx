@@ -2,7 +2,12 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { trackEvent } from "@/lib/analytics";
-import { formatPrice, LATE_NIGHT_FEES, type PlanPriceKind } from "@/data/plans";
+import {
+  DELIVERY_TIME_LABEL,
+  formatPrice,
+  LATE_NIGHT_FEES,
+  type PlanPriceKind,
+} from "@/data/plans";
 import { findCoupon, computeCouponDiscount, formatCouponDiscount } from "@/data/coupons";
 import { teamMembers } from "@/data/team";
 
@@ -20,6 +25,8 @@ type PlanOption = {
   basePrice: number | null;
   /** 子供（0〜15才）料金。/人 プランのみ */
   childPrice: number | null;
+  /** 1組料金に含まれる最大参加人数。上限なしは null */
+  maxParticipants: number | null;
 };
 
 type Props = {
@@ -115,6 +122,7 @@ ${v.totalText}${v.couponText ? `\n🎟 クーポン：${v.couponText}` : ""}
 ※お支払いは「現地にて現金決済のみ」となります。
 （最終金額はLINEにてご確定します）
 ※深夜料金は上記の概算に含まれていません。撮影時間の確定後、必要な場合は加算します。
+📷 納品：${DELIVERY_TIME_LABEL}（オンライン）
 ━━━━━━━━━━━━━━━━
 【送信後のご案内】
 内容を確認後、24時間以内にスタッフからLINEでご連絡します。
@@ -182,12 +190,17 @@ export function BookingForm({
   const selectedPlan = planOptions.find((p) => p.name === plan);
   const adultsNum = Math.max(0, parseInt(adults, 10) || 0);
   const childrenNum = Math.max(0, parseInt(children, 10) || 0);
+  const participantCount = adultsNum + childrenNum;
   const pickupAmount = pickup ? pickupPrice : 0;
   const staffNominationAmount = staffName === "稲田" ? staffNominationPrice : 0;
+  const exceedsParticipantLimit =
+    selectedPlan?.maxParticipants != null &&
+    participantCount > selectedPlan.maxParticipants;
 
   // 割引前の小計。quote（プロポーズ等）は null。
   const subtotal: number | null = useMemo(() => {
     if (!selectedPlan) return null;
+    if (exceedsParticipantLimit) return null;
     if (selectedPlan.kind === "perPerson") {
       return (
         adultsNum * (selectedPlan.basePrice ?? 0) +
@@ -200,7 +213,14 @@ export function BookingForm({
       return (selectedPlan.basePrice ?? 0) + pickupAmount + staffNominationAmount;
     }
     return null; // quote（プロポーズ等）
-  }, [selectedPlan, adultsNum, childrenNum, pickupAmount, staffNominationAmount]);
+  }, [
+    selectedPlan,
+    adultsNum,
+    childrenNum,
+    pickupAmount,
+    staffNominationAmount,
+    exceedsParticipantLimit,
+  ]);
 
   // ───── クーポン ─────
   const coupon = useMemo(() => findCoupon(couponInput), [couponInput]);
@@ -221,9 +241,12 @@ export function BookingForm({
   // 表示・送信用の合計テキスト
   const totalText = useMemo(() => {
     if (!plan) return "プランを選択すると概算が表示されます";
+    if (exceedsParticipantLimit && selectedPlan?.maxParticipants != null) {
+      return `${selectedPlan.maxParticipants + 1}名以上は別途お見積り（LINEでご相談ください）`;
+    }
     if (total == null) return "別途お見積り（LINEでご相談ください）";
     return `${formatPrice(total)}${location ? "　＋ 場所指定（応相談）" : ""}`;
-  }, [plan, total, location]);
+  }, [plan, total, location, exceedsParticipantLimit, selectedPlan]);
 
   // 内訳行（UI表示用）
   const breakdown = useMemo(() => {
@@ -235,7 +258,7 @@ export function BookingForm({
           `子ども ${childrenNum}名 × ${formatPrice(selectedPlan.childPrice ?? 0)}`,
         );
       }
-    } else if (selectedPlan?.kind === "perGroup") {
+    } else if (selectedPlan?.kind === "perGroup" && !exceedsParticipantLimit) {
       lines.push(`${selectedPlan.name} 1組 ${formatPrice(selectedPlan.basePrice ?? 0)}`);
     }
     if (pickup) lines.push(`送迎 +${formatPrice(pickupPrice)}`);
@@ -252,6 +275,7 @@ export function BookingForm({
     selectedPlan,
     adultsNum,
     childrenNum,
+    exceedsParticipantLimit,
     pickup,
     pickupPrice,
     staffName,
@@ -793,8 +817,12 @@ export function BookingForm({
             </ul>
           )}
           {selectedPlan?.kind === "perGroup" && (
-            <p className="mt-2 text-xs text-zinc-500">
-              ※{selectedPlan.name}は人数に関わらず1組あたりの料金です。
+            <p
+              className={`mt-2 text-xs ${exceedsParticipantLimit ? "font-medium text-amber-200" : "text-zinc-500"}`}
+            >
+              {selectedPlan.maxParticipants != null
+                ? `※${selectedPlan.name}は1組${selectedPlan.maxParticipants}名までです。${selectedPlan.maxParticipants + 1}名以上はLINEでご相談ください。`
+                : `※${selectedPlan.name}は人数に関わらず1組あたりの料金です。`}
             </p>
           )}
           <p className="mt-3 text-xs font-medium text-amber-100/80">

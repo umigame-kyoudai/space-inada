@@ -6,6 +6,7 @@ import {
   getPriceRange,
   getPickupPrice,
   formatPrice,
+  DELIVERY_TIME_LABEL,
   INADA_NOMINATION_PRICE,
   LATE_NIGHT_FEES,
 } from "@/data/plans";
@@ -73,7 +74,7 @@ export default function LegalPage() {
     },
     {
       term: "役務の提供時期",
-      desc: "撮影は予約日時に実施します。撮影データは、撮影後に各プランの納品内容に従ってオンラインで納品します。",
+      desc: `撮影は予約日時に実施します。撮影データは、各プランの納品内容に従い${DELIVERY_TIME_LABEL}にオンラインで納品します。`,
     },
     {
       term: "キャンセル・返金について",

@@ -1,3 +1,5 @@
+import { DELIVERY_TIME_LABEL } from "@/data/plans";
+
 /** FAQ = 単一の真実。/faq 表示と FAQPage 構造化データが参照する。 */
 export type Faq = { q: string; a: string };
 
@@ -28,6 +30,6 @@ export const faqs: Faq[] = [
   },
   {
     q: "写真の納品方法と時期は？",
-    a: "撮影データはオンラインでの納品が基本です。プランごとの納品枚数に応じて、後日ダウンロードURLをお送りします。レタッチを含むプランは仕上げに少しお時間をいただきます。",
+    a: `撮影データは${DELIVERY_TIME_LABEL}にオンラインで納品します。プランごとの納品枚数に応じて、ダウンロードURLをLINEでお送りします。`,
   },
 ];

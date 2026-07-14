@@ -6,7 +6,12 @@ import { PlanCard } from "@/components/sections/PlanCard";
 import { PlanComparison } from "@/components/sections/PlanComparison";
 import { CtaBooking } from "@/components/sections/CtaBooking";
 import { JsonLd } from "@/components/seo/JsonLd";
-import { getPlans, getPlanOptions, formatPrice } from "@/data/plans";
+import {
+  DELIVERY_TIME_LABEL,
+  getPlans,
+  getPlanOptions,
+  formatPrice,
+} from "@/data/plans";
 import { absoluteUrl } from "@/lib/seo";
 
 export const metadata: Metadata = buildMetadata({
@@ -41,6 +46,9 @@ export default function PlansPage() {
       <p className="mt-4 max-w-2xl text-sm leading-relaxed text-zinc-400">
         気軽なカジュアルから、記念日・プロポーズの特別な撮影まで。
         ご希望や人数、シーンに合わせてお選びいただけます。
+      </p>
+      <p className="mt-3 max-w-2xl text-sm font-medium text-amber-100/80">
+        撮影データは全プラン{DELIVERY_TIME_LABEL}にオンラインで納品します。
       </p>
 
       <div
