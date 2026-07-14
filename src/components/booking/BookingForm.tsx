@@ -10,6 +10,12 @@ import {
 } from "@/data/plans";
 import { findCoupon, computeCouponDiscount, formatCouponDiscount } from "@/data/coupons";
 import { teamMembers } from "@/data/team";
+import {
+  AVAILABILITY_YEAR,
+  getTodayInJapanDateKey,
+  isFullMoonClosureDate,
+} from "@/data/availability";
+import { AvailabilityCalendar } from "@/components/booking/AvailabilityCalendar";
 
 /** 公式LINE（予約相談） */
 const LINE_URL = "https://lin.ee/5z6HX4S";
@@ -172,7 +178,41 @@ export function BookingForm({
   const [actedMessage, setActedMessage] = useState("");
 
   const formRef = useRef<HTMLFormElement>(null);
+  const dateInputRef = useRef<HTMLInputElement>(null);
   const previewRef = useRef<HTMLTextAreaElement>(null);
+  const todayDateKey = useMemo(() => getTodayInJapanDateKey(), []);
+  const [availabilityMonthIndex, setAvailabilityMonthIndex] = useState(() =>
+    Math.min(11, Math.max(0, Number(todayDateKey.slice(5, 7)) - 1)),
+  );
+  const isSelectedDateClosed = isFullMoonClosureDate(date);
+  const requiredItems = [
+    {
+      label: "撮影希望日",
+      complete: Boolean(date) && date >= todayDateKey && !isSelectedDateClosed,
+    },
+    { label: "希望プラン", complete: Boolean(plan) },
+    { label: "お名前", complete: Boolean(name.trim()) },
+    { label: "携帯番号", complete: Boolean(phone.trim()) },
+    { label: "深夜料金への同意", complete: lateNightConsent },
+  ];
+  const incompleteRequiredItems = requiredItems.filter((item) => !item.complete);
+  const completedRequiredCount = requiredItems.length - incompleteRequiredItems.length;
+
+  function selectDate(value: string) {
+    setDate(value);
+    const [year, month] = value.split("-").map(Number);
+    if (year === AVAILABILITY_YEAR && month >= 1 && month <= 12) {
+      setAvailabilityMonthIndex(month - 1);
+    }
+  }
+
+  useEffect(() => {
+    dateInputRef.current?.setCustomValidity(
+      isSelectedDateClosed
+        ? "この日は満月期間のため、星空フォトの撮影をお休みしています。別の日程をお選びください。"
+        : "",
+    );
+  }, [isSelectedDateClosed]);
 
   // CV計測: フォーム開始（最初のフィールド操作で1回だけ送る）
   const formStartedRef = useRef(false);
@@ -343,7 +383,7 @@ export function BookingForm({
   // localStorage から復元（マウント後に一度だけ。ハイドレーション不一致を避ける）
   const restoredRef = useRef(false);
   function applySaved(s: Record<string, unknown>) {
-    if (typeof s.date === "string") setDate(s.date);
+    if (typeof s.date === "string") selectDate(s.date);
     if (typeof s.plan === "string") setPlan(s.plan);
     if (typeof s.name === "string") setName(s.name);
     if (typeof s.adults === "string") setAdults(s.adults);
@@ -524,6 +564,52 @@ export function BookingForm({
           入力すると右（スマホは下）の送信文が自動で作られます。
         </p>
 
+        <div
+          aria-live="polite"
+          className={`mt-4 rounded-xl border p-4 ${
+            incompleteRequiredItems.length === 0
+              ? "border-emerald-300/25 bg-emerald-400/[0.08]"
+              : "border-amber-200/20 bg-amber-300/[0.06]"
+          }`}
+        >
+          <div className="flex items-center justify-between gap-3">
+            <p
+              className={`text-sm font-bold ${
+                incompleteRequiredItems.length === 0
+                  ? "text-emerald-200"
+                  : "text-amber-100"
+              }`}
+            >
+              {incompleteRequiredItems.length === 0
+                ? "✓ 必須項目の入力が完了しました"
+                : `必須項目はあと${incompleteRequiredItems.length}個です`}
+            </p>
+            <span className="shrink-0 text-xs font-semibold text-zinc-400">
+              {completedRequiredCount}/{requiredItems.length}
+            </span>
+          </div>
+          <div
+            role="progressbar"
+            aria-label="必須項目の入力進捗"
+            aria-valuemin={0}
+            aria-valuemax={requiredItems.length}
+            aria-valuenow={completedRequiredCount}
+            className="mt-3 h-1.5 overflow-hidden rounded-full bg-white/10"
+          >
+            <div
+              className={`h-full rounded-full transition-all duration-300 ${
+                incompleteRequiredItems.length === 0 ? "bg-emerald-300" : "bg-amber-300"
+              }`}
+              style={{ width: `${(completedRequiredCount / requiredItems.length) * 100}%` }}
+            />
+          </div>
+          {incompleteRequiredItems.length > 0 && (
+            <p className="mt-2 text-xs leading-relaxed text-zinc-400">
+              未入力：{incompleteRequiredItems.map((item) => item.label).join("・")}
+            </p>
+          )}
+        </div>
+
         <div className="mt-6 space-y-5">
           <div>
             <label htmlFor="date" className="mb-1.5 block text-sm font-medium text-zinc-200">
@@ -531,12 +617,25 @@ export function BookingForm({
               <RequiredBadge />
             </label>
             <input
+              ref={dateInputRef}
               id="date"
               type="date"
               value={date}
-              onChange={(e) => setDate(e.target.value)}
+              onChange={(e) => selectDate(e.target.value)}
+              min={todayDateKey}
               required
               className={`${inputClass} [color-scheme:dark]`}
+            />
+            {isSelectedDateClosed && (
+              <p role="alert" className="mt-2 text-xs font-medium text-rose-300">
+                この日は満月期間のため、星空フォトの撮影をお休みしています。別の日程をお選びください。
+              </p>
+            )}
+            <AvailabilityCalendar
+              selectedDate={date}
+              onSelectDate={selectDate}
+              monthIndex={availabilityMonthIndex}
+              onMonthChange={setAvailabilityMonthIndex}
             />
           </div>
 
@@ -699,6 +798,9 @@ export function BookingForm({
                 </select>
                 <p className="mt-2 text-xs text-zinc-400">
                   稲田の指名のみ＋{formatPrice(staffNominationPrice)}、その他のカメラマンは指名料無料です。
+                </p>
+                <p className="mt-1 text-[11px] leading-relaxed text-zinc-500">
+                  ※担当カメラマンによって写真のクオリティは変わりません。
                 </p>
               </div>
               <label className="flex min-w-0 items-center justify-between gap-2 rounded-lg border border-teal-200/15 bg-[#050814]/60 px-4 py-3 text-sm text-zinc-200">
