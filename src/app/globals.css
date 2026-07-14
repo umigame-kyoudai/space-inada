@@ -29,6 +29,11 @@ figcaption {
   text-wrap: pretty;
 }
 
+/* 星空背景は静的に描画する。
+   以前は background-position の無限アニメ（star-drift）で流していたが、
+   ページ全体の再ペイントが常時走り、モバイルでの発熱・電池消費と
+   スクロールのカクつきの原因になるため停止した（星の動きはヒーロー内の
+   オーロラ・流星などコンポジタで済む装飾に集約）。 */
 body {
   font-family: var(--font-sans), -apple-system, "Hiragino Kaku Gothic ProN",
     "Yu Gothic", Meiryo, sans-serif;
@@ -51,7 +56,6 @@ body {
     180px 180px,
     240px 240px,
     320px 320px;
-  animation: star-drift 42s linear infinite;
 }
 
 ::selection {
@@ -82,7 +86,10 @@ body {
 
 .cosmic-section {
   position: relative;
-  overflow: hidden;
+  /* clip にする理由: hidden はスクロールコンテナ扱いになり、
+     子孫の position: sticky（予約フォームのプレビュー等）が効かなくなる。
+     clip なら装飾のはみ出しは切りつつ sticky はビューポート基準で動く。 */
+  overflow: clip;
 }
 
 .cosmic-section::before {
@@ -94,7 +101,8 @@ body {
     linear-gradient(120deg, transparent 0 32%, rgba(94, 234, 212, 0.06) 44%, transparent 58%),
     linear-gradient(78deg, transparent 0 64%, rgba(251, 191, 36, 0.05) 74%, transparent 86%);
   opacity: 0.85;
-  animation: nebula-sweep 18s ease-in-out infinite alternate;
+  /* 全セクション同時の無限アニメは描画コストが嵩むため静的表示にする
+     （動く装飾はヒーロー内に集約） */
 }
 
 .cosmic-section::after {
@@ -107,8 +115,7 @@ body {
     radial-gradient(circle at 36% 72%, rgba(94, 234, 212, 0.55) 0 1px, transparent 1.8px),
     radial-gradient(circle at 68% 18%, rgba(252, 211, 77, 0.5) 0 1px, transparent 1.8px),
     radial-gradient(circle at 88% 62%, rgba(255, 255, 255, 0.62) 0 1px, transparent 1.8px);
-  opacity: 0.22;
-  animation: constellation-breathe 8s ease-in-out infinite;
+  opacity: 0.26;
 }
 
 .cosmic-section > * {
@@ -131,13 +138,15 @@ body {
 
 .cosmic-panel {
   border: 1px solid rgba(148, 163, 184, 0.18);
+  /* backdrop-filter: blur() は多数のパネルで同時に使うとモバイルGPUの負荷が
+     大きい。背面はほぼ一様な暗色背景なので、不透明度を少し上げた
+     グラデーションでガラス感を再現し blur は使わない（blurはヘッダーのみ）。 */
   background:
-    linear-gradient(180deg, rgba(15, 23, 42, 0.72), rgba(8, 13, 26, 0.62)),
+    linear-gradient(180deg, rgba(15, 23, 42, 0.86), rgba(8, 13, 26, 0.8)),
     linear-gradient(135deg, rgba(45, 212, 191, 0.08), rgba(251, 191, 36, 0.04) 42%, rgba(244, 114, 182, 0.06));
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.07),
     0 18px 60px rgba(0, 0, 0, 0.28);
-  backdrop-filter: blur(16px);
 }
 
 .cosmic-panel-hover {
@@ -430,7 +439,8 @@ body {
   pointer-events: none;
   background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), rgba(94, 234, 212, 0.14), transparent);
   filter: blur(5px);
-  transform: skewX(-14deg);
+  /* left をアニメすると毎フレームレイアウトが走るため transform で流す */
+  transform: translateX(0) skewX(-14deg);
   opacity: 0;
   animation: shutter-scan 8s ease-in-out infinite;
 }
@@ -445,7 +455,6 @@ body {
     radial-gradient(circle, rgba(251, 191, 36, 0.3) 0 1px, transparent 1.7px);
   background-position: 0 0, 18px 22px, 76px 94px, 138px 48px;
   background-size: 100% 100%, 150px 150px, 220px 220px, 280px 280px;
-  animation: star-drift 34s linear infinite;
 }
 
 .cosmic-image-placeholder::before {
@@ -527,36 +536,6 @@ body {
   to {
     opacity: 1;
     transform: translateY(0) scale(1);
-  }
-}
-
-@keyframes star-drift {
-  from {
-    background-position:
-      0 0,
-      100% 0,
-      18px 32px,
-      72px 112px,
-      136px 58px;
-  }
-  to {
-    background-position:
-      0 0,
-      100% 0,
-      198px 212px,
-      312px 352px,
-      456px 378px;
-  }
-}
-
-@keyframes nebula-sweep {
-  from {
-    opacity: 0.55;
-    transform: translateX(-2%);
-  }
-  to {
-    opacity: 0.95;
-    transform: translateX(2%);
   }
 }
 
@@ -652,18 +631,6 @@ body {
   }
 }
 
-@keyframes constellation-breathe {
-  0%,
-  100% {
-    opacity: 0.14;
-    transform: translateY(0);
-  }
-  50% {
-    opacity: 0.38;
-    transform: translateY(-6px);
-  }
-}
-
 @keyframes photo-stars {
   0%,
   100% {
@@ -677,18 +644,16 @@ body {
 @keyframes shutter-scan {
   0%,
   58% {
-    left: -45%;
+    transform: translateX(0) skewX(-14deg);
     opacity: 0;
   }
   64% {
     opacity: 0.68;
   }
-  78% {
-    left: 118%;
-    opacity: 0;
-  }
+  78%,
   100% {
-    left: 118%;
+    /* 自身の幅（親の32%）基準で親幅の約163%ぶん右へ＝画面外まで掃く */
+    transform: translateX(510%) skewX(-14deg);
     opacity: 0;
   }
 }
@@ -712,6 +677,20 @@ body {
 
   .cosmic-meteor {
     width: 7rem;
+  }
+}
+
+/* ───────── モバイルヘッダーの自動格納 ─────────
+   スマホはロゴ行(4rem)＋タブナビ(3rem)で計7remが常時固定され画面を圧迫するため、
+   下スクロール中はヘッダーごと4rem持ち上げてタブナビだけを画面上端に残す。
+   状態は HeaderAutoHide（client）が <html data-header-collapsed> で切り替える。 */
+.site-header {
+  transition: transform 260ms ease;
+}
+
+@media (max-width: 767px) {
+  html[data-header-collapsed="true"] .site-header {
+    transform: translateY(-4rem);
   }
 }
 

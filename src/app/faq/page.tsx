@@ -22,8 +22,7 @@ export default function FaqPage() {
 
       <h1 className="cosmic-title mt-6 text-3xl font-bold sm:text-4xl">よくある質問</h1>
       <p className="mt-4 max-w-2xl text-sm leading-relaxed text-zinc-400">
-        天候、服装、お支払い、キャンセル、お子様の参加、送迎、納品方法について
-        お答えします。その他のご質問もお気軽にお問い合わせください。
+        天候、服装、お支払い、キャンセル、お子様の参加、送迎、納品方法についてお答えします。その他のご質問もお気軽にお問い合わせください。
       </p>
 
       <div className="cosmic-panel mt-12 divide-y divide-teal-200/10 rounded-lg px-5">

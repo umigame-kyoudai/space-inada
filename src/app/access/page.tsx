@@ -21,26 +21,25 @@ export default function AccessPage() {
         アクセス・集合場所のご案内
       </h1>
       <p className="mt-4 max-w-2xl text-sm leading-relaxed text-zinc-400">
-        対応エリアは{siteConfig.contact.areaServed}全域です。
-        宮古島内の各エリアから撮影スポットへご案内します。
+        対応エリアは{siteConfig.contact.areaServed}全域です。宮古島内の各エリアから撮影スポットへご案内します。
       </p>
 
       {/* 対応エリア・撮影時間 */}
       <dl className="mt-8 grid gap-4 sm:grid-cols-3">
-        <div className="cosmic-panel rounded-lg p-5">
+        <div className="cosmic-panel rounded-xl p-5">
           <dt className="text-xs text-zinc-500">対応エリア</dt>
           <dd className="mt-1 text-base font-semibold text-white">
             {siteConfig.contact.areaServed}全域
           </dd>
         </div>
-        <div className="cosmic-panel rounded-lg p-5">
+        <div className="cosmic-panel rounded-xl p-5">
           <dt className="text-xs text-zinc-500">撮影時間</dt>
           <dd className="mt-1 text-base font-semibold text-white">
             {siteConfig.hours.label}
           </dd>
           <p className="mt-1 text-xs text-zinc-500">{siteConfig.hours.description}</p>
         </div>
-        <div className="cosmic-panel rounded-lg p-5">
+        <div className="cosmic-panel rounded-xl p-5">
           <dt className="text-xs text-zinc-500">予約方法</dt>
           <dd className="mt-1 text-base font-semibold text-white">公式LINE</dd>
           <p className="mt-1 text-xs text-zinc-500">フォームから簡単にご相談いただけます</p>
@@ -49,7 +48,7 @@ export default function AccessPage() {
 
       {/* 対応エリアマップ */}
       <div className="mt-10">
-        <div className="cosmic-panel relative aspect-[16/9] w-full overflow-hidden rounded-lg sm:aspect-[21/9]">
+        <div className="cosmic-panel relative aspect-[16/9] w-full overflow-hidden rounded-2xl sm:aspect-[21/9]">
           <iframe
             src={mapEmbedUrl()}
             title={`${siteConfig.contact.areaServed}の対応エリアマップ`}

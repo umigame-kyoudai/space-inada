@@ -31,7 +31,7 @@ const primaryPages = [
     label: "予約",
     match: (path: string) => path.startsWith("/booking"),
   },
-].map((item, i) => ({ ...item, index: String(i + 1).padStart(2, "0") }));
+];
 
 export function MobilePrimaryNav() {
   const pathname = usePathname() ?? "/";
@@ -57,20 +57,13 @@ export function MobilePrimaryNav() {
               item.href.startsWith("/booking") ? "mobile_nav" : undefined
             }
             aria-current={active ? "page" : undefined}
-            className={`relative flex min-w-0 flex-col items-center justify-center gap-0.5 transition-colors ${
+            className={`relative flex min-w-0 items-center justify-center transition-colors ${
               active
                 ? "text-amber-100"
-                : "text-zinc-500 hover:text-teal-100"
+                : "text-zinc-400 hover:text-teal-100"
             }`}
           >
-            <span
-              className={`text-[8px] font-semibold tracking-[0.2em] ${
-                active ? "text-amber-300" : "text-teal-200/40"
-              }`}
-            >
-              {item.index}
-            </span>
-            <span className="text-[10px] font-semibold tracking-[0.08em]">
+            <span className="text-xs font-semibold tracking-[0.08em]">
               {item.label}
             </span>
             <span

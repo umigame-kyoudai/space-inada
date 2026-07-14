@@ -4,6 +4,7 @@ import { siteConfig } from "@/lib/seo";
 import { getTestimonials } from "@/data/testimonials";
 import { MobileMenu } from "./MobileMenu";
 import { MobilePrimaryNav } from "./MobilePrimaryNav";
+import { HeaderAutoHide } from "./HeaderAutoHide";
 
 const nav = [
   { href: "/plans", label: "プラン" },
@@ -20,7 +21,7 @@ const nav = [
 
 export function Header() {
   return (
-    <header className="sticky top-0 z-50 border-b border-teal-200/10 bg-[#03040a]/82 shadow-lg shadow-black/20 backdrop-blur-xl">
+    <header className="site-header sticky top-0 z-50 border-b border-teal-200/10 bg-[#03040a]/82 shadow-lg shadow-black/20 backdrop-blur-xl">
       <Container className="flex h-16 items-center justify-between">
         <Link href="/" className="group inline-flex items-center gap-2 text-base font-bold text-white">
           <span className="h-2 w-2 rounded-full bg-amber-300 shadow-[0_0_18px_rgba(251,191,36,0.8)]" />
@@ -42,7 +43,7 @@ export function Header() {
             href="/booking?from=header"
             data-ga-event="reservation_click"
             data-ga-button="header"
-            className="hidden h-10 items-center rounded-lg border border-amber-300/70 bg-amber-300 px-5 text-sm font-semibold text-zinc-950 shadow-lg shadow-amber-300/10 transition-all hover:bg-teal-200 sm:inline-flex"
+            className="hidden h-10 items-center rounded-lg border border-amber-300/70 bg-amber-300 px-5 text-sm font-semibold text-zinc-950 shadow-lg shadow-amber-300/10 transition-all hover:bg-amber-200 sm:inline-flex"
           >
             予約する
           </Link>
@@ -50,6 +51,7 @@ export function Header() {
         </div>
       </Container>
       <MobilePrimaryNav />
+      <HeaderAutoHide />
     </header>
   );
 }

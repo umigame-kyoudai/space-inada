@@ -129,7 +129,7 @@ export type VideoAsset = {
 
 export const shootingVideo: VideoAsset = {
   src: "/videos/shooting.mp4",
-  // poster: "/images/video-poster.jpg", // 用意できたら設定
+  poster: "/images/video/shooting-poster.jpg",
   label: "宮古島の星空のもとでの撮影の様子",
 };
 

@@ -50,8 +50,7 @@ export default async function BookingPage({
         LINEで予約・相談する
       </h1>
       <p className="mt-4 max-w-2xl text-sm leading-relaxed text-zinc-400">
-        下のフォームに入力すると、公式LINEへ送る文章が自動で作られます。
-        「内容をコピーする」→「公式LINEを開く」の順に進み、トークに貼り付けて送信してください。
+        下のフォームに入力すると、公式LINEへ送る文章が自動で作られます。「内容をコピーする」→「公式LINEを開く」の順に進み、トークに貼り付けて送信してください。
       </p>
 
       {/* 手順 */}

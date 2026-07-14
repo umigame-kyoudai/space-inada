@@ -264,6 +264,18 @@ export function BookingForm({
   const dateInputRef = useRef<HTMLInputElement>(null);
   const adultMaleRef = useRef<HTMLInputElement>(null);
   const previewRef = useRef<HTMLTextAreaElement>(null);
+  // モバイル固定バーの出し分け用。本来のアクションボタンが見えている間はバーを隠す。
+  const actionsRef = useRef<HTMLDivElement>(null);
+  const [actionsInView, setActionsInView] = useState(false);
+  useEffect(() => {
+    const el = actionsRef.current;
+    if (!el || typeof IntersectionObserver === "undefined") return;
+    const observer = new IntersectionObserver(([entry]) =>
+      setActionsInView(entry.isIntersecting),
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
   const todayDateKey = useMemo(() => getTodayInJapanDateKey(), []);
   const [availabilityMonthIndex, setAvailabilityMonthIndex] = useState(() =>
     Math.min(11, Math.max(0, Number(todayDateKey.slice(5, 7)) - 1)),
@@ -640,6 +652,27 @@ export function BookingForm({
     return formRef.current?.reportValidity() ?? false;
   }
 
+  // 公式LINEを開くリンク（メイン／モバイル固定バー共通）。
+  // 未入力があれば遷移させずフォームの該当箇所へ誘導する。
+  function handleLineClick(
+    e: React.MouseEvent<HTMLAnchorElement>,
+    buttonName: string,
+  ) {
+    if (!validateRequiredFields()) {
+      e.preventDefault();
+      return;
+    }
+    // CV計測：公式LINEを開いた（実質CV）
+    trackEvent("line_click", {
+      button_name: buttonName,
+      link_url: LINE_URL,
+      plan_name: plan || "未選択",
+      copied: effectiveStatus === "copied",
+      coupon: coupon?.code ?? "なし",
+      from: from || "direct",
+    });
+  }
+
   async function handleCopy() {
     if (!validateRequiredFields()) return;
 
@@ -680,7 +713,7 @@ export function BookingForm({
         ref={formRef}
         onSubmit={(e) => e.preventDefault()}
         onFocus={handleFormStart}
-        className="cosmic-panel min-w-0 max-w-full rounded-lg p-6 sm:p-8"
+        className="cosmic-panel min-w-0 max-w-full rounded-2xl p-6 sm:p-8"
       >
         <h2 className="text-lg font-bold text-white">予約内容を入力</h2>
         <p className="mt-1 text-xs text-zinc-500">
@@ -1056,6 +1089,9 @@ export function BookingForm({
             <p id="late-night-fee-description" className="mt-1">
               0:00〜0:59の撮影はお一人につき＋{formatPrice(LATE_NIGHT_FEES.midnight)}、1:00以降の撮影はお一人につき＋{formatPrice(LATE_NIGHT_FEES.afterOne)}の追加料金がかかります。
             </p>
+            <p className="mt-1 text-xs text-zinc-500">
+              ※撮影時間は月齢や当日の空模様に合わせて確定するため、ご希望の時間帯に関わらず全てのご予約で事前確認をお願いしています。
+            </p>
             <label className="mt-3 flex items-start gap-3 rounded-lg border border-amber-200/25 bg-[#050814]/60 p-3 text-sm text-zinc-200">
               <input
                 type="checkbox"
@@ -1177,19 +1213,21 @@ export function BookingForm({
 
       {/* プレビュー + アクション */}
       <div className="min-w-0 max-w-full lg:sticky lg:top-20 lg:self-start">
-        <div className="cosmic-panel min-w-0 max-w-full rounded-lg p-6 sm:p-8">
+        <div className="cosmic-panel min-w-0 max-w-full rounded-2xl p-6 sm:p-8">
           <h2 className="text-lg font-bold text-white">送信内容プレビュー</h2>
           <p className="mt-1 text-xs text-zinc-500">
             この内容をコピーして、公式LINEのトークに貼り付けて送信してください。
           </p>
 
+          {/* モバイルは max-h で圧縮（中はスクロール可）。長大な全文でボタンが
+              画面外に追いやられるのを防ぐ。sm以上は従来どおり全文表示。 */}
           <textarea
             ref={previewRef}
             readOnly
             value={message}
             rows={18}
             aria-label="送信内容プレビュー"
-            className="mt-4 min-w-0 w-full max-w-full resize-none rounded-lg border border-teal-200/15 bg-[#03040a]/85 p-4 text-base leading-relaxed text-zinc-200 outline-none sm:text-xs"
+            className="mt-4 min-w-0 w-full max-w-full resize-none rounded-lg border border-teal-200/15 bg-[#03040a]/85 p-4 text-base leading-relaxed text-zinc-200 outline-none max-h-56 sm:max-h-none sm:text-xs"
           />
 
           {/* ステータス表示 */}
@@ -1207,11 +1245,11 @@ export function BookingForm({
           </div>
 
           {/* ボタン */}
-          <div className="mt-2 space-y-3">
+          <div ref={actionsRef} className="mt-2 space-y-3">
             <button
               type="button"
               onClick={handleCopy}
-              className="flex h-14 w-full items-center justify-center gap-2 rounded-lg border border-amber-200/70 bg-amber-300 text-base font-bold text-zinc-950 shadow-lg shadow-amber-300/15 transition-colors hover:bg-teal-200"
+              className="flex h-14 w-full items-center justify-center gap-2 rounded-lg border border-amber-200/70 bg-amber-300 text-base font-bold text-zinc-950 shadow-lg shadow-amber-300/15 transition-colors hover:bg-amber-200"
             >
               📋 内容をコピーする
             </button>
@@ -1220,21 +1258,7 @@ export function BookingForm({
               href={LINE_URL}
               target="_blank"
               rel="noopener noreferrer"
-              onClick={(e) => {
-                if (!validateRequiredFields()) {
-                  e.preventDefault();
-                  return;
-                }
-                // CV計測：公式LINEを開いた（実質CV）
-                trackEvent("line_click", {
-                  button_name: "booking_form",
-                  link_url: LINE_URL,
-                  plan_name: plan || "未選択",
-                  copied: effectiveStatus === "copied",
-                  coupon: coupon?.code ?? "なし",
-                  from: from || "direct",
-                });
-              }}
+              onClick={(e) => handleLineClick(e, "booking_form")}
               className={`flex h-14 w-full items-center justify-center gap-2 rounded-lg text-base font-bold transition-all ${
                 effectiveStatus === "copied"
                   ? "scale-[1.02] bg-[#06C755] text-white shadow-lg shadow-[#06C755]/30 animate-pulse"
@@ -1250,6 +1274,48 @@ export function BookingForm({
           </div>
         </div>
       </div>
+
+      {/* モバイル用の固定アクションバー。
+          長いフォームのどこからでも進捗確認とコピー→LINEに進めるようにする。
+          本来のアクションボタンが見えている間は重複するため非表示。 */}
+      {!actionsInView && (
+        <div className="fixed inset-x-0 bottom-0 z-40 border-t border-teal-200/15 bg-[#03040a]/95 px-4 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-2.5 lg:hidden">
+          <p
+            aria-live="polite"
+            className={`text-center text-xs font-semibold ${
+              incompleteRequiredItems.length === 0
+                ? "text-emerald-300"
+                : "text-amber-200"
+            }`}
+          >
+            {incompleteRequiredItems.length === 0
+              ? "✓ 必須項目の入力が完了しました。コピーして送信へ"
+              : `必須項目 あと${incompleteRequiredItems.length}個（${completedRequiredCount}/${requiredItems.length}）`}
+          </p>
+          <div className="mt-2 grid grid-cols-2 gap-2">
+            <button
+              type="button"
+              onClick={handleCopy}
+              className="flex h-12 items-center justify-center gap-1.5 rounded-lg border border-amber-200/70 bg-amber-300 text-sm font-bold text-zinc-950 transition-colors hover:bg-amber-200"
+            >
+              📋 内容をコピー
+            </button>
+            <a
+              href={LINE_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={(e) => handleLineClick(e, "booking_form_sticky")}
+              className={`flex h-12 items-center justify-center gap-1.5 rounded-lg text-sm font-bold transition-all ${
+                effectiveStatus === "copied"
+                  ? "bg-[#06C755] text-white shadow-lg shadow-[#06C755]/30"
+                  : "border border-[#06C755]/60 bg-[#06C755]/10 text-[#5fe39a]"
+              }`}
+            >
+              💬 LINEを開く
+            </a>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -25,8 +25,7 @@ export default function GalleryPage() {
         撮影ギャラリー
       </h1>
       <p className="mt-4 max-w-2xl text-sm leading-relaxed text-zinc-400">
-        宮古島の星空のもとで撮影した作品の数々。天の川を背景にしたカップルフォト、
-        プロポーズの瞬間、家族の笑顔——ここでしか残せない一枚をご覧ください。
+        宮古島の星空のもとで撮影した作品の数々。天の川を背景にしたカップルフォト、プロポーズの瞬間、家族の笑顔——ここでしか残せない一枚をご覧ください。
       </p>
 
       <GalleryMasonry images={galleryImages} className="mt-12" priorityCount={3} />

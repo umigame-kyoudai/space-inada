@@ -107,7 +107,7 @@ export default async function PlanDetailPage({ params }: Props) {
 
       {/* 概要 */}
       <dl className="mt-10 grid gap-4 sm:grid-cols-3">
-        <div className="cosmic-panel rounded-lg p-5">
+        <div className="cosmic-panel rounded-xl p-5">
           <dt className="text-xs text-zinc-500">料金</dt>
           <dd className="mt-1">
             <p className="text-xl font-bold text-white">{planPriceLabel(plan)}</p>
@@ -118,13 +118,13 @@ export default async function PlanDetailPage({ params }: Props) {
             </ul>
           </dd>
         </div>
-        <div className="cosmic-panel rounded-lg p-5">
+        <div className="cosmic-panel rounded-xl p-5">
           <dt className="text-xs text-zinc-500">撮影時間の目安</dt>
           <dd className="mt-1 text-xl font-bold text-white">
             {plan.durationMin ? `約${plan.durationMin}分` : "応相談"}
           </dd>
         </div>
-        <div className="cosmic-panel rounded-lg p-5">
+        <div className="cosmic-panel rounded-xl p-5">
           <dt className="text-xs text-zinc-500">納品</dt>
           <dd className="mt-1 text-base font-semibold text-white">{plan.deliveryCount}</dd>
           {!plan.comingSoon && (

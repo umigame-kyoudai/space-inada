@@ -15,7 +15,7 @@ export function CtaBooking({
   // CV計測: どのCTAから予約フォームに来たかを from で識別する
   const trackedHref = `${bookingHref}${bookingHref.includes("?") ? "&" : "?"}from=cta`;
   return (
-    <div className="cosmic-panel relative overflow-hidden rounded-lg p-8 text-center sm:p-12">
+    <div className="cosmic-panel relative overflow-hidden rounded-2xl p-8 text-center sm:p-12">
       <div className="pointer-events-none absolute inset-x-8 top-0 h-px bg-gradient-to-r from-transparent via-amber-200/70 to-transparent" />
       <h2 className="cosmic-title text-2xl font-bold sm:text-3xl">{heading}</h2>
       <p className="mx-auto mt-4 max-w-2xl text-sm leading-relaxed text-zinc-300">

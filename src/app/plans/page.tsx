@@ -44,8 +44,7 @@ export default function PlansPage() {
         宮古島の星空フォト 撮影プラン
       </h1>
       <p className="mt-4 max-w-2xl text-sm leading-relaxed text-zinc-400">
-        気軽なカジュアルから、記念日・プロポーズの特別な撮影まで。
-        ご希望や人数、シーンに合わせてお選びいただけます。
+        気軽なカジュアルから、記念日・プロポーズの特別な撮影まで。ご希望や人数、シーンに合わせてお選びいただけます。
       </p>
       <p className="mt-3 max-w-2xl text-sm font-medium text-amber-100/80">
         撮影データは全プラン{DELIVERY_TIME_LABEL}にオンラインで納品します。

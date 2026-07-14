@@ -40,8 +40,7 @@ export default function BlogPage() {
 
       <h1 className="cosmic-title mt-6 text-3xl font-bold sm:text-4xl">星空フォトコラム</h1>
       <p className="mt-4 max-w-2xl text-sm leading-relaxed text-zinc-400">
-        宮古島で星空を楽しむ・撮るための知識を発信。見頃の時期や天の川、
-        プロポーズ撮影、夜観光まで、撮影のプロがお届けします。
+        宮古島で星空を楽しむ・撮るための知識を発信。見頃の時期や天の川、プロポーズ撮影、夜観光まで、撮影のプロがお届けします。
       </p>
 
       <div className="mt-12 grid gap-6 sm:grid-cols-2">

@@ -15,7 +15,7 @@ export function PlanGallery({
 }) {
   if (images.length <= 1) {
     return (
-      <div className="cosmic-panel relative mt-10 aspect-[16/9] w-full overflow-hidden rounded-lg">
+      <div className="cosmic-panel relative mt-10 aspect-[16/9] w-full overflow-hidden rounded-2xl">
         <ImageSlot asset={images[0]} priority={priority} sizes="(max-width: 1024px) 100vw, 1024px" />
       </div>
     );
@@ -30,7 +30,7 @@ export function PlanGallery({
       {images.map((img, i) => (
         <figure
           key={img.src ?? i}
-          className="cosmic-panel relative aspect-[16/9] w-[88%] shrink-0 snap-center overflow-hidden rounded-lg sm:w-[60%]"
+          className="cosmic-panel relative aspect-[16/9] w-[88%] shrink-0 snap-center overflow-hidden rounded-xl sm:w-[60%]"
         >
           <ImageSlot
             asset={img}

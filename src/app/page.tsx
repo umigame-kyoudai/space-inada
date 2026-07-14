@@ -9,9 +9,10 @@ import { Hero } from "@/components/sections/Hero";
 import { SectionHeading } from "@/components/sections/SectionHeading";
 import { GalleryMasonry } from "@/components/sections/GalleryMasonry";
 import { VideoPlayer } from "@/components/media/VideoPlayer";
+import { ImageSlot } from "@/components/media/ImageSlot";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { videoJsonLd } from "@/lib/jsonld";
-import { galleryImages, shootingVideo } from "@/data/images";
+import { galleryImages, postImage, shootingVideo } from "@/data/images";
 import { DELIVERY_TIME_LABEL, getPlans } from "@/data/plans";
 import { getPosts } from "@/data/posts";
 import { getTestimonials } from "@/data/testimonials";
@@ -87,11 +88,10 @@ export default function Home() {
           <p className="cosmic-kicker text-sm font-semibold tracking-widest">MOVIE</p>
           <h2 className="cosmic-title mt-3 text-2xl font-bold sm:text-3xl">撮影の様子</h2>
           <p className="mx-auto mt-4 max-w-2xl text-sm leading-relaxed text-zinc-400">
-            宮古島の星空のもとで、どんなふうに撮影が進むのか。
-            当日の雰囲気を動画でご覧ください。
+            宮古島の星空のもとで、どんなふうに撮影が進むのか。当日の雰囲気を動画でご覧ください。
           </p>
         </div>
-        <div className="cosmic-panel reveal-up delay-100 mt-8 overflow-hidden rounded-lg bg-black">
+        <div className="cosmic-panel reveal-up delay-100 mt-8 overflow-hidden rounded-2xl bg-black">
           <VideoPlayer video={shootingVideo} />
         </div>
       </Section>
@@ -105,7 +105,7 @@ export default function Home() {
           {features.map((f, i) => (
             <div
               key={f.title}
-              className={`cosmic-panel reveal-up rounded-lg p-6 ${i === 1 ? "delay-100" : i === 2 ? "delay-200" : ""}`}
+              className={`cosmic-panel reveal-up rounded-2xl p-6 ${i === 1 ? "delay-100" : i === 2 ? "delay-200" : ""}`}
             >
               <h3 className="text-lg font-bold text-teal-100">{f.title}</h3>
               <p className="mt-3 text-sm leading-relaxed text-zinc-400">{f.text}</p>
@@ -122,8 +122,7 @@ export default function Home() {
             宮古島の夜へ向かう流れ
           </h2>
           <p className="mx-auto mt-4 max-w-2xl text-sm leading-relaxed text-zinc-400">
-            ご予約から撮影、納品まで。夜空のコンディションに合わせて進めるため、
-            はじめての方でも安心してお越しいただけます。
+            ご予約から撮影、納品まで。夜空のコンディションに合わせて進めるため、はじめての方でも安心してお越しいただけます。
           </p>
         </div>
 
@@ -131,7 +130,7 @@ export default function Home() {
           {journey.map((item, i) => (
             <article
               key={item.step}
-              className={`cosmic-panel reveal-up grid gap-4 rounded-lg p-5 sm:w-[76%] sm:grid-cols-[5rem_1fr] sm:p-6 ${
+              className={`cosmic-panel reveal-up grid gap-4 rounded-2xl p-5 sm:w-[76%] sm:grid-cols-[5rem_1fr] sm:p-6 ${
                 i % 2 === 0 ? "sm:mr-auto" : "sm:ml-auto"
               } ${i === 1 ? "delay-100" : i === 2 ? "delay-200" : i === 3 ? "delay-300" : ""}`}
             >
@@ -185,14 +184,24 @@ export default function Home() {
             <Link
               key={post.slug}
               href={`/blog/${post.slug}`}
-              className={`cosmic-panel cosmic-panel-hover reveal-up group rounded-lg p-6 ${i === 1 ? "delay-100" : i === 2 ? "delay-200" : ""}`}
+              className={`cosmic-panel cosmic-panel-hover reveal-up group flex flex-col overflow-hidden rounded-2xl ${i === 1 ? "delay-100" : i === 2 ? "delay-200" : ""}`}
             >
-              <h3 className="text-base font-bold text-white group-hover:text-teal-100">
-                {post.title}
-              </h3>
-              <p className="mt-3 text-sm leading-relaxed text-zinc-400">
-                {post.excerpt}
-              </p>
+              <figure className="relative aspect-[16/9] w-full overflow-hidden">
+                <ImageSlot
+                  asset={postImage(post)}
+                  sizes="(max-width: 640px) 100vw, 33vw"
+                  className="transition-transform duration-500 group-hover:scale-105"
+                />
+                <div className="absolute inset-x-0 bottom-0 h-12 bg-gradient-to-t from-slate-950/70 to-transparent" />
+              </figure>
+              <div className="p-6">
+                <h3 className="text-base font-bold text-white group-hover:text-teal-100">
+                  {post.title}
+                </h3>
+                <p className="mt-3 text-sm leading-relaxed text-zinc-400">
+                  {post.excerpt}
+                </p>
+              </div>
             </Link>
           ))}
         </div>

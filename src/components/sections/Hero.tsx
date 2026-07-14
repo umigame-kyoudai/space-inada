@@ -139,9 +139,10 @@ export function Hero() {
           </span>
         </h1>
 
+        {/* JSXの改行は半角スペースとして描画され日本語の文中に不自然な空きが
+            できるため、文はひと続きの文字列で書く */}
         <p className="mx-auto mt-6 max-w-xl text-sm leading-relaxed text-slate-200 drop-shadow-[0_1px_18px_rgba(4,8,28,0.75)] sm:text-base">
-          宮古島の静かな夜、満天の星、天の川。
-          大切な人との時間を、忘れられない一枚に。
+          宮古島の静かな夜、満天の星、天の川。大切な人との時間を、忘れられない一枚に。
         </p>
 
         <div className="mt-9 flex flex-wrap items-center justify-center gap-3">
@@ -149,7 +150,7 @@ export function Hero() {
             href="/booking?from=hero"
             data-ga-event="reservation_click"
             data-ga-button="hero"
-            className="inline-flex h-12 items-center justify-center rounded-lg border border-amber-200/70 bg-amber-300 px-7 text-sm font-bold text-zinc-950 shadow-lg shadow-amber-300/20 transition-colors hover:bg-teal-200"
+            className="inline-flex h-12 items-center justify-center rounded-lg border border-amber-200/70 bg-amber-300 px-7 text-sm font-bold text-zinc-950 shadow-lg shadow-amber-300/20 transition-colors hover:bg-amber-200"
           >
             予約・相談する
           </Link>
