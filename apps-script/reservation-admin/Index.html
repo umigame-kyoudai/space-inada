@@ -1,0 +1,1038 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <base target="_top">
+  <meta charset="utf-8">
+  <style>
+    :root {
+      --navy: #0b1830;
+      --navy-2: #13294b;
+      --sky: #5ea9ff;
+      --sky-pale: #eaf4ff;
+      --gold: #f4c66a;
+      --ink: #18233a;
+      --muted: #64748b;
+      --line: #dbe4ef;
+      --paper: #ffffff;
+      --base: #f4f7fb;
+      --danger: #b42318;
+      --danger-bg: #fff1f0;
+      --success: #16794b;
+      --success-bg: #eaf8f1;
+      --shadow: 0 12px 36px rgba(13, 34, 68, .10);
+      --radius: 16px;
+    }
+
+    * { box-sizing: border-box; }
+    html { color-scheme: light; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--ink);
+      background: var(--base);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif;
+      line-height: 1.55;
+    }
+
+    button, input, select, textarea { font: inherit; }
+    button { cursor: pointer; }
+    [hidden] { display: none !important; }
+
+    .app-header {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      min-height: 72px;
+      padding: 12px clamp(16px, 4vw, 44px);
+      color: white;
+      background: linear-gradient(135deg, var(--navy), var(--navy-2));
+      box-shadow: 0 5px 22px rgba(5, 18, 39, .20);
+    }
+
+    .brand { display: flex; align-items: center; gap: 12px; }
+    .brand-mark {
+      display: grid;
+      place-items: center;
+      width: 42px;
+      height: 42px;
+      border: 1px solid rgba(255,255,255,.28);
+      border-radius: 13px;
+      color: var(--gold);
+      background: rgba(255,255,255,.08);
+      font-size: 21px;
+    }
+    .brand strong { display: block; font-size: 16px; letter-spacing: .03em; }
+    .brand small { display: block; color: #b8c9df; font-size: 11px; }
+    .staff-name { color: #c9d7e8; font-size: 13px; }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 220px minmax(0, 1fr);
+      min-height: calc(100vh - 72px);
+    }
+    .sidebar {
+      padding: 28px 16px;
+      border-right: 1px solid var(--line);
+      background: #fff;
+    }
+    .nav-button {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      width: 100%;
+      margin-bottom: 8px;
+      padding: 12px 14px;
+      border: 0;
+      border-radius: 11px;
+      color: #526176;
+      background: transparent;
+      text-align: left;
+      font-weight: 700;
+    }
+    .nav-button.active { color: #0d4f91; background: var(--sky-pale); }
+    .nav-icon { width: 24px; text-align: center; font-size: 18px; }
+    .sidebar-note {
+      margin-top: 28px;
+      padding: 13px;
+      border: 1px solid #f5dfad;
+      border-radius: 12px;
+      color: #785a18;
+      background: #fff9e9;
+      font-size: 12px;
+    }
+
+    main { min-width: 0; padding: clamp(20px, 4vw, 42px); }
+    .page-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    h1, h2, h3, p { margin-top: 0; }
+    h1 { margin-bottom: 7px; font-size: clamp(24px, 3vw, 32px); letter-spacing: -.02em; }
+    h2 { margin-bottom: 16px; font-size: 18px; }
+    h3 { margin-bottom: 10px; font-size: 15px; }
+    .lead { margin-bottom: 0; color: var(--muted); font-size: 14px; }
+
+    .grid-2 { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr); gap: 20px; align-items: start; }
+    .card {
+      min-width: 0;
+      padding: clamp(18px, 3vw, 26px);
+      border: 1px solid rgba(206, 218, 233, .8);
+      border-radius: var(--radius);
+      background: var(--paper);
+      box-shadow: var(--shadow);
+    }
+    .card-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+    .step {
+      display: inline-grid;
+      place-items: center;
+      width: 27px;
+      height: 27px;
+      margin-right: 8px;
+      border-radius: 50%;
+      color: white;
+      background: var(--navy-2);
+      font-size: 13px;
+    }
+
+    label { display: block; margin-bottom: 6px; color: #39475c; font-size: 13px; font-weight: 700; }
+    .required::after { content: " 必須"; color: var(--danger); font-size: 10px; }
+    input, select, textarea {
+      width: 100%;
+      border: 1px solid #cbd7e5;
+      border-radius: 10px;
+      color: var(--ink);
+      background: #fff;
+      outline: none;
+      transition: border .15s, box-shadow .15s;
+    }
+    input, select { min-height: 43px; padding: 9px 11px; }
+    textarea { min-height: 86px; padding: 11px; resize: vertical; }
+    input:focus, select:focus, textarea:focus { border-color: var(--sky); box-shadow: 0 0 0 3px rgba(94,169,255,.16); }
+    #rawText { min-height: 410px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12px; }
+    .field-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 15px; }
+    .field.full { grid-column: 1 / -1; }
+    .hint { display: block; margin-top: 5px; color: var(--muted); font-size: 11px; }
+
+    .button-row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 16px; }
+    .button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      min-height: 42px;
+      padding: 9px 16px;
+      border: 1px solid transparent;
+      border-radius: 10px;
+      font-weight: 800;
+      transition: transform .1s, opacity .15s, background .15s;
+    }
+    .button:hover { transform: translateY(-1px); }
+    .button:disabled { cursor: not-allowed; opacity: .48; transform: none; }
+    .button.primary { color: white; background: #1565ad; }
+    .button.dark { color: white; background: var(--navy-2); }
+    .button.secondary { color: #28405d; border-color: #ccd8e6; background: #fff; }
+    .button.danger { color: var(--danger); border-color: #f0c7c3; background: var(--danger-bg); }
+    .button.small { min-height: 34px; padding: 6px 11px; font-size: 12px; }
+
+    .parse-status {
+      margin: 16px 0;
+      padding: 12px 14px;
+      border-radius: 11px;
+      color: #45546a;
+      background: #f0f4f9;
+      font-size: 13px;
+      font-weight: 700;
+    }
+    .parse-status.ok { color: var(--success); background: var(--success-bg); }
+    .parse-status.warn { color: var(--danger); background: var(--danger-bg); }
+    .intake-proposal { margin-top: 22px; padding-top: 20px; border-top: 1px solid var(--line); }
+    .intake-proposal textarea { min-height: 210px; color: #2c3a4e; background: #f9fbfd; font-size: 12px; }
+    input[type="time"] { font-variant-numeric: tabular-nums; }
+
+    .toolbar {
+      display: grid;
+      grid-template-columns: minmax(220px, 1fr) 200px auto;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+    .summary-bar { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
+    .summary-pill { padding: 6px 10px; border-radius: 999px; color: #4f6075; background: #e9eef5; font-size: 12px; font-weight: 700; }
+
+    .table-wrap { overflow: auto; border: 1px solid var(--line); border-radius: 13px; background: #fff; }
+    table { width: 100%; min-width: 880px; border-collapse: collapse; }
+    th, td { padding: 12px 13px; border-bottom: 1px solid #e8edf3; text-align: left; vertical-align: middle; }
+    th { position: sticky; top: 0; z-index: 1; color: #526176; background: #f7f9fc; font-size: 11px; letter-spacing: .03em; }
+    td { font-size: 13px; }
+    tbody tr { cursor: pointer; transition: background .12s; }
+    tbody tr:hover { background: #f4f9ff; }
+    .customer-name { font-weight: 800; }
+    .subtext { margin-top: 2px; color: var(--muted); font-size: 11px; }
+    .status-chip { display: inline-flex; padding: 5px 9px; border-radius: 999px; color: #405169; background: #e8edf4; font-size: 11px; font-weight: 800; white-space: nowrap; }
+    .status-chip[data-status="未返信"] { color: #a43f0d; background: #fff0e6; }
+    .status-chip[data-status="時間確定"] { color: #11623d; background: #e7f7ee; }
+    .status-chip[data-status="当日案内済み"] { color: #0f528a; background: #e7f2fc; }
+    .status-chip[data-status="撮影完了"] { color: #5d3c91; background: #f0eafd; }
+    .status-chip[data-status="キャンセル"] { color: #8a2c2c; background: #faeaea; }
+    .empty { padding: 56px 20px; color: var(--muted); text-align: center; }
+
+    dialog {
+      width: min(1040px, calc(100vw - 28px));
+      max-height: calc(100vh - 28px);
+      padding: 0;
+      border: 0;
+      border-radius: 18px;
+      background: #f5f7fb;
+      box-shadow: 0 28px 80px rgba(5, 20, 45, .32);
+    }
+    dialog::backdrop { background: rgba(7, 18, 38, .62); backdrop-filter: blur(2px); }
+    .dialog-head {
+      position: sticky;
+      top: 0;
+      z-index: 3;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 18px 22px;
+      color: white;
+      background: var(--navy-2);
+    }
+    .dialog-head h2 { margin: 0; }
+    .icon-button { width: 38px; height: 38px; border: 0; border-radius: 10px; color: white; background: rgba(255,255,255,.12); font-size: 20px; }
+    .dialog-body { padding: 20px; }
+    .dialog-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(320px, .85fr); gap: 18px; align-items: start; }
+    .section-card { margin-bottom: 16px; padding: 18px; border: 1px solid var(--line); border-radius: 14px; background: #fff; }
+    .time-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+    .message-card { margin-bottom: 13px; padding: 15px; border: 1px solid #d7e1ed; border-radius: 13px; background: #fff; }
+    .message-card textarea { min-height: 170px; color: #2c3a4e; background: #f9fbfd; font-size: 12px; }
+    .message-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 8px; }
+    .message-head h3 { margin: 0; }
+    .dialog-actions { position: sticky; bottom: 0; display: flex; justify-content: flex-end; gap: 10px; padding: 14px 20px; border-top: 1px solid var(--line); background: rgba(255,255,255,.96); }
+
+    .toast {
+      position: fixed;
+      right: 20px;
+      bottom: 20px;
+      z-index: 100;
+      max-width: min(380px, calc(100vw - 40px));
+      padding: 12px 16px;
+      border-radius: 11px;
+      color: white;
+      background: #22334d;
+      box-shadow: 0 12px 36px rgba(0,0,0,.22);
+      font-size: 13px;
+      font-weight: 700;
+    }
+    .toast.error { background: #9f2f27; }
+    .loading {
+      position: fixed;
+      inset: 0;
+      z-index: 99;
+      display: grid;
+      place-items: center;
+      background: rgba(244,247,251,.70);
+      backdrop-filter: blur(2px);
+    }
+    .loading-box { padding: 14px 18px; border-radius: 12px; background: #fff; box-shadow: var(--shadow); font-weight: 800; }
+
+    @media (max-width: 900px) {
+      .layout { grid-template-columns: 1fr; }
+      .sidebar { position: sticky; top: 72px; z-index: 10; display: flex; gap: 8px; padding: 9px 14px; border-right: 0; border-bottom: 1px solid var(--line); overflow-x: auto; }
+      .nav-button { width: auto; min-width: max-content; margin: 0; padding: 9px 12px; }
+      .sidebar-note { display: none; }
+      .grid-2, .dialog-grid { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 620px) {
+      .app-header { min-height: 64px; }
+      .layout { min-height: calc(100vh - 64px); }
+      .staff-name, .brand small { display: none; }
+      .sidebar { top: 64px; }
+      main { padding: 18px 13px 30px; }
+      .field-grid, .time-grid { grid-template-columns: 1fr; }
+      .field.full { grid-column: auto; }
+      .toolbar { grid-template-columns: 1fr; }
+      .card { padding: 17px; }
+      .dialog-body { padding: 12px; }
+      .dialog-actions { flex-direction: column-reverse; }
+      .dialog-actions .button { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+  <header class="app-header">
+    <div class="brand">
+      <div class="brand-mark">✦</div>
+      <div>
+        <strong>星空フォト予約管理</strong>
+        <small>スタッフ専用</small>
+      </div>
+    </div>
+    <div class="staff-name" id="staffName">読み込み中…</div>
+  </header>
+
+  <div class="layout">
+    <aside class="sidebar">
+      <button class="nav-button active" data-view="intake"><span class="nav-icon">＋</span>予約を取り込む</button>
+      <button class="nav-button" data-view="list"><span class="nav-icon">☷</span>予約一覧</button>
+      <div class="sidebar-note">LINEへの送信は自動ではありません。生成した文章をコピーして、公式LINEへ貼り付けてください。</div>
+    </aside>
+
+    <main>
+      <section id="view-intake">
+        <div class="page-head">
+          <div>
+            <h1>予約内容を取り込む</h1>
+            <p class="lead">お客様からLINEに届いた予約文を、そのまま貼り付けます。</p>
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div class="card">
+            <h2><span class="step">1</span>LINEの文章を貼り付け</h2>
+            <textarea id="rawText" placeholder="① 撮影希望日&#10;2026/07/20&#10;&#10;② 希望プラン&#10;スタンダードプラン&#10;&#10;…"></textarea>
+            <div class="button-row">
+              <button class="button primary" id="parseButton">内容を読み取る</button>
+              <button class="button secondary" id="clearButton">クリア</button>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-head">
+              <h2><span class="step">2</span>読み取り結果を確認</h2>
+            </div>
+            <div class="parse-status" id="parseStatus">文章を貼り付けて「内容を読み取る」を押してください。</div>
+            <div class="field-grid">
+              <div class="field">
+                <label class="required" for="newShootDate">撮影希望日</label>
+                <input type="date" id="newShootDate">
+              </div>
+              <div class="field">
+                <label class="required" for="newPreferredTimeWindow">希望時間帯</label>
+                <select id="newPreferredTimeWindow"></select>
+              </div>
+              <div class="field">
+                <label class="required" for="newPlan">希望プラン</label>
+                <select id="newPlan"></select>
+              </div>
+              <div class="field">
+                <label class="required" for="newName">お名前</label>
+                <input id="newName">
+              </div>
+              <div class="field full">
+                <label class="required" for="newGender">参加者の性別内訳</label>
+                <input id="newGender" placeholder="例：大人（男性1人・女性1人）／子ども（男の子1人・女の子0人）">
+              </div>
+              <div class="field">
+                <label class="required" for="newPhone">携帯番号</label>
+                <input id="newPhone" inputmode="tel">
+              </div>
+              <div class="field">
+                <label for="newAdults">大人人数</label>
+                <input type="number" min="0" max="10" id="newAdults">
+              </div>
+              <div class="field">
+                <label for="newChildren">子ども人数</label>
+                <input type="number" min="0" max="10" id="newChildren">
+              </div>
+              <div class="field full">
+                <label for="newHotel">宿泊施設名</label>
+                <input id="newHotel">
+              </div>
+              <div class="field full">
+                <label for="newStay">滞在期間</label>
+                <textarea id="newStay"></textarea>
+              </div>
+              <div class="field">
+                <label for="newPickup">送迎</label>
+                <input id="newPickup">
+              </div>
+              <div class="field">
+                <label for="newPhotographer">カメラマン指名</label>
+                <input id="newPhotographer">
+                <span class="hint">指名によって写真のクオリティーは変わりません。</span>
+              </div>
+              <div class="field">
+                <label for="newLocationRequest">場所指定</label>
+                <input id="newLocationRequest">
+              </div>
+              <div class="field">
+                <label class="required" for="newLateFee">深夜料金への同意</label>
+                <input id="newLateFee">
+              </div>
+              <div class="field">
+                <label for="newInstagram">Instagram</label>
+                <input id="newInstagram">
+              </div>
+              <div class="field">
+                <label for="newStoryTag">ストーリータグ</label>
+                <input id="newStoryTag">
+              </div>
+            </div>
+
+            <div class="intake-proposal">
+              <h2><span class="step">3</span>提案時間を選んで文章を作る</h2>
+              <p class="lead">24時間の中から、1分単位で候補時間を選べます。</p>
+              <div class="time-grid" style="margin-top: 14px;">
+                <div><label for="newCandidate1">候補時間①</label><input type="time" step="60" id="newCandidate1"></div>
+                <div><label for="newCandidate2">候補時間②</label><input type="time" step="60" id="newCandidate2"></div>
+                <div><label for="newCandidate3">候補時間③</label><input type="time" step="60" id="newCandidate3"></div>
+              </div>
+              <span class="hint">0時台は＋1,000円／人、1時以降の深夜帯は＋2,000円／人です。</span>
+              <div class="message-card" style="margin-top: 15px; margin-bottom: 0;">
+                <div class="message-head">
+                  <h3>お客様へ送る時間提案文</h3>
+                  <button class="button small secondary copy-button" id="copyNewProposalButton" data-target="newProposalMessage" disabled>文章だけコピー</button>
+                </div>
+                <textarea id="newProposalMessage" readonly placeholder="予約内容を読み取り、候補時間を選ぶと文章が自動生成されます。"></textarea>
+              </div>
+            </div>
+            <div class="button-row">
+              <button class="button secondary" id="saveNewButton" disabled>予約だけ保存</button>
+              <button class="button dark" id="saveAndCopyButton" disabled>保存して提案文をコピー</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="view-list" hidden>
+        <div class="page-head">
+          <div>
+            <h1>予約一覧</h1>
+            <p class="lead">予約を開くと、候補時間・確定時間・集合場所とLINE文章を編集できます。</p>
+          </div>
+        </div>
+        <div class="toolbar">
+          <input id="searchInput" placeholder="お名前・日付・予約IDで検索">
+          <select id="statusFilter"></select>
+          <button class="button secondary" id="refreshButton">再読み込み</button>
+        </div>
+        <div class="summary-bar" id="summaryBar"></div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>撮影日</th><th>お客様</th><th>プラン</th><th>候補／確定時間</th><th>担当</th><th>ステータス</th><th>更新</th></tr>
+            </thead>
+            <tbody id="reservationRows"></tbody>
+          </table>
+          <div class="empty" id="emptyList" hidden>該当する予約はありません。</div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <dialog id="detailDialog">
+    <div class="dialog-head">
+      <div>
+        <h2 id="detailTitle">予約詳細</h2>
+        <div id="detailId" class="subtext"></div>
+      </div>
+      <button class="icon-button" id="closeDialogButton" aria-label="閉じる">×</button>
+    </div>
+    <div class="dialog-body">
+      <div class="dialog-grid">
+        <div>
+          <div class="section-card">
+            <h3>予約内容</h3>
+            <div class="field-grid">
+              <div class="field"><label for="editShootDate">撮影希望日</label><input type="date" id="editShootDate"></div>
+              <div class="field"><label for="editPreferredTimeWindow">希望時間帯</label><select id="editPreferredTimeWindow"></select></div>
+              <div class="field"><label for="editPlan">希望プラン</label><select id="editPlan"></select></div>
+              <div class="field"><label for="editName">お名前</label><input id="editName"></div>
+              <div class="field full"><label for="editGender">参加者の性別内訳</label><input id="editGender" placeholder="例：男性2人・女性1人"></div>
+              <div class="field"><label for="editPhone">携帯番号</label><input id="editPhone"></div>
+              <div class="field"><label for="editAdults">大人</label><input type="number" min="0" max="10" id="editAdults"></div>
+              <div class="field"><label for="editChildren">子ども</label><input type="number" min="0" max="10" id="editChildren"></div>
+              <div class="field full"><label for="editHotel">宿泊施設名</label><input id="editHotel"></div>
+              <div class="field full"><label for="editStay">滞在期間</label><textarea id="editStay"></textarea></div>
+              <div class="field"><label for="editPickup">送迎</label><input id="editPickup"></div>
+              <div class="field"><label for="editPhotographer">カメラマン</label><select id="editPhotographer"></select><span class="hint">指名によって写真のクオリティーは変わりません。</span></div>
+              <div class="field"><label for="editLocationRequest">場所指定</label><input id="editLocationRequest"></div>
+              <div class="field"><label for="editLateFee">深夜料金</label><input id="editLateFee"></div>
+              <div class="field"><label for="editInstagram">Instagram</label><input id="editInstagram"></div>
+              <div class="field"><label for="editStoryTag">ストーリータグ</label><input id="editStoryTag"></div>
+            </div>
+          </div>
+
+          <div class="section-card">
+            <h3>時間を提案</h3>
+            <div class="time-grid">
+              <div><label for="candidate1">候補時間①</label><input type="time" step="60" id="candidate1"></div>
+              <div><label for="candidate2">候補時間②</label><input type="time" step="60" id="candidate2"></div>
+              <div><label for="candidate3">候補時間③</label><input type="time" step="60" id="candidate3"></div>
+            </div>
+            <span class="hint">24時間・1分単位で選択できます。0時台は＋1,000円／人、1時以降の深夜帯は＋2,000円／人です。</span>
+          </div>
+
+          <div class="section-card">
+            <h3>確定内容・当日案内</h3>
+            <div class="field-grid">
+              <div class="field"><label for="confirmedTime">確定時間</label><input type="time" step="60" id="confirmedTime"></div>
+              <div class="field"><label for="status">ステータス</label><select id="status"></select></div>
+              <div class="field full"><label for="meetingPlace">集合場所</label><input id="meetingPlace" list="meetingPlaceList" placeholder="当日に決めた集合場所を入力"><datalist id="meetingPlaceList"></datalist><span class="hint">集合場所はその日の星空コンディションに合わせて決定します。</span></div>
+              <div class="field full"><label for="memo">スタッフメモ</label><textarea id="memo"></textarea></div>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <div class="message-card">
+            <div class="message-head"><h3>① 時間提案の文章</h3><button class="button small primary copy-button" data-target="proposalMessage">コピー</button></div>
+            <textarea id="proposalMessage" readonly></textarea>
+          </div>
+          <div class="message-card">
+            <div class="message-head"><h3>② 予約確定の文章</h3><button class="button small primary copy-button" data-target="confirmationMessage">コピー</button></div>
+            <textarea id="confirmationMessage" readonly></textarea>
+          </div>
+          <div class="message-card">
+            <div class="message-head"><h3>③ 当日案内の文章</h3><button class="button small primary copy-button" data-target="sameDayMessage">コピー</button></div>
+            <textarea id="sameDayMessage" readonly></textarea>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="dialog-actions">
+      <button class="button secondary" id="cancelDialogButton">閉じる</button>
+      <button class="button dark" id="saveDetailButton">変更を保存</button>
+    </div>
+  </dialog>
+
+  <div class="loading" id="loading"><div class="loading-box">読み込み中…</div></div>
+  <div class="toast" id="toast" hidden></div>
+
+  <script>
+    const state = {
+      reservations: [],
+      settings: { plans: [], times: [], statuses: [], photographers: [], meetingPlaces: [] },
+      closureDates: new Set(),
+      selectedId: '',
+      parsed: false,
+      messageTimer: null,
+      newMessageTimer: null,
+    };
+
+    const $ = (id) => document.getElementById(id);
+
+    document.addEventListener('DOMContentLoaded', init);
+
+    async function init() {
+      bindEvents();
+      try {
+        const data = await server('getInitialData');
+        state.reservations = data.reservations || [];
+        state.settings = data.settings || state.settings;
+        state.closureDates = new Set(data.closureDates || []);
+        $('staffName').textContent = data.staff || 'スタッフ';
+        configureSelects();
+        renderReservations();
+      } catch (error) {
+        showToast(error.message, true, 7000);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    function bindEvents() {
+      document.querySelectorAll('.nav-button').forEach((button) => {
+        button.addEventListener('click', () => showView(button.dataset.view));
+      });
+      $('parseButton').addEventListener('click', parseRawText);
+      $('clearButton').addEventListener('click', clearIntake);
+      $('saveNewButton').addEventListener('click', () => saveNewReservation(false));
+      $('saveAndCopyButton').addEventListener('click', () => saveNewReservation(true));
+      $('searchInput').addEventListener('input', renderReservations);
+      $('statusFilter').addEventListener('change', renderReservations);
+      $('refreshButton').addEventListener('click', reloadData);
+      $('closeDialogButton').addEventListener('click', closeDialog);
+      $('cancelDialogButton').addEventListener('click', closeDialog);
+      $('saveDetailButton').addEventListener('click', saveReservationDetail);
+      document.querySelectorAll('.copy-button').forEach((button) => {
+        button.addEventListener('click', () => copyText(button.dataset.target, button));
+      });
+      document.querySelectorAll('#detailDialog input, #detailDialog select, #detailDialog textarea:not([readonly])').forEach((element) => {
+        element.addEventListener('input', scheduleMessageRefresh);
+        element.addEventListener('change', scheduleMessageRefresh);
+      });
+      ['newShootDate','newPreferredTimeWindow','newPlan','newName','newGender','newPhone','newLateFee'].forEach((id) => {
+        $(id).addEventListener('input', () => {
+          updateNewRequiredStatus();
+          scheduleNewProposalRefresh();
+        });
+        $(id).addEventListener('change', () => {
+          updateNewRequiredStatus();
+          scheduleNewProposalRefresh();
+        });
+      });
+      ['newCandidate1','newCandidate2','newCandidate3'].forEach((id) => {
+        $(id).addEventListener('input', () => {
+          updateNewRequiredStatus();
+          scheduleNewProposalRefresh();
+        });
+        $(id).addEventListener('change', () => {
+          updateNewRequiredStatus();
+          scheduleNewProposalRefresh();
+        });
+      });
+    }
+
+    function configureSelects() {
+      const preferredTimeWindows = ['19:00〜22:00', '22:00〜24:00', '24:00〜翌4:00'];
+      setSelect('newPlan', state.settings.plans, '選択してください');
+      setSelect('newPreferredTimeWindow', preferredTimeWindows, '選択してください');
+      setSelect('statusFilter', state.settings.statuses, 'すべてのステータス');
+      setSelect('editPlan', state.settings.plans, '選択してください');
+      setSelect('editPreferredTimeWindow', preferredTimeWindows, '選択してください');
+      setSelect('editPhotographer', state.settings.photographers, '選択してください');
+      setSelect('status', state.settings.statuses, '選択してください');
+      $('meetingPlaceList').innerHTML = state.settings.meetingPlaces.map((value) => '<option value="' + escapeHtml(value) + '"></option>').join('');
+    }
+
+    function showView(view) {
+      document.querySelectorAll('.nav-button').forEach((button) => button.classList.toggle('active', button.dataset.view === view));
+      $('view-intake').hidden = view !== 'intake';
+      $('view-list').hidden = view !== 'list';
+      if (view === 'list') renderReservations();
+    }
+
+    async function parseRawText() {
+      const rawText = $('rawText').value.trim();
+      if (!rawText) return showToast('LINEの予約内容を貼り付けてください。', true);
+      setLoading(true, '文章を読み取っています…');
+      try {
+        const result = await server('previewBookingText', rawText);
+        fillNewBooking(result.booking || {});
+        state.parsed = true;
+        updateNewRequiredStatus(result.isClosureDate);
+        refreshNewProposal();
+        if (result.isClosureDate) {
+          $('parseStatus').textContent = 'この日は満月期間の撮影休止日です。日程を変更してください。';
+          $('parseStatus').className = 'parse-status warn';
+        }
+      } catch (error) {
+        showToast(error.message, true);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    function fillNewBooking(booking) {
+      setValue('newShootDate', booking.shootDate);
+      setSelectValue('newPreferredTimeWindow', booking.preferredTimeWindow);
+      setSelectValue('newPlan', booking.plan);
+      setValue('newName', booking.name);
+      setValue('newGender', booking.gender);
+      setValue('newPhone', booking.phone);
+      setValue('newAdults', booking.adults || '');
+      setValue('newChildren', booking.children === 0 ? 0 : booking.children);
+      setValue('newHotel', booking.hotel);
+      setValue('newStay', booking.stay);
+      setValue('newPickup', booking.pickup);
+      setValue('newPhotographer', booking.photographer);
+      setValue('newLocationRequest', booking.locationRequest);
+      setValue('newLateFee', booking.lateFee);
+      setValue('newInstagram', booking.instagram);
+      setValue('newStoryTag', booking.storyTag);
+    }
+
+    function newBookingPayload() {
+      return {
+        shootDate: $('newShootDate').value,
+        preferredTimeWindow: $('newPreferredTimeWindow').value,
+        plan: $('newPlan').value,
+        name: $('newName').value,
+        gender: $('newGender').value,
+        phone: $('newPhone').value,
+        adults: $('newAdults').value,
+        children: $('newChildren').value || 0,
+        hotel: $('newHotel').value,
+        stay: $('newStay').value,
+        pickup: $('newPickup').value,
+        photographer: $('newPhotographer').value,
+        locationRequest: $('newLocationRequest').value,
+        lateFee: $('newLateFee').value,
+        instagram: $('newInstagram').value,
+        storyTag: $('newStoryTag').value,
+      };
+    }
+
+    function updateNewRequiredStatus(forceClosure) {
+      const booking = newBookingPayload();
+      const required = [
+        ['shootDate','撮影希望日'], ['preferredTimeWindow','希望時間帯'], ['plan','希望プラン'], ['name','お名前'],
+        ['gender','参加者の性別内訳'], ['phone','携帯番号'], ['lateFee','深夜料金への同意'],
+      ];
+      const missing = required.filter(([key]) => {
+        const value = String(booking[key] || '').trim();
+        if (key === 'lateFee') {
+          return !value || /未確認|未同意|了承していない/.test(value) || !/了承|同意|確認済/.test(value);
+        }
+        return !value;
+      });
+      const closure = forceClosure === true || state.closureDates.has(booking.shootDate);
+      const complete = state.parsed && missing.length === 0 && !closure;
+      const hasProposalTime = newProposalTimes().some(Boolean);
+      $('saveNewButton').disabled = !complete;
+      $('saveAndCopyButton').disabled = !complete || !hasProposalTime;
+      $('copyNewProposalButton').disabled = !complete || !hasProposalTime;
+      if (closure) {
+        $('parseStatus').textContent = 'この日は満月期間の撮影休止日です。日程を変更してください。';
+        $('parseStatus').className = 'parse-status warn';
+      } else if (!state.parsed) {
+        $('parseStatus').textContent = '文章を貼り付けて「内容を読み取る」を押してください。';
+        $('parseStatus').className = 'parse-status';
+      } else if (missing.length) {
+        $('parseStatus').textContent = '必須項目はあと' + missing.length + '個です：' + missing.map((item) => item[1]).join('、');
+        $('parseStatus').className = 'parse-status warn';
+      } else {
+        $('parseStatus').textContent = '必須項目はすべてそろっています。内容を確認して保存してください。';
+        $('parseStatus').className = 'parse-status ok';
+      }
+    }
+
+    function newProposalTimes() {
+      return [$('newCandidate1').value, $('newCandidate2').value, $('newCandidate3').value];
+    }
+
+    function scheduleNewProposalRefresh() {
+      clearTimeout(state.newMessageTimer);
+      state.newMessageTimer = setTimeout(refreshNewProposal, 180);
+    }
+
+    async function refreshNewProposal() {
+      if (!state.parsed) {
+        $('newProposalMessage').value = '';
+        return;
+      }
+      try {
+        const messages = await server('generateMessages', Object.assign({}, newBookingPayload(), {
+          candidateTimes: newProposalTimes(),
+          status: '未返信',
+        }));
+        $('newProposalMessage').value = messages.proposal || '';
+      } catch (error) {
+        showToast(error.message, true);
+      }
+    }
+
+    async function saveNewReservation(markProposed) {
+      const proposalText = $('newProposalMessage').value;
+      if (markProposed) {
+        try {
+          await writeClipboard(proposalText, 'newProposalMessage');
+        } catch (error) {
+          return showToast(error.message, true, 7000);
+        }
+      }
+      setLoading(true, '予約を保存しています…');
+      try {
+        const result = await server('saveReservation', {
+          rawText: $('rawText').value,
+          booking: newBookingPayload(),
+          candidateTimes: newProposalTimes(),
+          status: markProposed ? '時間提案済み' : '未返信',
+        });
+        state.reservations = result.reservations || [];
+        showToast(markProposed ? '予約を保存し、提案文をコピーしました。' : '予約を保存しました。');
+        clearIntake();
+        showView('list');
+      } catch (error) {
+        showToast(error.message, true, 7000);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    function clearIntake() {
+      $('rawText').value = '';
+      ['newShootDate','newName','newPhone','newAdults','newChildren','newHotel','newStay','newPickup','newPhotographer','newLocationRequest','newLateFee','newInstagram','newStoryTag'].forEach((id) => setValue(id, ''));
+      ['newCandidate1','newCandidate2','newCandidate3'].forEach((id) => setValue(id, ''));
+      $('newProposalMessage').value = '';
+      $('newPlan').value = '';
+      $('newPreferredTimeWindow').value = '';
+      $('newGender').value = '';
+      state.parsed = false;
+      updateNewRequiredStatus();
+    }
+
+    function renderReservations() {
+      const query = $('searchInput').value.trim().toLowerCase();
+      const status = $('statusFilter').value;
+      const filtered = state.reservations.filter((reservation) => {
+        const haystack = [reservation.id, reservation.name, reservation.shootDate, reservation.phone, reservation.hotel].join(' ').toLowerCase();
+        return (!query || haystack.includes(query)) && (!status || reservation.status === status);
+      });
+
+      const counts = {};
+      state.reservations.forEach((reservation) => { counts[reservation.status] = (counts[reservation.status] || 0) + 1; });
+      $('summaryBar').innerHTML = '<span class="summary-pill">全 ' + state.reservations.length + '件</span>' +
+        Object.keys(counts).map((key) => '<span class="summary-pill">' + escapeHtml(key) + ' ' + counts[key] + '件</span>').join('');
+
+      $('reservationRows').innerHTML = filtered.map((reservation) => {
+        const time = reservation.confirmedTime || reservation.candidateTimes.filter(Boolean).join(' / ') || reservation.preferredTimeWindow || '未設定';
+        return '<tr data-id="' + escapeHtml(reservation.id) + '">' +
+          '<td><strong>' + escapeHtml(formatShortDate(reservation.shootDate)) + '</strong><div class="subtext">' + escapeHtml(reservation.id) + '</div></td>' +
+          '<td><div class="customer-name">' + escapeHtml(reservation.name) + ' 様</div><div class="subtext">' + escapeHtml(reservation.gender || '性別内訳未入力') + '・大人' + reservation.adults + '・子ども' + reservation.children + '</div></td>' +
+          '<td>' + escapeHtml(reservation.plan) + '</td>' +
+          '<td>' + escapeHtml(time) + '</td>' +
+          '<td>' + escapeHtml(reservation.photographer || '指名なし') + '</td>' +
+          '<td><span class="status-chip" data-status="' + escapeHtml(reservation.status) + '">' + escapeHtml(reservation.status) + '</span></td>' +
+          '<td>' + escapeHtml(reservation.updatedAt || reservation.receivedAt) + '</td>' +
+        '</tr>';
+      }).join('');
+      $('emptyList').hidden = filtered.length !== 0;
+      document.querySelectorAll('#reservationRows tr').forEach((row) => row.addEventListener('click', () => openReservation(row.dataset.id)));
+    }
+
+    function openReservation(id) {
+      const reservation = state.reservations.find((item) => item.id === id);
+      if (!reservation) return showToast('予約が見つかりません。再読み込みしてください。', true);
+      state.selectedId = id;
+      $('detailTitle').textContent = reservation.name + ' 様の予約';
+      $('detailId').textContent = reservation.id + '　受付 ' + reservation.receivedAt;
+      setValue('editShootDate', reservation.shootDate);
+      setSelectValue('editPreferredTimeWindow', reservation.preferredTimeWindow);
+      setSelectValue('editPlan', reservation.plan);
+      setValue('editName', reservation.name);
+      setValue('editGender', reservation.gender);
+      setValue('editPhone', reservation.phone);
+      setValue('editAdults', reservation.adults);
+      setValue('editChildren', reservation.children);
+      setValue('editHotel', reservation.hotel);
+      setValue('editStay', reservation.stay);
+      setValue('editPickup', reservation.pickup);
+      setSelectValue('editPhotographer', reservation.photographer || '指名なし');
+      setValue('editLocationRequest', reservation.locationRequest);
+      setValue('editLateFee', reservation.lateFee);
+      setValue('editInstagram', reservation.instagram);
+      setValue('editStoryTag', reservation.storyTag);
+      setValue('candidate1', timeInputValue(reservation.candidateTimes[0]));
+      setValue('candidate2', timeInputValue(reservation.candidateTimes[1]));
+      setValue('candidate3', timeInputValue(reservation.candidateTimes[2]));
+      setValue('confirmedTime', timeInputValue(reservation.confirmedTime));
+      setValue('meetingPlace', reservation.meetingPlace);
+      setSelectValue('status', reservation.status);
+      setValue('memo', reservation.memo);
+      refreshMessages();
+      $('detailDialog').showModal();
+    }
+
+    function detailPayload() {
+      return {
+        id: state.selectedId,
+        shootDate: $('editShootDate').value,
+        preferredTimeWindow: $('editPreferredTimeWindow').value,
+        plan: $('editPlan').value,
+        name: $('editName').value,
+        gender: $('editGender').value,
+        phone: $('editPhone').value,
+        adults: $('editAdults').value,
+        children: $('editChildren').value || 0,
+        hotel: $('editHotel').value,
+        stay: $('editStay').value,
+        pickup: $('editPickup').value,
+        photographer: $('editPhotographer').value,
+        locationRequest: $('editLocationRequest').value,
+        lateFee: $('editLateFee').value,
+        instagram: $('editInstagram').value,
+        storyTag: $('editStoryTag').value,
+        candidateTimes: [$('candidate1').value, $('candidate2').value, $('candidate3').value],
+        confirmedTime: $('confirmedTime').value,
+        meetingPlace: $('meetingPlace').value,
+        status: $('status').value,
+        memo: $('memo').value,
+      };
+    }
+
+    async function saveReservationDetail() {
+      setLoading(true, '変更を保存しています…');
+      try {
+        const result = await server('updateReservation', detailPayload());
+        state.reservations = result.reservations || [];
+        renderReservations();
+        closeDialog();
+        showToast('予約内容を更新しました。');
+      } catch (error) {
+        showToast(error.message, true, 7000);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    function scheduleMessageRefresh() {
+      clearTimeout(state.messageTimer);
+      state.messageTimer = setTimeout(refreshMessages, 220);
+    }
+
+    async function refreshMessages() {
+      try {
+        const messages = await server('generateMessages', detailPayload());
+        $('proposalMessage').value = messages.proposal || '';
+        $('confirmationMessage').value = messages.confirmation || '';
+        $('sameDayMessage').value = messages.sameDay || '';
+      } catch (error) {
+        showToast(error.message, true);
+      }
+    }
+
+    async function reloadData() {
+      setLoading(true, '最新情報を読み込んでいます…');
+      try {
+        const data = await server('getInitialData');
+        state.reservations = data.reservations || [];
+        state.settings = data.settings || state.settings;
+        state.closureDates = new Set(data.closureDates || []);
+        configureSelects();
+        renderReservations();
+        showToast('最新情報に更新しました。');
+      } catch (error) {
+        showToast(error.message, true);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    async function copyText(targetId, button) {
+      const text = $(targetId).value;
+      if (!text) return showToast('コピーする文章がありません。', true);
+      await writeClipboard(text, targetId);
+      const old = button.textContent;
+      button.textContent = 'コピー済み';
+      showToast('文章をコピーしました。');
+      setTimeout(() => { button.textContent = old; }, 1300);
+    }
+
+    async function writeClipboard(text, sourceId) {
+      try {
+        await navigator.clipboard.writeText(text);
+      } catch (_) {
+        const source = sourceId ? $(sourceId) : null;
+        const temporary = source || document.createElement('textarea');
+        if (!source) {
+          temporary.value = text;
+          temporary.style.position = 'fixed';
+          temporary.style.opacity = '0';
+          document.body.appendChild(temporary);
+        }
+        temporary.focus();
+        temporary.select();
+        const copied = document.execCommand('copy');
+        if (!source) temporary.remove();
+        if (!copied) throw new Error('コピーできませんでした。文章欄から手動でコピーしてください。');
+      }
+    }
+
+    function closeDialog() {
+      if ($('detailDialog').open) $('detailDialog').close();
+      state.selectedId = '';
+    }
+
+    function setSelect(id, values, placeholder) {
+      const current = $(id).value;
+      $(id).innerHTML = '<option value="">' + escapeHtml(placeholder) + '</option>' +
+        (values || []).map((value) => '<option value="' + escapeHtml(value) + '">' + escapeHtml(value) + '</option>').join('');
+      if (current) setSelectValue(id, current);
+    }
+
+    function setSelectValue(id, value) {
+      const select = $(id);
+      const target = value == null ? '' : String(value);
+      if (target && !Array.from(select.options).some((option) => option.value === target)) {
+        select.add(new Option(target, target));
+      }
+      select.value = target;
+    }
+
+    function setValue(id, value) {
+      $(id).value = value == null ? '' : value;
+    }
+
+    function timeInputValue(value) {
+      const match = String(value || '').match(/(\d{1,2}):(\d{2})/);
+      if (!match) return '';
+      return String(Number(match[1])).padStart(2, '0') + ':' + match[2];
+    }
+
+    function setLoading(show, label) {
+      $('loading').hidden = !show;
+      if (label) $('loading').querySelector('.loading-box').textContent = label;
+      if (!show) $('loading').querySelector('.loading-box').textContent = '読み込み中…';
+    }
+
+    function showToast(message, isError, duration) {
+      const toast = $('toast');
+      toast.textContent = message || 'エラーが発生しました。';
+      toast.className = 'toast' + (isError ? ' error' : '');
+      toast.hidden = false;
+      clearTimeout(showToast.timer);
+      showToast.timer = setTimeout(() => { toast.hidden = true; }, duration || 3000);
+    }
+
+    function formatShortDate(key) {
+      const parts = String(key || '').split('-');
+      if (parts.length !== 3) return key || '日付未設定';
+      return Number(parts[0]) + '/' + Number(parts[1]) + '/' + Number(parts[2]);
+    }
+
+    function escapeHtml(value) {
+      return String(value == null ? '' : value).replace(/[&<>'"]/g, (char) => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'
+      })[char]);
+    }
+
+    function server(method, ...args) {
+      return new Promise((resolve, reject) => {
+        const runner = google.script.run
+          .withSuccessHandler(resolve)
+          .withFailureHandler((error) => reject(new Error(error && error.message ? error.message : String(error))));
+        runner[method](...args);
+      });
+    }
+  </script>
+</body>
+</html>

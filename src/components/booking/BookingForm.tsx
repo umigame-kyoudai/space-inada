@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { type Ref, useEffect, useMemo, useRef, useState } from "react";
 import { trackEvent } from "@/lib/analytics";
 import {
   DELIVERY_TIME_LABEL,
@@ -46,6 +46,34 @@ type Props = {
   from?: string;
 };
 
+type PreferredTimeWindow =
+  | ""
+  | "19:00〜22:00"
+  | "22:00〜24:00"
+  | "24:00〜翌4:00";
+
+const PREFERRED_TIME_WINDOWS = [
+  {
+    value: "19:00〜22:00",
+    label: "19:00〜22:00",
+    note: "夏季は早くても21:00頃のスタートです",
+  },
+  {
+    value: "22:00〜24:00",
+    label: "22:00〜24:00",
+    note: "夜の遅めの時間帯を希望する方",
+  },
+  {
+    value: "24:00〜翌4:00",
+    label: "24:00〜翌4:00",
+    note: "深夜料金がかかります",
+  },
+] as const satisfies ReadonlyArray<{
+  value: Exclude<PreferredTimeWindow, "">;
+  label: string;
+  note: string;
+}>;
+
 function formatDate(v: string): string {
   if (!v) return "";
   const [y, m, d] = v.split("-");
@@ -64,10 +92,15 @@ function formatInstagram(v: string): string {
  */
 function buildMessage(v: {
   date: string;
+  preferredTimeWindow: PreferredTimeWindow;
   plan: string;
   name: string;
-  adults: string;
-  children: string;
+  adults: number;
+  children: number;
+  adultMale: number;
+  adultFemale: number;
+  childMale: number;
+  childFemale: number;
   phone: string;
   hotel: string;
   stay: string;
@@ -75,7 +108,6 @@ function buildMessage(v: {
   pickupPrice: number;
   staffName: string;
   staffNominationPrice: number;
-  location: boolean;
   lateNightConsent: boolean;
   instagram: string;
   story: boolean;
@@ -92,6 +124,7 @@ function buildMessage(v: {
 
 ① 撮影希望日：
 ${formatDate(v.date)}
+希望時間帯：${v.preferredTimeWindow}
 
 ② 希望プラン：
 ${v.plan}
@@ -102,6 +135,7 @@ ${v.name}
 ④ 人数：
 大人：${v.adults}人
 子ども（0〜15才）：${v.children}人
+参加者の性別内訳：大人（男性${v.adultMale}人・女性${v.adultFemale}人）／子ども（男の子${v.childMale}人・女の子${v.childFemale}人）
 
 ⑤ 携帯番号：
 ${v.phone}
@@ -115,7 +149,6 @@ ${v.stay}
 ⑧ オプション：
 送迎：${v.pickup ? `希望する（+${formatPrice(v.pickupPrice)}）` : "なし"}
 カメラマン指名：${staffNominationText}
-場所指定：${v.location ? "希望する（応相談）" : "なし"}
 深夜料金：${v.lateNightConsent ? `0:00〜0:59は+${formatPrice(LATE_NIGHT_FEES.midnight)}/人、1:00以降は+${formatPrice(LATE_NIGHT_FEES.afterOne)}/人を了承済み` : "未確認"}
 
 ⑨ Instagram（任意）：
@@ -148,6 +181,52 @@ function RequiredBadge() {
   );
 }
 
+function ParticipantNumberInput({
+  id,
+  label,
+  value,
+  onChange,
+  inputRef,
+  describedBy,
+  invalid = false,
+}: {
+  id: string;
+  label: string;
+  value: string;
+  onChange: (value: string) => void;
+  inputRef?: Ref<HTMLInputElement>;
+  describedBy: string;
+  invalid?: boolean;
+}) {
+  return (
+    <div>
+      <label htmlFor={id} className="mb-1.5 block text-xs font-medium text-zinc-300">
+        {label}
+      </label>
+      <div className="relative">
+        <input
+          ref={inputRef}
+          id={id}
+          type="number"
+          min={0}
+          max={10}
+          step={1}
+          inputMode="numeric"
+          value={value}
+          onChange={(event) => onChange(event.target.value)}
+          required
+          aria-describedby={describedBy}
+          aria-invalid={invalid}
+          className={`${inputClass} pr-10`}
+        />
+        <span className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-sm text-zinc-500">
+          人
+        </span>
+      </div>
+    </div>
+  );
+}
+
 export function BookingForm({
   planOptions,
   defaultPlan,
@@ -159,16 +238,19 @@ export function BookingForm({
     planOptions.find((p) => p.slug === defaultPlan)?.name ?? "";
 
   const [date, setDate] = useState("");
+  const [preferredTimeWindow, setPreferredTimeWindow] =
+    useState<PreferredTimeWindow>("");
   const [plan, setPlan] = useState(defaultPlanName);
   const [name, setName] = useState("");
-  const [adults, setAdults] = useState("2");
-  const [children, setChildren] = useState("0");
+  const [adultMale, setAdultMale] = useState("0");
+  const [adultFemale, setAdultFemale] = useState("0");
+  const [childMale, setChildMale] = useState("0");
+  const [childFemale, setChildFemale] = useState("0");
   const [phone, setPhone] = useState("");
   const [hotel, setHotel] = useState("");
   const [stay, setStay] = useState("");
   const [pickup, setPickup] = useState(false);
   const [staffName, setStaffName] = useState("");
-  const [location, setLocation] = useState(false);
   const [lateNightConsent, setLateNightConsent] = useState(false);
   const [instagram, setInstagram] = useState("");
   const [story, setStory] = useState(false);
@@ -179,19 +261,30 @@ export function BookingForm({
 
   const formRef = useRef<HTMLFormElement>(null);
   const dateInputRef = useRef<HTMLInputElement>(null);
+  const adultMaleRef = useRef<HTMLInputElement>(null);
   const previewRef = useRef<HTMLTextAreaElement>(null);
   const todayDateKey = useMemo(() => getTodayInJapanDateKey(), []);
   const [availabilityMonthIndex, setAvailabilityMonthIndex] = useState(() =>
     Math.min(11, Math.max(0, Number(todayDateKey.slice(5, 7)) - 1)),
   );
   const isSelectedDateClosed = isFullMoonClosureDate(date);
+  const adultMaleNum = Math.max(0, parseInt(adultMale, 10) || 0);
+  const adultFemaleNum = Math.max(0, parseInt(adultFemale, 10) || 0);
+  const childMaleNum = Math.max(0, parseInt(childMale, 10) || 0);
+  const childFemaleNum = Math.max(0, parseInt(childFemale, 10) || 0);
+  const adultsNum = adultMaleNum + adultFemaleNum;
+  const childrenNum = childMaleNum + childFemaleNum;
+  const participantCount = adultsNum + childrenNum;
+  const participantCountComplete = participantCount > 0 && participantCount <= 10;
   const requiredItems = [
     {
       label: "撮影希望日",
       complete: Boolean(date) && date >= todayDateKey && !isSelectedDateClosed,
     },
+    { label: "希望時間帯", complete: Boolean(preferredTimeWindow) },
     { label: "希望プラン", complete: Boolean(plan) },
     { label: "お名前", complete: Boolean(name.trim()) },
+    { label: "参加人数・性別", complete: participantCountComplete },
     { label: "携帯番号", complete: Boolean(phone.trim()) },
     { label: "深夜料金への同意", complete: lateNightConsent },
   ];
@@ -214,6 +307,16 @@ export function BookingForm({
     );
   }, [isSelectedDateClosed]);
 
+  useEffect(() => {
+    const message =
+      participantCount <= 0
+        ? "参加人数を1名以上入力してください。"
+        : participantCount <= 10
+          ? ""
+          : "参加人数は10名までです。11名以上の場合はLINEでご相談ください。";
+    adultMaleRef.current?.setCustomValidity(message);
+  }, [participantCount]);
+
   // CV計測: フォーム開始（最初のフィールド操作で1回だけ送る）
   const formStartedRef = useRef(false);
   function handleFormStart() {
@@ -228,9 +331,6 @@ export function BookingForm({
 
   // ───── お会計（概算）の計算 ─────
   const selectedPlan = planOptions.find((p) => p.name === plan);
-  const adultsNum = Math.max(0, parseInt(adults, 10) || 0);
-  const childrenNum = Math.max(0, parseInt(children, 10) || 0);
-  const participantCount = adultsNum + childrenNum;
   const pickupAmount = pickup ? pickupPrice : 0;
   const staffNominationAmount = staffName === "稲田" ? staffNominationPrice : 0;
   const exceedsParticipantLimit =
@@ -285,8 +385,8 @@ export function BookingForm({
       return `${selectedPlan.maxParticipants + 1}名以上は別途お見積り（LINEでご相談ください）`;
     }
     if (total == null) return "別途お見積り（LINEでご相談ください）";
-    return `${formatPrice(total)}${location ? "　＋ 場所指定（応相談）" : ""}`;
-  }, [plan, total, location, exceedsParticipantLimit, selectedPlan]);
+    return formatPrice(total);
+  }, [plan, total, exceedsParticipantLimit, selectedPlan]);
 
   // 内訳行（UI表示用）
   const breakdown = useMemo(() => {
@@ -337,10 +437,15 @@ export function BookingForm({
     () =>
       buildMessage({
         date,
+        preferredTimeWindow,
         plan,
         name,
-        adults,
-        children,
+        adults: adultsNum,
+        children: childrenNum,
+        adultMale: adultMaleNum,
+        adultFemale: adultFemaleNum,
+        childMale: childMaleNum,
+        childFemale: childFemaleNum,
         phone,
         hotel,
         stay,
@@ -348,7 +453,6 @@ export function BookingForm({
         pickupPrice,
         staffName,
         staffNominationPrice,
-        location,
         lateNightConsent,
         instagram,
         story,
@@ -357,10 +461,15 @@ export function BookingForm({
       }),
     [
       date,
+      preferredTimeWindow,
       plan,
       name,
-      adults,
-      children,
+      adultsNum,
+      childrenNum,
+      adultMaleNum,
+      adultFemaleNum,
+      childMaleNum,
+      childFemaleNum,
       phone,
       hotel,
       stay,
@@ -368,7 +477,6 @@ export function BookingForm({
       pickupPrice,
       staffName,
       staffNominationPrice,
-      location,
       lateNightConsent,
       instagram,
       story,
@@ -384,10 +492,19 @@ export function BookingForm({
   const restoredRef = useRef(false);
   function applySaved(s: Record<string, unknown>) {
     if (typeof s.date === "string") selectDate(s.date);
+    if (
+      s.preferredTimeWindow === "19:00〜22:00" ||
+      s.preferredTimeWindow === "22:00〜24:00" ||
+      s.preferredTimeWindow === "24:00〜翌4:00"
+    ) {
+      setPreferredTimeWindow(s.preferredTimeWindow);
+    }
     if (typeof s.plan === "string") setPlan(s.plan);
     if (typeof s.name === "string") setName(s.name);
-    if (typeof s.adults === "string") setAdults(s.adults);
-    if (typeof s.children === "string") setChildren(s.children);
+    if (typeof s.adultMale === "string") setAdultMale(s.adultMale);
+    if (typeof s.adultFemale === "string") setAdultFemale(s.adultFemale);
+    if (typeof s.childMale === "string") setChildMale(s.childMale);
+    if (typeof s.childFemale === "string") setChildFemale(s.childFemale);
     if (typeof s.phone === "string") setPhone(s.phone);
     if (typeof s.hotel === "string") setHotel(s.hotel);
     if (typeof s.stay === "string") setStay(s.stay);
@@ -398,7 +515,6 @@ export function BookingForm({
       // 旧形式の保存データは「稲田指名」として引き継ぐ。
       setStaffName("稲田");
     }
-    if (typeof s.location === "boolean") setLocation(s.location);
     if (typeof s.lateNightConsent === "boolean") {
       setLateNightConsent(s.lateNightConsent);
     }
@@ -433,16 +549,18 @@ export function BookingForm({
         STORAGE_KEY,
         JSON.stringify({
           date,
+          preferredTimeWindow,
           plan,
           name,
-          adults,
-          children,
+          adultMale,
+          adultFemale,
+          childMale,
+          childFemale,
           phone,
           hotel,
           stay,
           pickup,
           staffName,
-          location,
           lateNightConsent,
           instagram,
           story,
@@ -454,16 +572,18 @@ export function BookingForm({
     }
   }, [
     date,
+    preferredTimeWindow,
     plan,
     name,
-    adults,
-    children,
+    adultMale,
+    adultFemale,
+    childMale,
+    childFemale,
     phone,
     hotel,
     stay,
     pickup,
     staffName,
-    location,
     lateNightConsent,
     instagram,
     story,
@@ -472,16 +592,18 @@ export function BookingForm({
 
   function handleClear() {
     setDate("");
+    setPreferredTimeWindow("");
     setPlan(defaultPlanName);
     setName("");
-    setAdults("2");
-    setChildren("0");
+    setAdultMale("0");
+    setAdultFemale("0");
+    setChildMale("0");
+    setChildFemale("0");
     setPhone("");
     setHotel("");
     setStay("");
     setPickup(false);
     setStaffName("");
-    setLocation(false);
     setLateNightConsent(false);
     setInstagram("");
     setStory(false);
@@ -639,6 +761,61 @@ export function BookingForm({
             />
           </div>
 
+          <fieldset>
+            <legend className="mb-1.5 block text-sm font-medium text-zinc-200">
+              希望時間帯
+              <RequiredBadge />
+            </legend>
+            <p id="preferred-time-help" className="mb-3 text-xs leading-relaxed text-zinc-400">
+              ご希望に近い時間帯を1つ選んでください。
+            </p>
+            <div className="grid gap-2 sm:grid-cols-3">
+              {PREFERRED_TIME_WINDOWS.map((option) => {
+                const selected = preferredTimeWindow === option.value;
+                return (
+                  <label
+                    key={option.value}
+                    className={`flex min-h-24 cursor-pointer flex-col justify-center rounded-lg border px-4 py-3 transition-all focus-within:ring-2 focus-within:ring-teal-200/70 ${
+                      selected
+                        ? "border-teal-200/80 bg-teal-200/15 shadow-sm shadow-teal-300/10"
+                        : "border-teal-200/15 bg-[#050814]/60 hover:border-teal-200/45 hover:bg-teal-200/[0.06]"
+                    }`}
+                  >
+                    <input
+                      type="radio"
+                      name="preferred-time-window"
+                      value={option.value}
+                      checked={selected}
+                      onChange={() => setPreferredTimeWindow(option.value)}
+                      required
+                      aria-describedby="preferred-time-help preferred-time-notice"
+                      className="sr-only"
+                    />
+                    <span className={`text-base font-bold ${selected ? "text-teal-100" : "text-white"}`}>
+                      {option.label}
+                    </span>
+                    <span
+                      className={`mt-1 text-[11px] leading-relaxed ${
+                        option.value === "24:00〜翌4:00" ? "text-amber-200" : "text-zinc-400"
+                      }`}
+                    >
+                      {option.note}
+                    </span>
+                  </label>
+                );
+              })}
+            </div>
+            <div
+              id="preferred-time-notice"
+              className="mt-3 rounded-lg border border-amber-200/20 bg-amber-300/[0.06] p-3 text-xs leading-relaxed text-zinc-300"
+            >
+              <p className="font-semibold text-amber-100">選択した時間帯は、あくまでご希望枠です。</p>
+              <p className="mt-1">
+                月齢・星の位置・空き状況を確認し、原則としてご希望枠内で撮影時間を確定します。枠内での撮影が難しい場合は、LINEで別の時間をご提案します。
+              </p>
+            </div>
+          </fieldset>
+
           <div>
             <label htmlFor="plan" className="mb-1.5 block text-sm font-medium text-zinc-200">
               希望プラン
@@ -677,36 +854,79 @@ export function BookingForm({
             />
           </div>
 
-          <div className="grid min-w-0 grid-cols-2 gap-4">
-            <div className="min-w-0">
-              <label htmlFor="adults" className="mb-1.5 block text-sm font-medium text-zinc-200">
-                大人の人数
-              </label>
-              <input
-                id="adults"
-                type="number"
-                min={0}
-                inputMode="numeric"
-                value={adults}
-                onChange={(e) => setAdults(e.target.value)}
-                className={inputClass}
-              />
+          <fieldset className="rounded-lg border border-teal-200/15 bg-[#050814]/45 p-4">
+            <legend className="px-1 text-sm font-medium text-zinc-200">
+              参加人数
+              <RequiredBadge />
+            </legend>
+            <p id="participant-count-help" className="mb-4 text-xs leading-relaxed text-zinc-400">
+              男女別の人数を入力すると、大人・子どもの人数と合計が自動で計算されます。
+            </p>
+            <div className="space-y-4">
+              <div className="rounded-lg border border-white/5 bg-white/[0.025] p-3">
+                <div className="mb-3 flex items-center justify-between gap-3">
+                  <p className="text-sm font-semibold text-white">大人（16才以上）</p>
+                  <p className="text-sm font-semibold text-teal-200">計 {adultsNum}人</p>
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <ParticipantNumberInput
+                    id="adult-male"
+                    label="男性"
+                    value={adultMale}
+                    onChange={setAdultMale}
+                    inputRef={adultMaleRef}
+                    describedBy="participant-count-help participant-count-status"
+                    invalid={!participantCountComplete}
+                  />
+                  <ParticipantNumberInput
+                    id="adult-female"
+                    label="女性"
+                    value={adultFemale}
+                    onChange={setAdultFemale}
+                    describedBy="participant-count-help participant-count-status"
+                  />
+                </div>
+              </div>
+
+              <div className="rounded-lg border border-white/5 bg-white/[0.025] p-3">
+                <div className="mb-3 flex items-center justify-between gap-3">
+                  <p className="text-sm font-semibold text-white">子ども（0〜15才）</p>
+                  <p className="text-sm font-semibold text-teal-200">計 {childrenNum}人</p>
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <ParticipantNumberInput
+                    id="child-male"
+                    label="男の子"
+                    value={childMale}
+                    onChange={setChildMale}
+                    describedBy="participant-count-help participant-count-status"
+                  />
+                  <ParticipantNumberInput
+                    id="child-female"
+                    label="女の子"
+                    value={childFemale}
+                    onChange={setChildFemale}
+                    describedBy="participant-count-help participant-count-status"
+                  />
+                </div>
+              </div>
             </div>
-            <div className="min-w-0">
-              <label htmlFor="children" className="mb-1.5 block text-sm font-medium text-zinc-200">
-                子ども（0〜15才）
-              </label>
-              <input
-                id="children"
-                type="number"
-                min={0}
-                inputMode="numeric"
-                value={children}
-                onChange={(e) => setChildren(e.target.value)}
-                className={inputClass}
-              />
-            </div>
-          </div>
+            <p
+              id="participant-count-status"
+              aria-live="polite"
+              className={`mt-4 rounded-lg px-3 py-2 text-sm font-semibold ${
+                participantCountComplete
+                  ? "bg-emerald-400/10 text-emerald-300"
+                  : "bg-amber-300/10 text-amber-200"
+              }`}
+            >
+              {participantCount <= 0
+                ? "参加人数を入力してください"
+                : participantCount <= 10
+                  ? `✓ 合計 ${participantCount}人（大人${adultsNum}人・子ども${childrenNum}人）`
+                  : `合計${participantCount}人です。10人を超える場合はLINEでご相談ください`}
+            </p>
+          </fieldset>
 
           <div>
             <label htmlFor="phone" className="mb-1.5 block text-sm font-medium text-zinc-200">
@@ -803,18 +1023,6 @@ export function BookingForm({
                   ※担当カメラマンによって写真のクオリティは変わりません。
                 </p>
               </div>
-              <label className="flex min-w-0 items-center justify-between gap-2 rounded-lg border border-teal-200/15 bg-[#050814]/60 px-4 py-3 text-sm text-zinc-200">
-                <span className="flex min-w-0 items-center gap-2">
-                  <input
-                    type="checkbox"
-                    checked={location}
-                    onChange={(e) => setLocation(e.target.checked)}
-                    className="h-4 w-4 rounded border-teal-200/20 bg-[#050814] accent-teal-300"
-                  />
-                  場所指定（撮りたい場所をリクエスト）
-                </span>
-                <span className="shrink-0 text-zinc-400">応相談</span>
-              </label>
             </div>
           </fieldset>
 
@@ -908,9 +1116,6 @@ export function BookingForm({
               {plan && total != null ? formatPrice(total) : totalText}
             </span>
           </div>
-          {plan && total != null && location && (
-            <p className="mt-1 text-right text-xs text-zinc-400">＋ 場所指定（応相談）</p>
-          )}
           {breakdown.length > 0 && (
             <ul className="mt-3 space-y-0.5 text-xs text-zinc-400">
               {breakdown.map((b) => (
