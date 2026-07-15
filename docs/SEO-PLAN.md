@@ -279,6 +279,8 @@ Step 1 の具体的成果物:
 
 > ※Step 1 着手前に決めておくべき入力: **本番ドメイン名**、**正式な屋号/サイト名**、**NAP（住所・電話・営業時間）**、**代表者名（稲田圭市）表記**。これらは `seo.ts`/JSON-LD のハードな前提値になる。
 >
-> **確定値（2026-06）**: 屋号/サイト名 = **KEY PHOTO 宮古島**（`siteConfig.name`）。title 末尾の短縮表記 = **KEY PHOTO**（`siteConfig.shortName`）。代表者 = 稲田圭市。旧称「スペースイナダ／スペース稲田」からの屋号変更。ドメインは当面 `space-inada.com` を維持（表示ブランドのみ KEY PHOTO に統一）。
+> **確定値（2026-06）**: 屋号/サイト名 = **KEY PHOTO 宮古島**（`siteConfig.name`）。title 末尾の短縮表記 = **KEY PHOTO**（`siteConfig.shortName`）。代表者 = 稲田圭市。旧称「スペースイナダ／スペース稲田」からの屋号変更。
+>
+> **更新（2026-07-15）**: ドメインを `space-inada.com` から **`keyphotomiyakojima.com`** へ正式移行。サイトURLは `NEXT_PUBLIC_SITE_URL`（フォールバックは `src/lib/seo.ts`）で一元管理。旧ドメインは301リダイレクト用に維持する。
 </content>
 </invoke>

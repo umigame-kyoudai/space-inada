@@ -11,7 +11,7 @@ import type { Metadata } from "next";
  */
 
 const SITE_URL = (
-  process.env.NEXT_PUBLIC_SITE_URL ?? "https://space-inada.com"
+  process.env.NEXT_PUBLIC_SITE_URL ?? "https://keyphotomiyakojima.com"
 ).replace(/\/$/, "");
 
 export const siteConfig = {

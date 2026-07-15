@@ -14,14 +14,16 @@
   - 電話: 090-9279-9586
   - エリア: 沖縄県宮古島市（非店舗型のため「サービス提供地域」で設定）
   - 営業時間: 18:00〜23:00（完全予約制）
-- [ ] ウェブサイト: https://space-inada.com ／ 予約リンク: https://space-inada.com/booking
+- [ ] ウェブサイト: https://keyphotomiyakojima.com ／ 予約リンク: https://keyphotomiyakojima.com/booking
 - [ ] 撮影作品の写真を10枚以上アップロード（`public/images/gallery` と同じ写真でOK）
 - [ ] 撮影後のお客様にクチコミ投稿を依頼する運用を作る（LINEでURLを送る等）
 
 ## 2. Google Search Console
 
-- [x] プロパティ登録済み（ドメインプロパティ `space-inada.com`・DNS認証済み。
-  `NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION` の設定は不要）
+- [ ] 新ドメインのプロパティ登録（ドメインプロパティ `keyphotomiyakojima.com`・DNS認証）。
+  旧ドメイン `space-inada.com` のプロパティは登録済み（2026-07に新ドメインへ移行。
+  旧プロパティは「アドレス変更」実行後も削除せず残す）。
+  `NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION` の設定は不要
 - [ ] サイトマップ送信: 左メニュー「サイトマップ」から `sitemap.xml` と `feed.xml` を送信
   （2026-07-08 時点でインデックス登録済み1ページのみ＝未送信が最大のボトルネック）
 - [ ] URL検査で主要ページのインデックス登録をリクエスト
@@ -41,7 +43,7 @@
 
 - [ ] X (Twitter) アカウントを作る場合: `src/lib/seo.ts` の `siteConfig.twitter.site` に
   `@ハンドル` を設定し、`siteConfig.sameAs` にプロフィールURLを追加
-- [ ] Instagram（設定済み: @_key_photo）のプロフィールに https://space-inada.com を記載
+- [ ] Instagram（設定済み: @_key_photo）のプロフィールに https://keyphotomiyakojima.com を記載
 - [ ] 投稿には可能な範囲でサイトのプラン・記事URLへの導線を付ける
 
 ## 5. 被リンク・サイテーション（中期）
