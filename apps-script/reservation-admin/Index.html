@@ -629,24 +629,23 @@
       if (view === 'list') renderReservations();
     }
 
-    async function parseRawText() {
+    function parseRawText() {
       const rawText = $('rawText').value.trim();
       if (!rawText) return showToast('LINEの予約内容を貼り付けてください。', true);
-      setLoading(true, '文章を読み取っています…');
       try {
-        const result = await server('previewBookingText', rawText);
-        fillNewBooking(result.booking || {});
+        const booking = parseBookingTextClient(rawText);
+        fillNewBooking(booking);
         state.parsed = true;
-        updateNewRequiredStatus(result.isClosureDate);
+        const isClosureDate = state.closureDates.has(booking.shootDate);
+        updateNewRequiredStatus(isClosureDate);
         refreshNewConfirmation();
-        if (result.isClosureDate) {
+        if (isClosureDate) {
           $('parseStatus').textContent = 'この日は満月期間の撮影休止日です。日程を変更してください。';
           $('parseStatus').className = 'parse-status warn';
         }
+        showToast('予約内容を読み取りました。');
       } catch (error) {
         showToast(error.message, true);
-      } finally {
-        setLoading(false);
       }
     }
 
@@ -728,16 +727,16 @@
 
     function scheduleNewConfirmationRefresh() {
       clearTimeout(state.newMessageTimer);
-      state.newMessageTimer = setTimeout(refreshNewConfirmation, 180);
+      state.newMessageTimer = setTimeout(refreshNewConfirmation, 40);
     }
 
-    async function refreshNewConfirmation() {
+    function refreshNewConfirmation() {
       if (!state.parsed) {
         $('newConfirmationMessage').value = '';
         return;
       }
       try {
-        const messages = await server('generateMessages', Object.assign({}, newBookingPayload(), {
+        const messages = generateMessagesClient(Object.assign({}, newBookingPayload(), {
           rawText: $('rawText').value,
           status: '時間確定',
         }));
@@ -756,11 +755,11 @@
           confirmedTime: $('newConfirmedTime').value,
           status: '時間確定',
         });
-        state.reservations = result.reservations || [];
+        upsertReservation(result.reservation);
         let copyError = null;
         if (copyConfirmation) {
           try {
-            const messages = await server('generateMessages', result.reservation || {});
+            const messages = result.messages || generateMessagesClient(result.reservation || {});
             $('newConfirmationMessage').value = messages.confirmation || '';
             await writeClipboard($('newConfirmationMessage').value, 'newConfirmationMessage');
           } catch (error) {
@@ -885,7 +884,7 @@
       setLoading(true, '変更を保存しています…');
       try {
         const result = await server('updateReservation', detailPayload());
-        state.reservations = result.reservations || [];
+        upsertReservation(result.reservation);
         renderReservations();
         closeDialog();
         showToast('予約内容を更新しました。');
@@ -898,17 +897,348 @@
 
     function scheduleMessageRefresh() {
       clearTimeout(state.messageTimer);
-      state.messageTimer = setTimeout(refreshMessages, 220);
+      state.messageTimer = setTimeout(refreshMessages, 40);
     }
 
-    async function refreshMessages() {
+    function refreshMessages() {
       try {
-        const messages = await server('generateMessages', detailPayload());
+        const messages = generateMessagesClient(detailPayload());
         $('confirmationMessage').value = messages.confirmation || '';
         $('sameDayMessage').value = messages.sameDay || '';
       } catch (error) {
         showToast(error.message, true);
       }
+    }
+
+    function upsertReservation(reservation) {
+      if (!reservation || !reservation.id) return;
+      state.reservations = [reservation].concat(
+        state.reservations.filter((item) => item.id !== reservation.id),
+      ).sort((a, b) => String(b.receivedAt || '').localeCompare(String(a.receivedAt || '')));
+    }
+
+    function parseBookingTextClient(rawText) {
+      const sections = splitNumberedSectionsClient(rawText);
+      const people = sections['④'] || '';
+      const options = sections['⑧'] || '';
+      const instagram = sections['⑨'] || '';
+      return {
+        shootDate: parseDateKeyClient(firstValueClient(sections['①'])),
+        preferredTimeWindow: extractLabeledValueClient(sections['①'], ['希望時間帯', '希望時間枠']),
+        plan: firstValueClient(sections['②']),
+        name: firstValueClient(sections['③']),
+        gender:
+          extractLabeledValueClient(people, ['参加者の性別内訳', '性別内訳']) ||
+          extractLabeledValueClient(sections['③'], ['ご予約者の性別', '性別']),
+        adults: extractCountClient(people, ['大人', 'おとな']),
+        children: extractCountClient(people, ['子ども', 'こども', '子供']),
+        phone: firstValueClient(sections['⑤']).replace(/\s+/g, ''),
+        hotel: firstValueClient(sections['⑥']),
+        stay: cleanMultilineClient(sections['⑦']),
+        pickup: extractLabeledValueClient(options, ['送迎']),
+        photographer: extractLabeledValueClient(options, ['カメラマン指名', 'カメラマン']),
+        locationRequest: extractLabeledValueClient(options, ['場所指定', '撮影場所']),
+        lateFee: extractLabeledValueClient(options, ['深夜料金', '追加料金']),
+        instagram: extractInstagramValueClient(instagram),
+        storyTag: extractLabeledValueClient(instagram, ['ストーリータグ付け', 'ストーリータグ', 'ストーリーでタグ付け', 'タグ付け']),
+      };
+    }
+
+    function splitNumberedSectionsClient(rawText) {
+      const result = {};
+      const aliases = {
+        '①': ['撮影希望日'], '②': ['希望プラン', 'プラン'], '③': ['お名前', '名前'],
+        '④': ['人数'], '⑤': ['携帯番号', '電話番号'], '⑥': ['宿泊施設名', '宿泊先'],
+        '⑦': ['滞在期間'], '⑧': ['オプション'], '⑨': ['Instagram', 'インスタグラム'],
+      };
+      let current = '';
+      cleanMultilineClient(rawText).split('\n').forEach((line) => {
+        const match = line.match(/^\s*([①②③④⑤⑥⑦⑧⑨])\s*(.*)$/);
+        if (match) {
+          current = match[1];
+          result[current] = result[current] || '';
+          let rest = match[2] || '';
+          (aliases[current] || []).some((alias) => {
+            if (rest.indexOf(alias) !== 0) return false;
+            rest = rest.slice(alias.length).replace(/^\s*(?:（任意）|\(任意\))?\s*[:：\-]?\s*/, '');
+            return true;
+          });
+          if (rest) result[current] += rest;
+        } else if (current) {
+          result[current] += (result[current] ? '\n' : '') + line;
+        }
+      });
+      Object.keys(result).forEach((key) => { result[key] = cleanMultilineClient(result[key]); });
+      return result;
+    }
+
+    function firstValueClient(value) {
+      const lines = cleanMultilineClient(value).split('\n').map((line) =>
+        line.replace(/^\s*(?:[・●■□✓✔︎\-]|回答)\s*[:：]?\s*/, '').trim(),
+      ).filter(Boolean);
+      return cleanTextClient(lines[0]);
+    }
+
+    function extractCountClient(text, labels) {
+      const normalized = normalizeDigitsClient(text);
+      for (const label of labels) {
+        const pattern = new RegExp(escapeRegExpClient(label) + '(?:\\s*[（(][^）)]*[）)])?\\s*[:：]?\\s*(\\d+)');
+        const match = normalized.match(pattern);
+        if (match) return Number(match[1]);
+      }
+      return 0;
+    }
+
+    function extractLabeledValueClient(text, labels) {
+      const lines = cleanMultilineClient(text).split('\n').filter(Boolean);
+      for (const label of labels) {
+        const pattern = new RegExp('^(?:[・●■□✓✔︎\\-]\\s*)?' + escapeRegExpClient(label) + '\\s*[:：]\\s*(.+)$', 'i');
+        for (const line of lines) {
+          const match = line.trim().match(pattern);
+          if (match) return cleanTextClient(match[1]);
+        }
+      }
+      return '';
+    }
+
+    function extractInstagramValueClient(text) {
+      const labeled = extractLabeledValueClient(text, ['Instagram', 'インスタグラム', 'アカウント']);
+      if (labeled) return labeled;
+      return cleanMultilineClient(text).split('\n').map(cleanTextClient).find((item) => /^@[^\s]+/.test(item)) || '';
+    }
+
+    function parseDateKeyClient(value) {
+      const normalized = normalizeDigitsClient(cleanTextClient(value));
+      const match = normalized.match(/(20\d{2})\s*[\/\.\-年]\s*(\d{1,2})\s*[\/\.\-月]\s*(\d{1,2})/);
+      if (!match) return '';
+      const year = Number(match[1]);
+      const month = Number(match[2]);
+      const day = Number(match[3]);
+      const date = new Date(year, month - 1, day, 12, 0, 0);
+      if (date.getFullYear() !== year || date.getMonth() !== month - 1 || date.getDate() !== day) return '';
+      return [year, pad2Client(month), pad2Client(day)].join('-');
+    }
+
+    function generateMessagesClient(payload) {
+      const reservation = normalizeClientReservation(payload || {});
+      const name = reservation.name || 'お客様';
+      const dateLabel = formatDateLabelClient(reservation.shootDate);
+      const price = calculateConfirmedPriceClient(reservation);
+      const participantCount = reservation.adults + reservation.children;
+      const participantLabel = '合計' + participantCount + '名（大人' + reservation.adults + '名・子ども' + reservation.children + '名）';
+      const genderBreakdown = formatGenderBreakdownClient(reservation.gender);
+      const pickupLabel = reservation.pickup || 'なし';
+      const photographerLabel = reservation.photographer || '指名なし（おまかせ）';
+      const confirmedTimeLabel = reservation.confirmedTime || '［確定時間］';
+      const couponLabel = extractCouponLabelClient(reservation.rawText);
+      const lateFeeConsentLabel = isLateFeeConsentConfirmedClient(reservation.lateFee)
+        ? '了承済み（0:00〜0:59は＋1,000円／人、1:00以降は＋2,000円／人）'
+        : (reservation.lateFee || '未確認');
+      const confirmedPriceLabel = price.total == null ? '別途お見積り' : formatCurrencyClient(price.total);
+      const lateNightPriceLine = price.lateNightFee > 0
+        ? '\n深夜料金：' + formatCurrencyClient(price.lateNightFee) + '（' + participantCount + '名分・合計料金に含まれています）'
+        : '';
+      const meetingPlaceGuide = formatMeetingPlaceGuideClient(reservation.meetingPlace);
+
+      return {
+        confirmation:
+          name + '様、ご返信ありがとうございます。\n\n' +
+          '撮影時間が確定いたしましたので、下記の内容でご予約を確定いたします。\n' +
+          'お手数ですが、内容にお間違いがないかご確認をお願いいたします。\n\n' +
+          '【ご予約確定内容】\n' +
+          '撮影日：' + dateLabel + '\n' +
+          '撮影開始時間：' + confirmedTimeLabel + '\n' +
+          '撮影プラン：' + (reservation.plan || '［撮影プラン］') + '\n' +
+          '参加人数：' + participantLabel + '\n' +
+          genderBreakdown + '\n' +
+          'お名前：' + name + '様\n' +
+          '携帯番号：' + optionalLabelClient(reservation.phone) + '\n' +
+          '宿泊施設名：' + optionalLabelClient(reservation.hotel) + '\n' +
+          '滞在期間：' + optionalLabelClient(reservation.stay) + '\n\n' +
+          '【オプション・確認事項】\n' +
+          '送迎：' + pickupLabel + '\n' +
+          'カメラマン：' + photographerLabel + '\n' +
+          'クーポン：' + couponLabel + '\n' +
+          '深夜料金：' + lateFeeConsentLabel + '\n' +
+          'Instagram：' + optionalLabelClient(reservation.instagram) + '\n' +
+          'ストーリータグ付け：' + optionalLabelClient(reservation.storyTag) + '\n\n' +
+          '【お支払い金額】\n' +
+          '合計料金：' + confirmedPriceLabel + lateNightPriceLine + '\n' +
+          'お支払い方法：撮影当日に現地での現金決済\n\n' +
+          '【集合場所について】\n' +
+          '主な撮影候補地：前浜・友利博愛・白鳥岬\n' +
+          '候補地の地図：https://keyphotomiyakojima.com/access#shooting-locations\n\n' +
+          '集合場所は、当日の雲や風などの星空コンディションを確認したうえで、その日に最もきれいに撮影できる場所をご案内いたします。\n' +
+          '撮影当日にこちらのLINEへお送りしますので、必ずご確認をお願いいたします。\n\n' +
+          '撮影データは、撮影後24時間以内を目安にオンラインでお届けいたします。\n\n' +
+          '内容に間違いや変更がございましたら、このLINEへご連絡ください。\n' +
+          '当日はどうぞよろしくお願いいたします。',
+        sameDay:
+          name + '様、本日の星空フォト撮影についてご案内いたします。\n' +
+          '下記の内容をご確認のうえ、集合場所までお気をつけてお越しください。\n\n' +
+          '【本日の撮影案内】\n' +
+          '撮影日：' + dateLabel + '\n' +
+          '集合時間：' + (reservation.confirmedTime || '［確定時間］') + '\n' +
+          '集合場所：' + meetingPlaceGuide + '\n\n' +
+          '【現地到着時のご注意】\n' +
+          '安全で最高の星空撮影を行うため、以下の2点をお守りください。\n\n' +
+          '1．安全に停車後、車のライトは必ず消灯してください\n' +
+          '光が漏れると星空の撮影に影響が出てしまいます。安全な場所へ停車したあと、ヘッドライトや車内灯を消し、周囲へのご配慮をお願いいたします。\n\n' +
+          '2．合図があるまで車内でお待ちください\n' +
+          '前のお客様の撮影が終了次第、スタッフからお声がけいたします。それまでは車内での待機をお願いいたします。\n\n' +
+          '【当日の開催判断について】\n' +
+          '星空撮影は雲の動きに左右されるため、天候が怪しい場合は、開催可否の判断を当日18:00頃に行います。\n\n' +
+          '※天候の心配がないと判断した場合、18:00頃のご連絡はいたしません。\n' +
+          '※中止の場合は、ほかの日程への振替も可能です。\n' +
+          '※中止のご連絡後に天候が回復した場合は、改めてご連絡する場合がございます。\n\n' +
+          '【当日の服装・準備】\n' +
+          '・服装：白い服や明るい色のお洋服は、夜の背景にとてもきれいに映えます。\n' +
+          '・足元：暗い場所を歩くため、歩きやすい靴がおすすめです。\n' +
+          '・防寒：夜の屋外は冷え込むことがあります。羽織るものを1枚お持ちいただくことをおすすめします。\n\n' +
+          '【緊急連絡について】\n' +
+          '当日の「道に迷った」「少し遅れそう」などのご連絡は、現場スタッフが直接確認できるショートメッセージ（SMS）がスムーズです。\n\n' +
+          '【当日の緊急連絡先】\n' +
+          '090-9279-9586（稲田）\n' +
+          '※SMSでのご連絡も可能です。\n\n' +
+          'それでは、本日はどうぞよろしくお願いいたします。',
+      };
+    }
+
+    function normalizeClientReservation(payload) {
+      return {
+        rawText: cleanMultilineClient(payload.rawText), shootDate: parseDateKeyClient(payload.shootDate),
+        plan: cleanTextClient(payload.plan), name: cleanTextClient(payload.name), gender: cleanTextClient(payload.gender),
+        adults: toNumberClient(payload.adults), children: toNumberClient(payload.children), phone: cleanTextClient(payload.phone),
+        hotel: cleanTextClient(payload.hotel), stay: cleanMultilineClient(payload.stay), pickup: cleanTextClient(payload.pickup),
+        photographer: cleanTextClient(payload.photographer), lateFee: cleanTextClient(payload.lateFee),
+        instagram: cleanTextClient(payload.instagram), storyTag: cleanTextClient(payload.storyTag),
+        confirmedTime: normalizeTimeValueClient(payload.confirmedTime), meetingPlace: cleanTextClient(payload.meetingPlace),
+      };
+    }
+
+    function calculateConfirmedPriceClient(reservation) {
+      const extractedBase = extractEstimatedTotalClient(reservation.rawText);
+      const fallbackBase = calculateBasePriceClient(reservation);
+      const base = extractedBase == null ? fallbackBase : extractedBase;
+      const participantCount = Math.max(0, reservation.adults + reservation.children);
+      const lateNightFee = getLateNightRateClient(reservation.confirmedTime) * participantCount;
+      return { base, lateNightFee, total: base == null ? null : base + lateNightFee };
+    }
+
+    function extractEstimatedTotalClient(rawText) {
+      const match = normalizeDigitsClient(cleanMultilineClient(rawText)).match(/お会計（概算）\s*[:：]\s*\n?\s*(?:¥|￥)?\s*([0-9][0-9,]*)/);
+      if (!match) return null;
+      const amount = Number(match[1].replace(/,/g, ''));
+      return Number.isNaN(amount) ? null : amount;
+    }
+
+    function calculateBasePriceClient(reservation) {
+      const prices = {
+        'カジュアルプラン': { kind: 'perPerson', adult: 7000, child: 3000 },
+        'スタンダードプラン': { kind: 'perPerson', adult: 9000, child: 5000 },
+        'ファミリープラン': { kind: 'perGroup', amount: 18000, maxParticipants: 10 },
+        'クリエイティブプラン': { kind: 'perGroup', amount: 28000 },
+      };
+      const price = prices[reservation.plan];
+      if (!price) return null;
+      const participantCount = reservation.adults + reservation.children;
+      if (price.maxParticipants && participantCount > price.maxParticipants) return null;
+      let amount = price.kind === 'perPerson'
+        ? reservation.adults * price.adult + reservation.children * price.child
+        : price.amount;
+      if (isPickupRequestedClient(reservation.pickup)) amount += 6000;
+      if (/稲田/.test(reservation.photographer)) amount += 2000;
+      return amount;
+    }
+
+    function formatGenderBreakdownClient(value) {
+      const text = normalizeDigitsClient(cleanTextClient(value));
+      const adultMatch = text.match(/大人[^／/]*男性\s*(\d+)\s*人[^／/]*女性\s*(\d+)\s*人/);
+      const childMatch = text.match(/子ども[^／/]*男の子\s*(\d+)\s*人[^／/]*女の子\s*(\d+)\s*人/);
+      const lines = [];
+      if (adultMatch) lines.push('大人（16歳以上）：男性' + adultMatch[1] + '名・女性' + adultMatch[2] + '名');
+      if (childMatch) lines.push('子ども（0〜15歳）：男の子' + childMatch[1] + '名・女の子' + childMatch[2] + '名');
+      return lines.length ? lines.join('\n') : '参加者の性別内訳：' + optionalLabelClient(value);
+    }
+
+    function extractCouponLabelClient(rawText) {
+      const match = cleanMultilineClient(rawText).match(/(?:🎟\s*)?クーポン\s*[:：]\s*([^\n]+)/);
+      return match ? cleanTextClient(match[1]) : '記入なし';
+    }
+
+    function isPickupRequestedClient(value) {
+      const text = cleanTextClient(value);
+      return Boolean(text) && !/なし|希望しない|不要/.test(text) && /希望|あり|する/.test(text);
+    }
+
+    function isLateFeeConsentConfirmedClient(value) {
+      const text = cleanTextClient(value);
+      return Boolean(text) && !/未確認|未同意|了承していない/.test(text) && /了承|同意|確認済/.test(text);
+    }
+
+    function getLateNightRateClient(value) {
+      const normalized = normalizeTimeValueClient(value);
+      if (!normalized) return 0;
+      const hour = Number(normalized.slice(0, 2));
+      if (hour === 0) return 1000;
+      if (hour >= 1 && hour < 6) return 2000;
+      return 0;
+    }
+
+    function normalizeTimeValueClient(value) {
+      const match = normalizeDigitsClient(cleanTextClient(value)).match(/(\d{1,2}):(\d{2})/);
+      if (!match) return '';
+      const hour = Number(match[1]);
+      const minute = Number(match[2]);
+      return hour >= 0 && hour <= 23 && minute >= 0 && minute <= 59 ? pad2Client(hour) + ':' + pad2Client(minute) : '';
+    }
+
+    function formatMeetingPlaceGuideClient(value) {
+      const text = cleanTextClient(value);
+      if (!text) return '［集合場所］';
+      const separatorIndex = text.indexOf('｜');
+      if (separatorIndex === -1) return text;
+      const name = cleanTextClient(text.slice(0, separatorIndex));
+      const url = cleanTextClient(text.slice(separatorIndex + 1));
+      return name + (url ? '\nGoogleマップ：' + url : '');
+    }
+
+    function formatDateLabelClient(key) {
+      const parts = String(key || '').split('-');
+      return parts.length === 3 ? Number(parts[0]) + '年' + Number(parts[1]) + '月' + Number(parts[2]) + '日' : (key || '［撮影日］');
+    }
+
+    function formatCurrencyClient(value) {
+      return '¥' + Math.round(Number(value) || 0).toLocaleString('ja-JP');
+    }
+
+    function optionalLabelClient(value) {
+      return cleanTextClient(value) || '記入なし';
+    }
+
+    function toNumberClient(value) {
+      const number = Number(normalizeDigitsClient(String(value == null ? '' : value)).replace(/[^0-9.-]/g, ''));
+      return Number.isNaN(number) ? 0 : number;
+    }
+
+    function cleanTextClient(value) {
+      return String(value == null ? '' : value).replace(/\s+/g, ' ').trim();
+    }
+
+    function cleanMultilineClient(value) {
+      return String(value == null ? '' : value).replace(/\r\n?/g, '\n').replace(/[ \t]+\n/g, '\n').replace(/\n{3,}/g, '\n\n').trim();
+    }
+
+    function normalizeDigitsClient(value) {
+      return String(value || '').replace(/[０-９]/g, (char) => String.fromCharCode(char.charCodeAt(0) - 0xFEE0));
+    }
+
+    function escapeRegExpClient(value) {
+      return String(value).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    }
+
+    function pad2Client(value) {
+      return String(value).padStart(2, '0');
     }
 
     async function reloadData() {

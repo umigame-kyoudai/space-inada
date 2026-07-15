@@ -132,13 +132,14 @@ function saveReservation(payload) {
       booking.gender,
       booking.preferredTimeWindow,
     ];
-    sheet.appendRow(row);
-    const reservation = rowToReservation_(row, sheet.getLastRow());
+    const rowNumber = sheet.getLastRow() + 1;
+    sheet.getRange(rowNumber, 1, 1, row.length).setValues([row]);
+    const reservation = rowToReservation_(row, rowNumber);
     syncConfirmedSlot_({}, reservation);
     appendLog_(staff, id, '予約取込', '', booking.name + ' / ' + booking.shootDate);
     return {
       reservation: reservation,
-      reservations: listReservations_(),
+      messages: generateMessages(reservation),
     };
   } finally {
     lock.releaseLock();
@@ -211,7 +212,7 @@ function updateReservation(payload) {
 
     return {
       reservation: rowToReservation_(newRow, found.rowNumber),
-      reservations: listReservations_(),
+      messages: generateMessages(rowToReservation_(newRow, found.rowNumber)),
     };
   } finally {
     lock.releaseLock();
@@ -270,7 +271,7 @@ function generateMessages(payload) {
       'お支払い方法：撮影当日に現地での現金決済\n\n' +
       '【集合場所について】\n' +
       '主な撮影候補地：前浜・友利博愛・白鳥岬\n' +
-      '候補地の地図：https://space-inada.com/access#shooting-locations\n\n' +
+      '候補地の地図：https://keyphotomiyakojima.com/access#shooting-locations\n\n' +
       '集合場所は、当日の雲や風などの星空コンディションを確認したうえで、その日に最もきれいに撮影できる場所をご案内いたします。\n' +
       '撮影当日にこちらのLINEへお送りしますので、必ずご確認をお願いいたします。\n\n' +
       '撮影データは、撮影後24時間以内を目安にオンラインでお届けいたします。\n\n' +
@@ -639,8 +640,13 @@ function createReservationId_(date) {
   return 'SF-' + Utilities.formatDate(date, APP_CONFIG.timeZone, 'yyyyMMdd-HHmmss') + '-' + Math.floor(100 + Math.random() * 900);
 }
 
+let spreadsheetCache_;
+
 function getSpreadsheet_() {
-  return SpreadsheetApp.openById(APP_CONFIG.spreadsheetId);
+  if (!spreadsheetCache_) {
+    spreadsheetCache_ = SpreadsheetApp.openById(APP_CONFIG.spreadsheetId);
+  }
+  return spreadsheetCache_;
 }
 
 function getSheet_(name) {
