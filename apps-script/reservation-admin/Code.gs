@@ -16,8 +16,14 @@ const RESERVATION_HEADERS = Object.freeze([
   'カメラマン指名', '場所指定', '深夜料金確認', 'Instagram', 'ストーリータグ',
   '候補時間①', '候補時間②', '候補時間③', '確定時間', '集合場所',
   'ステータス', '最終更新日時', '更新者', 'メモ', '参加者の性別内訳',
-  '希望時間帯',
+  '希望時間帯', 'カレンダーイベントID',
 ]);
+
+const CALENDAR_CONFIG = Object.freeze({
+  eventMinutes: 60,
+  titlePrefix: '🌌',
+  settingsColumn: 7,
+});
 
 const REQUIRED_FIELDS = Object.freeze([
   ['shootDate', '撮影希望日'],
@@ -53,7 +59,7 @@ function doGet() {
   return HtmlService.createTemplateFromFile('Index')
     .evaluate()
     .setTitle('星空フォト予約管理')
-    .addMetaTag('viewport', 'width=device-width, initial-scale=1');
+    .addMetaTag('viewport', 'width=device-width, initial-scale=1, maximum-scale=1');
 }
 
 function getInitialData() {
@@ -98,6 +104,7 @@ function saveReservation(payload) {
   lock.waitLock(20000);
   try {
     const sheet = getSheet_(APP_CONFIG.sheets.reservations);
+    ensureReservationColumns_(sheet);
     const now = new Date();
     const id = createReservationId_(now);
     const staff = getStaffName_();
@@ -131,15 +138,18 @@ function saveReservation(payload) {
       cleanText_(payload.memo),
       booking.gender,
       booking.preferredTimeWindow,
+      '',
     ];
     const rowNumber = sheet.getLastRow() + 1;
     sheet.getRange(rowNumber, 1, 1, row.length).setValues([row]);
     const reservation = rowToReservation_(row, rowNumber);
     syncConfirmedSlot_({}, reservation);
     appendLog_(staff, id, '予約取込', '', booking.name + ' / ' + booking.shootDate);
+    const calendarWarning = applyCalendarSync_(sheet, reservation, staff);
     return {
       reservation: reservation,
       messages: generateMessages(reservation),
+      calendarWarning: calendarWarning,
     };
   } finally {
     lock.releaseLock();
@@ -155,6 +165,7 @@ function updateReservation(payload) {
   lock.waitLock(20000);
   try {
     const sheet = getSheet_(APP_CONFIG.sheets.reservations);
+    ensureReservationColumns_(sheet);
     const found = findReservationRow_(sheet, id);
     if (!found) throw new Error('対象の予約が見つかりません。再読み込みしてください。');
 
@@ -207,12 +218,15 @@ function updateReservation(payload) {
     newRow[27] = next.preferredTimeWindow;
 
     sheet.getRange(found.rowNumber, 1, 1, newRow.length).setValues([newRow]);
-    syncConfirmedSlot_(oldReservation, rowToReservation_(newRow, found.rowNumber));
-    appendLog_(staff, id, '予約更新', summarizeReservation_(oldReservation), summarizeReservation_(rowToReservation_(newRow, found.rowNumber)));
+    const updated = rowToReservation_(newRow, found.rowNumber);
+    syncConfirmedSlot_(oldReservation, updated);
+    appendLog_(staff, id, '予約更新', summarizeReservation_(oldReservation), summarizeReservation_(updated));
+    const calendarWarning = applyCalendarSync_(sheet, updated, staff);
 
     return {
-      reservation: rowToReservation_(newRow, found.rowNumber),
-      messages: generateMessages(rowToReservation_(newRow, found.rowNumber)),
+      reservation: updated,
+      messages: generateMessages(updated),
+      calendarWarning: calendarWarning,
     };
   } finally {
     lock.releaseLock();
@@ -471,6 +485,7 @@ function normalizeReservationUpdate_(payload, fallback) {
 
 function listReservations_() {
   const sheet = getSheet_(APP_CONFIG.sheets.reservations);
+  ensureReservationColumns_(sheet);
   const lastRow = sheet.getLastRow();
   if (lastRow < 2) return [];
   const values = sheet.getRange(2, 1, lastRow - 1, RESERVATION_HEADERS.length).getValues();
@@ -511,6 +526,7 @@ function rowToReservation_(row, rowNumber) {
     memo: cleanMultiline_(row[25]),
     gender: cleanText_(row[26]),
     preferredTimeWindow: cleanText_(row[27]),
+    calendarEventId: cleanText_(row[28]),
   };
 }
 
@@ -599,6 +615,170 @@ function syncConfirmedSlot_(oldReservation, nextReservation) {
     sheet.getRange(existingRow, 1, 1, 7).setValues(slotRow);
   } else {
     sheet.appendRow(slotRow[0]);
+  }
+}
+
+// ===== Googleカレンダー連携 =====
+// 設定シートのG2に共有カレンダーIDを入れると、確定した予約が自動でカレンダーに登録されます。
+// エディタから setupSharedCalendar を1回実行すると、専用カレンダーの作成とID設定を自動で行います。
+
+function setupSharedCalendar() {
+  const existing = getCalendarId_();
+  if (existing) {
+    Logger.log('共有カレンダーは設定済みです。ID: ' + existing);
+    return existing;
+  }
+  const calendar = CalendarApp.createCalendar('星空フォト予約', { timeZone: APP_CONFIG.timeZone });
+  const sheet = getSheet_(APP_CONFIG.sheets.settings);
+  if (sheet.getMaxColumns() < CALENDAR_CONFIG.settingsColumn) {
+    sheet.insertColumnsAfter(sheet.getMaxColumns(), CALENDAR_CONFIG.settingsColumn - sheet.getMaxColumns());
+  }
+  sheet.getRange(1, CALENDAR_CONFIG.settingsColumn).setValue('共有カレンダーID');
+  sheet.getRange(2, CALENDAR_CONFIG.settingsColumn).setValue(calendar.getId());
+  Logger.log('共有カレンダー「星空フォト予約」を作成しました。ID: ' + calendar.getId());
+  Logger.log('Googleカレンダーの設定から、このカレンダーをスタッフのアカウントへ共有してください。');
+  return calendar.getId();
+}
+
+function syncAllReservationsToCalendar() {
+  if (!getCalendarId_()) {
+    throw new Error('先に setupSharedCalendar を実行するか、設定シートのG2セルに共有カレンダーIDを入力してください。');
+  }
+  const sheet = getSheet_(APP_CONFIG.sheets.reservations);
+  const reservations = listReservations_();
+  let synced = 0;
+  reservations.forEach(function (reservation) {
+    const warning = applyCalendarSync_(sheet, reservation, '一括同期');
+    if (warning) Logger.log(reservation.id + ': ' + warning);
+    if (reservation.calendarEventId) synced += 1;
+  });
+  Logger.log(reservations.length + '件を確認し、' + synced + '件をカレンダーへ同期しました。');
+}
+
+function getCalendarId_() {
+  const sheet = getSheet_(APP_CONFIG.sheets.settings);
+  if (sheet.getMaxColumns() < CALENDAR_CONFIG.settingsColumn) return '';
+  return cleanText_(sheet.getRange(2, CALENDAR_CONFIG.settingsColumn).getDisplayValue());
+}
+
+function applyCalendarSync_(sheet, reservation, staff) {
+  let warning = '';
+  try {
+    const sync = syncCalendarEvent_(reservation);
+    if (sync.eventId !== reservation.calendarEventId) {
+      sheet.getRange(reservation.rowNumber, RESERVATION_HEADERS.length).setValue(sync.eventId);
+      reservation.calendarEventId = sync.eventId;
+    }
+    warning = sync.warning;
+  } catch (error) {
+    warning = 'カレンダーへの反映に失敗しました：' + error.message;
+  }
+  if (warning) appendLog_(staff, reservation.id, 'カレンダー同期警告', '', warning);
+  return warning;
+}
+
+function syncCalendarEvent_(reservation) {
+  const calendarId = getCalendarId_();
+  if (!calendarId) return { eventId: reservation.calendarEventId || '', warning: '' };
+  const calendar = CalendarApp.getCalendarById(calendarId);
+  if (!calendar) {
+    return {
+      eventId: reservation.calendarEventId || '',
+      warning: '共有カレンダーが見つかりません。設定シートG2のIDとカレンダーの共有権限を確認してください。',
+    };
+  }
+
+  const existing = reservation.calendarEventId ? getCalendarEventSafe_(calendar, reservation.calendarEventId) : null;
+  const shouldHold = reservation.confirmedTime && reservation.status !== 'キャンセル';
+  if (!shouldHold) {
+    if (existing) existing.deleteEvent();
+    return { eventId: '', warning: '' };
+  }
+
+  const start = shootStartDateTime_(reservation.shootDate, reservation.confirmedTime);
+  const end = new Date(start.getTime() + CALENDAR_CONFIG.eventMinutes * 60000);
+  const title = calendarEventTitle_(reservation);
+  const description = calendarEventDescription_(reservation);
+  const location = cleanText_(String(reservation.meetingPlace || '').replace('｜', ' '));
+
+  if (existing) {
+    existing.setTime(start, end);
+    existing.setTitle(title);
+    existing.setDescription(description);
+    existing.setLocation(location);
+    return { eventId: reservation.calendarEventId, warning: '' };
+  }
+  const event = calendar.createEvent(title, start, end, { description: description, location: location });
+  return { eventId: event.getId(), warning: '' };
+}
+
+function getCalendarEventSafe_(calendar, eventId) {
+  try {
+    return calendar.getEventById(eventId);
+  } catch (_) {
+    return null;
+  }
+}
+
+function shootStartDateTime_(shootDateKey, time) {
+  const parts = String(shootDateKey || '').split('-').map(Number);
+  const match = normalizeTimeValue_(time).match(/(\d{2}):(\d{2})/);
+  if (parts.length !== 3 || parts.some(isNaN) || !match) {
+    throw new Error('カレンダー登録用の日時を作成できませんでした。');
+  }
+  const date = new Date(parts[0], parts[1] - 1, parts[2], Number(match[1]), Number(match[2]), 0);
+  // 0〜5時台は「撮影日の夜」が日をまたいだ深夜帯なので、カレンダー上は翌日の日時にする
+  if (Number(match[1]) < 6) date.setDate(date.getDate() + 1);
+  return date;
+}
+
+function calendarEventTitle_(reservation) {
+  const photographer = normalizePhotographer_(reservation.photographer);
+  return CALENDAR_CONFIG.titlePrefix + ' ' + reservation.confirmedTime + ' ' + reservation.name + '様 ' +
+    (reservation.plan || 'プラン未定') +
+    '（大人' + reservation.adults + '・子ども' + reservation.children + '）' +
+    (photographer === '指名なし' ? '' : '／' + photographer);
+}
+
+function calendarEventDescription_(reservation) {
+  return [
+    '予約ID：' + reservation.id,
+    'ステータス：' + reservation.status,
+    '撮影日：' + formatDateLabel_(reservation.shootDate),
+    '撮影開始時間：' + reservation.confirmedTime,
+    'プラン：' + optionalLabel_(reservation.plan),
+    '参加人数：大人' + reservation.adults + '名・子ども' + reservation.children + '名',
+    '性別内訳：' + optionalLabel_(reservation.gender),
+    '携帯番号：' + optionalLabel_(reservation.phone),
+    '宿泊施設名：' + optionalLabel_(reservation.hotel),
+    '滞在期間：' + optionalLabel_(reservation.stay),
+    '送迎：' + optionalLabel_(reservation.pickup),
+    'カメラマン指名：' + optionalLabel_(reservation.photographer),
+    '場所指定：' + optionalLabel_(reservation.locationRequest),
+    '深夜料金：' + optionalLabel_(reservation.lateFee),
+    'Instagram：' + optionalLabel_(reservation.instagram),
+    '集合場所：' + (reservation.meetingPlace || '未定'),
+    'メモ：' + optionalLabel_(reservation.memo),
+    '',
+    '※予約管理ツールから自動登録されたイベントです。予約の変更はツール側で行うと自動で反映されます。',
+  ].join('\n');
+}
+
+function ensureReservationColumns_(sheet) {
+  const needed = RESERVATION_HEADERS.length;
+  let created = false;
+  if (sheet.getMaxColumns() < needed) {
+    sheet.insertColumnsAfter(sheet.getMaxColumns(), needed - sheet.getMaxColumns());
+    created = true;
+  }
+  const lastHeader = cleanText_(sheet.getRange(1, needed).getDisplayValue());
+  if (lastHeader !== RESERVATION_HEADERS[needed - 1]) {
+    sheet.getRange(1, needed).setValue(RESERVATION_HEADERS[needed - 1]);
+    created = true;
+  }
+  if (created) {
+    // 挿入した列は隣の列（希望時間帯）の入力規則を引き継ぐため、イベントID列からは外す
+    sheet.getRange(1, needed, sheet.getMaxRows(), 1).clearDataValidations();
   }
 }
 

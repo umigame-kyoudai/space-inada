@@ -28,6 +28,7 @@
     body {
       margin: 0;
       min-height: 100vh;
+      min-height: 100dvh;
       color: var(--ink);
       background: var(--base);
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif;
@@ -67,12 +68,14 @@
     }
     .brand strong { display: block; font-size: 16px; letter-spacing: .03em; }
     .brand small { display: block; color: #b8c9df; font-size: 11px; }
+    .header-tools { display: flex; align-items: center; gap: 12px; }
     .staff-name { color: #c9d7e8; font-size: 13px; }
 
     .layout {
       display: grid;
       grid-template-columns: 220px minmax(0, 1fr);
       min-height: calc(100vh - 72px);
+      min-height: calc(100dvh - 72px);
     }
     .sidebar {
       padding: 28px 16px;
@@ -196,6 +199,44 @@
     .intake-proposal textarea { min-height: 210px; color: #2c3a4e; background: #f9fbfd; font-size: 12px; }
     input[type="time"] { font-variant-numeric: tabular-nums; }
 
+    .optional-fields { margin-top: 15px; }
+    .optional-fields summary {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      min-height: 42px;
+      padding: 10px 12px;
+      border: 1px dashed #c3d2e2;
+      border-radius: 10px;
+      color: #3c5069;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      list-style: none;
+      -webkit-user-select: none;
+      user-select: none;
+    }
+    .optional-fields summary::-webkit-details-marker { display: none; }
+    .optional-fields summary::before { content: '▸'; transition: transform .15s; }
+    .optional-fields[open] summary::before { transform: rotate(90deg); }
+    .optional-fields[open] summary { margin-bottom: 12px; }
+
+    .intake-actions-status { display: none; }
+
+    .date-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
+    .chip {
+      min-height: 38px;
+      padding: 7px 16px;
+      border: 1px solid #ccd8e6;
+      border-radius: 999px;
+      color: #3c4f68;
+      background: #fff;
+      font-size: 13px;
+      font-weight: 700;
+      transition: background .15s, color .15s;
+    }
+    .chip.active { color: #fff; border-color: transparent; background: #1565ad; }
+
     .toolbar {
       display: grid;
       grid-template-columns: minmax(220px, 1fr) 200px auto;
@@ -222,14 +263,34 @@
     .status-chip[data-status="キャンセル"] { color: #8a2c2c; background: #faeaea; }
     .empty { padding: 56px 20px; color: var(--muted); text-align: center; }
 
+    .reservation-cards { display: none; }
+    .reservation-card {
+      display: block;
+      width: 100%;
+      margin-bottom: 10px;
+      padding: 13px 14px;
+      border: 1px solid var(--line);
+      border-radius: 13px;
+      background: var(--paper);
+      text-align: left;
+      box-shadow: 0 2px 10px rgba(13, 34, 68, .05);
+    }
+    .reservation-card:active { background: #f4f9ff; }
+    .reservation-card-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 4px; }
+    .reservation-card-when { font-size: 15px; font-weight: 800; font-variant-numeric: tabular-nums; }
+    .reservation-card-name { font-size: 15px; font-weight: 800; }
+    .reservation-card-meta { margin-top: 2px; color: var(--muted); font-size: 12px; }
+
     dialog {
       width: min(1040px, calc(100vw - 28px));
       max-height: calc(100vh - 28px);
+      max-height: calc(100dvh - 28px);
       padding: 0;
       border: 0;
       border-radius: 18px;
       background: #f5f7fb;
       box-shadow: 0 28px 80px rgba(5, 20, 45, .32);
+      overflow-y: auto;
     }
     dialog::backdrop { background: rgba(7, 18, 38, .62); backdrop-filter: blur(2px); }
     .dialog-head {
@@ -254,7 +315,21 @@
     .message-card textarea { min-height: 170px; color: #2c3a4e; background: #f9fbfd; font-size: 12px; }
     .message-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 8px; }
     .message-head h3 { margin: 0; }
-    .dialog-actions { position: sticky; bottom: 0; display: flex; justify-content: flex-end; gap: 10px; padding: 14px 20px; border-top: 1px solid var(--line); background: rgba(255,255,255,.96); }
+    .dialog-actions { position: sticky; bottom: 0; display: flex; justify-content: flex-end; gap: 10px; padding: 14px 20px calc(14px + env(safe-area-inset-bottom)); border-top: 1px solid var(--line); background: var(--paper); }
+
+    .dialog-tabs { display: none; }
+    .dialog-tab {
+      flex: 1;
+      min-height: 44px;
+      padding: 8px 6px;
+      border: 1px solid #ccd8e6;
+      border-radius: 10px;
+      color: #3c4f68;
+      background: #fff;
+      font-size: 13px;
+      font-weight: 700;
+    }
+    .dialog-tab.active { color: #fff; border-color: transparent; background: var(--navy-2); }
 
     .toast {
       position: fixed;
@@ -288,21 +363,137 @@
       .nav-button { width: auto; min-width: max-content; margin: 0; padding: 9px 12px; }
       .sidebar-note { display: none; }
       .grid-2, .dialog-grid { grid-template-columns: 1fr; }
+      /* iOS Safariは16px未満の入力欄にフォーカスすると自動ズームするため、モバイルでは16px未満を禁止 */
+      input, select, textarea,
+      #rawText, .intake-proposal textarea, .message-card textarea { font-size: 16px; }
+      .table-wrap { display: none; }
+      .reservation-cards { display: block; }
+      .dialog-head { position: static; }
+      .dialog-tabs {
+        position: sticky;
+        top: 0;
+        z-index: 4;
+        display: flex;
+        gap: 6px;
+        padding: 10px 12px;
+        border-bottom: 1px solid var(--line);
+        background: #f5f7fb;
+      }
+      #detailDialog[data-tab="info"] .dialog-pane:not([data-pane="info"]),
+      #detailDialog[data-tab="confirm"] .dialog-pane:not([data-pane="confirm"]),
+      #detailDialog[data-tab="messages"] .dialog-pane:not([data-pane="messages"]) { display: none; }
     }
     @media (max-width: 620px) {
-      .app-header { min-height: 64px; }
-      .layout { min-height: calc(100vh - 64px); }
+      /* ヘッダーはスクロールで画面外へ逃がし、ビュー切替ナビだけを上部に固定する */
+      .app-header { position: static; min-height: 56px; }
+      .layout { min-height: calc(100vh - 56px); min-height: calc(100dvh - 56px); }
       .staff-name, .brand small { display: none; }
-      .sidebar { top: 64px; }
-      main { padding: 18px 13px 30px; }
+      .sidebar { top: 0; }
+      .chip { min-height: 44px; }
+      .toast {
+        top: calc(10px + env(safe-area-inset-top));
+        right: 12px;
+        bottom: auto;
+        left: 12px;
+        max-width: none;
+      }
+      dialog {
+        width: 100vw;
+        max-width: none;
+        height: 100vh;
+        height: 100dvh;
+        max-height: none;
+        margin: 0;
+        border-radius: 0;
+      }
+      .intake-actions {
+        position: sticky;
+        bottom: 0;
+        z-index: 5;
+        margin: 16px -14px -14px;
+        padding: 10px 14px calc(12px + env(safe-area-inset-bottom));
+        border-top: 1px solid var(--line);
+        border-radius: 0 0 var(--radius) var(--radius);
+        background: var(--paper);
+      }
+      .intake-actions .button-row { flex-direction: column; margin-top: 0; }
+      .intake-actions .button { width: 100%; }
+      .intake-actions-status { display: block; margin: 0 0 8px; padding: 8px 10px; font-size: 12px; }
+      main { padding: 12px 12px 26px; }
+      .page-head { margin-bottom: 12px; }
+      h1 { font-size: 21px; margin-bottom: 4px; }
+      .lead { font-size: 13px; }
       .field-grid, .time-grid { grid-template-columns: 1fr; }
       .field.full { grid-column: auto; }
       .toolbar { grid-template-columns: 1fr; }
-      .card { padding: 17px; }
+      .grid-2 { gap: 14px; }
+      .card { padding: 14px; }
+      h2 { margin-bottom: 12px; font-size: 16px; }
+      #rawText { min-height: 140px; }
+      .parse-status { margin: 12px 0; }
+      .intake-proposal { margin-top: 16px; padding-top: 14px; }
+      .intake-proposal textarea { min-height: 150px; }
+      .button-row { margin-top: 12px; }
       .dialog-body { padding: 12px; }
       .dialog-actions { flex-direction: column-reverse; }
       .dialog-actions .button { width: 100%; }
     }
+
+    /* ナイトモード：夜の現場でまぶしくないよう全体を暗色に切り替える */
+    html[data-theme="dark"] {
+      color-scheme: dark;
+      --sky-pale: #163150;
+      --ink: #dee7f2;
+      --muted: #8fa1b8;
+      --line: #2a3a50;
+      --paper: #16202f;
+      --base: #0d1420;
+      --danger: #f1998e;
+      --danger-bg: #38201c;
+      --success: #6fd9a8;
+      --success-bg: #143327;
+      --shadow: 0 12px 36px rgba(0, 0, 0, .45);
+    }
+    html[data-theme="dark"] .sidebar { background: #121b29; }
+    html[data-theme="dark"] .nav-button { color: #9db0c7; }
+    html[data-theme="dark"] .nav-button.active { color: #8fc4ff; background: var(--sky-pale); }
+    html[data-theme="dark"] .sidebar-note { border-color: #5c4a1d; color: #e8c877; background: #2a2410; }
+    html[data-theme="dark"] label { color: #a9bbd1; }
+    html[data-theme="dark"] input,
+    html[data-theme="dark"] select,
+    html[data-theme="dark"] textarea { border-color: #33465e; background: #101927; }
+    html[data-theme="dark"] .intake-proposal textarea,
+    html[data-theme="dark"] .message-card textarea { color: #c7d4e4; background: #0e1622; }
+    html[data-theme="dark"] .button.dark { background: #24447a; }
+    html[data-theme="dark"] .button.secondary { color: #c3d3e6; border-color: #3b5070; background: #182432; }
+    html[data-theme="dark"] .button.danger { color: #ff9d94; border-color: #5c2a26; background: #2e1513; }
+    html[data-theme="dark"] .step { background: #2f5187; }
+    html[data-theme="dark"] .parse-status { color: #b9c7da; background: #1b2637; }
+    html[data-theme="dark"] .parse-status.ok { color: var(--success); background: var(--success-bg); }
+    html[data-theme="dark"] .parse-status.warn { color: var(--danger); background: var(--danger-bg); }
+    html[data-theme="dark"] .optional-fields summary { border-color: #3b5070; color: #a9bccf; }
+    html[data-theme="dark"] .summary-pill { color: #a7b8cd; background: #1d2a3c; }
+    html[data-theme="dark"] .chip { color: #b9c9dd; border-color: #3b5070; background: #182432; }
+    html[data-theme="dark"] .chip.active { color: #fff; border-color: transparent; background: #1565ad; }
+    html[data-theme="dark"] .table-wrap { background: var(--paper); }
+    html[data-theme="dark"] th { color: #93a7bf; background: #1a2534; }
+    html[data-theme="dark"] th, html[data-theme="dark"] td { border-bottom-color: #223349; }
+    html[data-theme="dark"] tbody tr:hover { background: #1c2c42; }
+    html[data-theme="dark"] .reservation-card:active { background: #1c2c42; }
+    html[data-theme="dark"] .status-chip { color: #b7c6da; background: #23334a; }
+    html[data-theme="dark"] .status-chip[data-status="未返信"] { color: #ffb08a; background: #3a2214; }
+    html[data-theme="dark"] .status-chip[data-status="時間確定"] { color: #7fdcae; background: #143327; }
+    html[data-theme="dark"] .status-chip[data-status="当日案内済み"] { color: #8ec7f7; background: #142e47; }
+    html[data-theme="dark"] .status-chip[data-status="撮影完了"] { color: #c3a8f2; background: #251b3d; }
+    html[data-theme="dark"] .status-chip[data-status="キャンセル"] { color: #e89a9a; background: #391b1b; }
+    html[data-theme="dark"] dialog { background: #101927; }
+    html[data-theme="dark"] .section-card { background: var(--paper); }
+    html[data-theme="dark"] .message-card { border-color: var(--line); background: var(--paper); }
+    html[data-theme="dark"] .dialog-tabs { background: #101927; }
+    html[data-theme="dark"] .dialog-tab { color: #b9c9dd; border-color: #3b5070; background: #182432; }
+    html[data-theme="dark"] .dialog-tab.active { color: #fff; border-color: transparent; background: #24447a; }
+    html[data-theme="dark"] .loading { background: rgba(10, 16, 26, .70); }
+    html[data-theme="dark"] .loading-box { background: var(--paper); }
   </style>
 </head>
 <body>
@@ -314,7 +505,10 @@
         <small>スタッフ専用</small>
       </div>
     </div>
-    <div class="staff-name" id="staffName">読み込み中…</div>
+    <div class="header-tools">
+      <div class="staff-name" id="staffName">読み込み中…</div>
+      <button class="icon-button" id="themeToggle" aria-label="ナイトモード切り替え">🌙</button>
+    </div>
   </header>
 
   <div class="layout">
@@ -338,9 +532,11 @@
             <h2><span class="step">1</span>LINEの文章を貼り付け</h2>
             <textarea id="rawText" placeholder="① 撮影希望日&#10;2026/07/20&#10;&#10;② 希望プラン&#10;スタンダードプラン&#10;&#10;…"></textarea>
             <div class="button-row">
-              <button class="button primary" id="parseButton">内容を読み取る</button>
+              <button class="button primary" id="pasteButton">貼り付けて読み取る</button>
+              <button class="button secondary" id="parseButton">内容を読み取る</button>
               <button class="button secondary" id="clearButton">クリア</button>
             </div>
+            <span class="hint">文章欄に貼り付けるだけで、自動で読み取りまで行います。</span>
           </div>
 
           <div class="card">
@@ -374,47 +570,53 @@
                 <input id="newPhone" inputmode="tel">
               </div>
               <div class="field">
-                <label for="newAdults">大人人数</label>
-                <input type="number" min="0" max="10" id="newAdults">
-              </div>
-              <div class="field">
-                <label for="newChildren">子ども人数</label>
-                <input type="number" min="0" max="10" id="newChildren">
-              </div>
-              <div class="field full">
-                <label for="newHotel">宿泊施設名</label>
-                <input id="newHotel">
-              </div>
-              <div class="field full">
-                <label for="newStay">滞在期間</label>
-                <textarea id="newStay"></textarea>
-              </div>
-              <div class="field">
-                <label for="newPickup">送迎</label>
-                <input id="newPickup">
-              </div>
-              <div class="field">
-                <label for="newPhotographer">カメラマン指名</label>
-                <input id="newPhotographer">
-                <span class="hint">指名によって写真のクオリティーは変わりません。</span>
-              </div>
-              <div class="field">
-                <label for="newLocationRequest">場所指定</label>
-                <input id="newLocationRequest">
-              </div>
-              <div class="field">
                 <label class="required" for="newLateFee">深夜料金への同意</label>
                 <input id="newLateFee">
               </div>
-              <div class="field">
-                <label for="newInstagram">Instagram</label>
-                <input id="newInstagram">
-              </div>
-              <div class="field">
-                <label for="newStoryTag">ストーリータグ</label>
-                <input id="newStoryTag">
-              </div>
             </div>
+
+            <details class="optional-fields" id="optionalFields">
+              <summary>その他の項目（人数・宿泊先・送迎・Instagramなど）</summary>
+              <div class="field-grid">
+                <div class="field">
+                  <label for="newAdults">大人人数</label>
+                  <input type="number" min="0" max="10" id="newAdults">
+                </div>
+                <div class="field">
+                  <label for="newChildren">子ども人数</label>
+                  <input type="number" min="0" max="10" id="newChildren">
+                </div>
+                <div class="field full">
+                  <label for="newHotel">宿泊施設名</label>
+                  <input id="newHotel">
+                </div>
+                <div class="field full">
+                  <label for="newStay">滞在期間</label>
+                  <textarea id="newStay"></textarea>
+                </div>
+                <div class="field">
+                  <label for="newPickup">送迎</label>
+                  <input id="newPickup">
+                </div>
+                <div class="field">
+                  <label for="newPhotographer">カメラマン指名</label>
+                  <input id="newPhotographer">
+                  <span class="hint">指名によって写真のクオリティーは変わりません。</span>
+                </div>
+                <div class="field">
+                  <label for="newLocationRequest">場所指定</label>
+                  <input id="newLocationRequest">
+                </div>
+                <div class="field">
+                  <label for="newInstagram">Instagram</label>
+                  <input id="newInstagram">
+                </div>
+                <div class="field">
+                  <label for="newStoryTag">ストーリータグ</label>
+                  <input id="newStoryTag">
+                </div>
+              </div>
+            </details>
 
             <div class="intake-proposal">
               <h2><span class="step">3</span>撮影時間を確定して文章を作る</h2>
@@ -434,9 +636,12 @@
                 <textarea id="newConfirmationMessage" readonly placeholder="予約内容を読み取り、確定時間を選ぶと文章が自動生成されます。"></textarea>
               </div>
             </div>
-            <div class="button-row">
-              <button class="button secondary" id="saveNewButton" disabled>確定内容を保存</button>
-              <button class="button dark" id="saveAndCopyButton" disabled>保存して確定文をコピー</button>
+            <div class="intake-actions">
+              <div class="parse-status intake-actions-status" id="intakeActionsStatus">文章を貼り付けて「内容を読み取る」を押してください。</div>
+              <div class="button-row">
+                <button class="button secondary" id="saveNewButton" disabled>確定内容を保存</button>
+                <button class="button dark" id="saveAndCopyButton" disabled>保存して確定文をコピー</button>
+              </div>
             </div>
           </div>
         </div>
@@ -448,6 +653,11 @@
             <h1>予約一覧</h1>
             <p class="lead">予約を開くと、確定時間・集合場所とLINE文章を編集できます。</p>
           </div>
+        </div>
+        <div class="date-chips" id="dateChips">
+          <button class="chip active" data-range="all">すべて</button>
+          <button class="chip" data-range="today">今日</button>
+          <button class="chip" data-range="tomorrow">明日</button>
         </div>
         <div class="toolbar">
           <input id="searchInput" placeholder="お名前・日付・予約IDで検索">
@@ -462,13 +672,14 @@
             </thead>
             <tbody id="reservationRows"></tbody>
           </table>
-          <div class="empty" id="emptyList" hidden>該当する予約はありません。</div>
         </div>
+        <div class="reservation-cards" id="reservationCards"></div>
+        <div class="empty" id="emptyList" hidden>該当する予約はありません。</div>
       </section>
     </main>
   </div>
 
-  <dialog id="detailDialog">
+  <dialog id="detailDialog" data-tab="info">
     <div class="dialog-head">
       <div>
         <h2 id="detailTitle">予約詳細</h2>
@@ -476,10 +687,15 @@
       </div>
       <button class="icon-button" id="closeDialogButton" aria-label="閉じる">×</button>
     </div>
+    <div class="dialog-tabs" id="dialogTabs">
+      <button class="dialog-tab active" data-tab="info">予約内容</button>
+      <button class="dialog-tab" data-tab="confirm">確定・当日</button>
+      <button class="dialog-tab" data-tab="messages">LINE文章</button>
+    </div>
     <div class="dialog-body">
       <div class="dialog-grid">
         <div>
-          <div class="section-card">
+          <div class="section-card dialog-pane" data-pane="info">
             <h3>予約内容</h3>
             <div class="field-grid">
               <div class="field"><label for="editShootDate">撮影希望日</label><input type="date" id="editShootDate"></div>
@@ -501,7 +717,7 @@
             </div>
           </div>
 
-          <div class="section-card">
+          <div class="section-card dialog-pane" data-pane="confirm">
             <h3>確定内容・当日案内</h3>
             <div class="field-grid">
               <div class="field"><label for="confirmedTime">確定した撮影開始時間</label><input type="time" step="60" id="confirmedTime"><span class="hint">24時間・1分単位で変更できます。</span></div>
@@ -512,7 +728,7 @@
           </div>
         </div>
 
-        <div>
+        <div class="dialog-pane" data-pane="messages">
           <div class="message-card">
             <div class="message-head"><h3>① 予約確定の文章</h3><button class="button small primary copy-button" data-target="confirmationMessage">コピー</button></div>
             <textarea id="confirmationMessage" readonly></textarea>
@@ -538,6 +754,7 @@
       reservations: [],
       settings: { plans: [], times: [], statuses: [], photographers: [], meetingPlaces: [] },
       closureDates: new Set(),
+      dateFilter: 'all',
       selectedId: '',
       parsed: false,
       messageTimer: null,
@@ -549,7 +766,9 @@
     document.addEventListener('DOMContentLoaded', init);
 
     async function init() {
+      initTheme();
       bindEvents();
+      if (window.matchMedia('(min-width: 901px)').matches) $('optionalFields').open = true;
       try {
         const data = await server('getInitialData');
         state.reservations = data.reservations || [];
@@ -570,11 +789,30 @@
         button.addEventListener('click', () => showView(button.dataset.view));
       });
       $('parseButton').addEventListener('click', parseRawText);
+      $('pasteButton').addEventListener('click', pasteAndParse);
       $('clearButton').addEventListener('click', clearIntake);
+      $('rawText').addEventListener('input', autoSizeRawText);
+      $('rawText').addEventListener('paste', () => {
+        setTimeout(() => {
+          autoSizeRawText();
+          if ($('rawText').value.trim()) parseRawText();
+        }, 0);
+      });
+      $('themeToggle').addEventListener('click', toggleTheme);
+      document.querySelectorAll('.dialog-tab').forEach((tab) => {
+        tab.addEventListener('click', () => setDialogTab(tab.dataset.tab));
+      });
       $('saveNewButton').addEventListener('click', () => saveNewReservation(false));
       $('saveAndCopyButton').addEventListener('click', () => saveNewReservation(true));
       $('searchInput').addEventListener('input', renderReservations);
       $('statusFilter').addEventListener('change', renderReservations);
+      document.querySelectorAll('#dateChips .chip').forEach((chip) => {
+        chip.addEventListener('click', () => {
+          state.dateFilter = chip.dataset.range;
+          document.querySelectorAll('#dateChips .chip').forEach((item) => item.classList.toggle('active', item === chip));
+          renderReservations();
+        });
+      });
       $('refreshButton').addEventListener('click', reloadData);
       $('closeDialogButton').addEventListener('click', closeDialog);
       $('cancelDialogButton').addEventListener('click', closeDialog);
@@ -629,6 +867,49 @@
       if (view === 'list') renderReservations();
     }
 
+    function autoSizeRawText() {
+      const rawText = $('rawText');
+      rawText.style.height = 'auto';
+      const maxHeight = Math.round(window.innerHeight * 0.55);
+      rawText.style.height = Math.min(rawText.scrollHeight + 2, maxHeight) + 'px';
+    }
+
+    async function pasteAndParse() {
+      if (!navigator.clipboard || !navigator.clipboard.readText) {
+        return showToast('この端末では自動貼り付けを使えません。文章欄を長押しして「ペースト」すると、自動で読み取ります。', true, 6000);
+      }
+      try {
+        const text = await navigator.clipboard.readText();
+        if (!text.trim()) return showToast('コピーされた文章がありません。先にLINEで予約文をコピーしてください。', true, 5000);
+        $('rawText').value = text;
+        autoSizeRawText();
+        parseRawText();
+      } catch (_) {
+        showToast('自動貼り付けが許可されませんでした。文章欄を長押しして「ペースト」すると、そのまま自動で読み取ります。', true, 7000);
+      }
+    }
+
+    function initTheme() {
+      let saved = '';
+      try { saved = localStorage.getItem('reservationTheme') || ''; } catch (_) {}
+      applyTheme(saved || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'));
+    }
+
+    function applyTheme(theme) {
+      document.documentElement.dataset.theme = theme;
+      $('themeToggle').textContent = theme === 'dark' ? '☀️' : '🌙';
+      try { localStorage.setItem('reservationTheme', theme); } catch (_) {}
+    }
+
+    function toggleTheme() {
+      applyTheme(document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark');
+    }
+
+    function setDialogTab(tab) {
+      $('detailDialog').dataset.tab = tab;
+      document.querySelectorAll('.dialog-tab').forEach((item) => item.classList.toggle('active', item.dataset.tab === tab));
+    }
+
     function parseRawText() {
       const rawText = $('rawText').value.trim();
       if (!rawText) return showToast('LINEの予約内容を貼り付けてください。', true);
@@ -642,6 +923,10 @@
         if (isClosureDate) {
           $('parseStatus').textContent = 'この日は満月期間の撮影休止日です。日程を変更してください。';
           $('parseStatus').className = 'parse-status warn';
+          syncIntakeActionsStatus();
+        }
+        if (window.matchMedia('(max-width: 900px)').matches) {
+          setTimeout(() => $('parseStatus').scrollIntoView({ block: 'center' }), 80);
         }
         showToast('予約内容を読み取りました。');
       } catch (error) {
@@ -723,6 +1008,12 @@
         $('parseStatus').textContent = '必須項目はすべてそろっています。内容を確認して保存してください。';
         $('parseStatus').className = 'parse-status ok';
       }
+      syncIntakeActionsStatus();
+    }
+
+    function syncIntakeActionsStatus() {
+      $('intakeActionsStatus').textContent = $('parseStatus').textContent;
+      $('intakeActionsStatus').className = 'intake-actions-status ' + $('parseStatus').className;
     }
 
     function scheduleNewConfirmationRefresh() {
@@ -768,10 +1059,13 @@
         }
         clearIntake();
         showView('list');
+        const savedMessage = copyConfirmation ? '予約を確定し、確定文をコピーしました。' : '予約の確定内容を保存しました。';
         if (copyError) {
           showToast('予約は確定・保存済みです。文章は予約一覧から開いてコピーしてください。', true, 7000);
+        } else if (result.calendarWarning) {
+          showToast(savedMessage + ' ' + result.calendarWarning, true, 8000);
         } else {
-          showToast(copyConfirmation ? '予約を確定し、確定文をコピーしました。' : '予約の確定内容を保存しました。');
+          showToast(savedMessage);
         }
       } catch (error) {
         showToast(error.message, true, 7000);
@@ -782,6 +1076,7 @@
 
     function clearIntake() {
       $('rawText').value = '';
+      $('rawText').style.height = '';
       ['newShootDate','newName','newPhone','newAdults','newChildren','newHotel','newStay','newPickup','newPhotographer','newLocationRequest','newLateFee','newInstagram','newStoryTag'].forEach((id) => setValue(id, ''));
       setValue('newConfirmedTime', '');
       $('newConfirmationMessage').value = '';
@@ -792,12 +1087,33 @@
       updateNewRequiredStatus();
     }
 
+    function dateKeyOffsetClient(days) {
+      const date = new Date();
+      date.setDate(date.getDate() + days);
+      return date.getFullYear() + '-' + pad2Client(date.getMonth() + 1) + '-' + pad2Client(date.getDate());
+    }
+
     function renderReservations() {
       const query = $('searchInput').value.trim().toLowerCase();
       const status = $('statusFilter').value;
+      const dateKeys = { today: dateKeyOffsetClient(0), tomorrow: dateKeyOffsetClient(1) };
+      const targetDate = dateKeys[state.dateFilter] || '';
+      const isShootingPlanned = (reservation) => reservation.status !== 'キャンセル';
       const filtered = state.reservations.filter((reservation) => {
         const haystack = [reservation.id, reservation.name, reservation.shootDate, reservation.phone, reservation.hotel].join(' ').toLowerCase();
-        return (!query || haystack.includes(query)) && (!status || reservation.status === status);
+        return (!query || haystack.includes(query)) &&
+          (!status || reservation.status === status) &&
+          (!targetDate || (reservation.shootDate === targetDate && isShootingPlanned(reservation)));
+      });
+      if (targetDate) {
+        filtered.sort((a, b) => String(a.confirmedTime || '99:99').localeCompare(String(b.confirmedTime || '99:99')));
+      }
+
+      document.querySelectorAll('#dateChips .chip').forEach((chip) => {
+        const key = dateKeys[chip.dataset.range];
+        if (!key) return;
+        const count = state.reservations.filter((reservation) => reservation.shootDate === key && isShootingPlanned(reservation)).length;
+        chip.textContent = (chip.dataset.range === 'today' ? '今日 ' : '明日 ') + count + '件';
       });
 
       const counts = {};
@@ -806,7 +1122,7 @@
         Object.keys(counts).map((key) => '<span class="summary-pill">' + escapeHtml(key) + ' ' + counts[key] + '件</span>').join('');
 
       $('reservationRows').innerHTML = filtered.map((reservation) => {
-        const time = reservation.confirmedTime || reservation.candidateTimes.filter(Boolean).join(' / ') || reservation.preferredTimeWindow || '未設定';
+        const time = reservationTimeLabel(reservation);
         return '<tr data-id="' + escapeHtml(reservation.id) + '">' +
           '<td><strong>' + escapeHtml(formatShortDate(reservation.shootDate)) + '</strong><div class="subtext">' + escapeHtml(reservation.id) + '</div></td>' +
           '<td><div class="customer-name">' + escapeHtml(reservation.name) + ' 様</div><div class="subtext">' + escapeHtml(reservation.gender || '性別内訳未入力') + '・大人' + reservation.adults + '・子ども' + reservation.children + '</div></td>' +
@@ -817,8 +1133,37 @@
           '<td>' + escapeHtml(reservation.updatedAt || reservation.receivedAt) + '</td>' +
         '</tr>';
       }).join('');
+      $('reservationCards').innerHTML = filtered.map((reservation) => {
+        return '<button class="reservation-card" data-id="' + escapeHtml(reservation.id) + '">' +
+          '<div class="reservation-card-top">' +
+            '<span class="reservation-card-when">' + escapeHtml(formatCardDate(reservation.shootDate)) + '　' + escapeHtml(reservationTimeLabel(reservation)) + '</span>' +
+            '<span class="status-chip" data-status="' + escapeHtml(reservation.status) + '">' + escapeHtml(reservation.status) + '</span>' +
+          '</div>' +
+          '<div class="reservation-card-name">' + escapeHtml(reservation.name) + ' 様</div>' +
+          '<div class="reservation-card-meta">' + escapeHtml(reservation.plan || 'プラン未定') + '・大人' + reservation.adults + '・子ども' + reservation.children +
+            '・' + escapeHtml(reservation.photographer || '指名なし') + '</div>' +
+        '</button>';
+      }).join('');
+      $('emptyList').textContent = targetDate
+        ? (state.dateFilter === 'today' ? '今日' : '明日') + 'の撮影予定はありません。'
+        : '該当する予約はありません。';
       $('emptyList').hidden = filtered.length !== 0;
       document.querySelectorAll('#reservationRows tr').forEach((row) => row.addEventListener('click', () => openReservation(row.dataset.id)));
+      document.querySelectorAll('#reservationCards .reservation-card').forEach((card) => card.addEventListener('click', () => openReservation(card.dataset.id)));
+    }
+
+    function reservationTimeLabel(reservation) {
+      return reservation.confirmedTime ||
+        (reservation.candidateTimes || []).filter(Boolean).join(' / ') ||
+        reservation.preferredTimeWindow || '時間未定';
+    }
+
+    function formatCardDate(key) {
+      const parts = String(key || '').split('-');
+      if (parts.length !== 3) return key || '日付未設定';
+      const date = new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
+      const weekday = ['日', '月', '火', '水', '木', '金', '土'][date.getDay()];
+      return Number(parts[1]) + '/' + Number(parts[2]) + '（' + weekday + '）';
     }
 
     function openReservation(id) {
@@ -848,7 +1193,9 @@
       setSelectValue('status', reservation.status);
       setValue('memo', reservation.memo);
       refreshMessages();
+      setDialogTab('info');
       $('detailDialog').showModal();
+      $('detailDialog').scrollTop = 0;
     }
 
     function detailPayload() {
@@ -887,7 +1234,11 @@
         upsertReservation(result.reservation);
         renderReservations();
         closeDialog();
-        showToast('予約内容を更新しました。');
+        if (result.calendarWarning) {
+          showToast('予約内容を更新しました。' + result.calendarWarning, true, 8000);
+        } else {
+          showToast('予約内容を更新しました。');
+        }
       } catch (error) {
         showToast(error.message, true, 7000);
       } finally {
