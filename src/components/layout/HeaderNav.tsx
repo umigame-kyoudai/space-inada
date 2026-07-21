@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import { SUPPORTED_LOCALES, type Locale } from "@/lib/i18n/locales";
 import { MobileMenu } from "./MobileMenu";
-import { LanguageSwitcher } from "./LanguageSwitcher";
+import { LanguageMenuButton } from "./LanguageMenuButton";
 
 const jaNav = [
   { href: "/plans", label: "プラン" },
@@ -50,7 +50,7 @@ export function HeaderNav({ showVoice }: { showVoice: boolean }) {
           ))}
         </nav>
         <div className="flex items-center gap-3">
-          <LanguageSwitcher className="hidden lg:flex" />
+          <LanguageMenuButton />
           <Link
             href="/booking?from=header"
             data-ga-event="reservation_click"
@@ -86,7 +86,7 @@ export function HeaderNav({ showVoice }: { showVoice: boolean }) {
         ))}
       </nav>
       <div className="flex items-center gap-3">
-        <LanguageSwitcher className="hidden lg:flex" />
+        <LanguageMenuButton />
         <Link
           href={`/${locale}/booking`}
           data-ga-event="reservation_click"
