@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import Link from "next/link";
+import { LanguageSwitcher } from "./LanguageSwitcher";
 
 type NavItem = { href: string; label: string };
 
@@ -11,9 +12,8 @@ type Props = {
   /** 予約導線のリンク先・ラベル（翻訳ページ用）。未指定は日本語版の既定値。 */
   bookingHref?: string;
   bookingLabel?: string;
-  /** 翻訳ページから日本語サイトへ戻るリンク（指定時のみ表示） */
+  /** 翻訳ページかどうか（true のとき、下部の日本語専用リーガルリンクを隠す） */
   backToJapaneseHref?: string;
-  backToJapaneseLabel?: string;
 };
 
 /** スマホ用ハンバーガーメニュー（md未満で表示）。 */
@@ -22,7 +22,6 @@ export function MobileMenu({
   bookingHref = "/booking?from=mobile-menu",
   bookingLabel = "LINEで予約・相談する",
   backToJapaneseHref,
-  backToJapaneseLabel,
 }: Props) {
   const [open, setOpen] = useState(false);
 
@@ -107,14 +106,15 @@ export function MobileMenu({
               {bookingLabel}
             </Link>
 
-            {backToJapaneseHref ? (
-              <div className="mt-8 flex justify-center text-xs text-zinc-500">
-                <Link href={backToJapaneseHref} onClick={() => setOpen(false)}>
-                  {backToJapaneseLabel}
-                </Link>
-              </div>
-            ) : (
-              <div className="mt-8 flex justify-center gap-5 text-xs text-zinc-500">
+            <div className="mt-8 border-t border-teal-200/10 pt-6">
+              <p className="mb-3 text-center text-[11px] font-semibold tracking-widest text-zinc-500">
+                LANGUAGE / 言語
+              </p>
+              <LanguageSwitcher className="justify-center gap-3 text-sm" />
+            </div>
+
+            {backToJapaneseHref ? null : (
+              <div className="mt-6 flex justify-center gap-5 text-xs text-zinc-500">
                 <Link href="/privacy" onClick={() => setOpen(false)}>
                   プライバシーポリシー
                 </Link>

@@ -100,7 +100,6 @@ export function HeaderNav({ showVoice }: { showVoice: boolean }) {
           bookingHref={`/${locale}/booking`}
           bookingLabel={dict.nav.bookCta}
           backToJapaneseHref="/"
-          backToJapaneseLabel={dict.nav.backToJapanese}
         />
       </div>
     </>
