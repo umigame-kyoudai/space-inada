@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { buildMetadata } from "@/lib/seo";
+import { hreflangAlternates } from "@/lib/i18n/locales";
 import { Section } from "@/components/ui/Section";
 import { Button } from "@/components/ui/Button";
 import { Breadcrumbs } from "@/components/layout/Breadcrumbs";
@@ -32,6 +33,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     title: plan.seo.title,
     description: plan.seo.description,
     path: `/plans/${plan.slug}`,
+    languages: hreflangAlternates({ key: "planDetail", slug: plan.slug }),
     ownOgImage: true,
   });
 }

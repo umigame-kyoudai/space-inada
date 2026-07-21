@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { buildMetadata } from "@/lib/seo";
+import { hreflangAlternates } from "@/lib/i18n/locales";
 import { Section } from "@/components/ui/Section";
 import { Breadcrumbs } from "@/components/layout/Breadcrumbs";
 import { PlanCard } from "@/components/sections/PlanCard";
@@ -19,6 +20,7 @@ export const metadata: Metadata = buildMetadata({
   description:
     "宮古島の星空フォト撮影プラン。カジュアル・スタンダード・ファミリー・クリエイティブ・プロポーズと送迎・カメラマン指名・深夜料金をご紹介します。",
   path: "/plans",
+  languages: hreflangAlternates("plans"),
 });
 
 export default function PlansPage() {

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { buildMetadata, siteConfig, mapEmbedUrl, mapLink } from "@/lib/seo";
+import { hreflangAlternates } from "@/lib/i18n/locales";
 import { Section } from "@/components/ui/Section";
 import { Breadcrumbs } from "@/components/layout/Breadcrumbs";
 import { CtaBooking } from "@/components/sections/CtaBooking";
@@ -10,6 +11,7 @@ export const metadata: Metadata = buildMetadata({
   description:
     "宮古島の星空フォト撮影の集合場所・候補地・送迎についてのご案内。前浜・友利博愛・白鳥岬などから、当日に最適な撮影場所をお伝えします。",
   path: "/access",
+  languages: hreflangAlternates("access"),
 });
 
 export default function AccessPage() {

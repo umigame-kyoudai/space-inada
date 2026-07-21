@@ -17,6 +17,9 @@ import {
   isFullMoonClosureDate,
 } from "@/data/availability";
 import { AvailabilityCalendar } from "@/components/booking/AvailabilityCalendar";
+import type { Dictionary } from "@/lib/i18n/dictionaries/types";
+import type { Locale } from "@/lib/i18n/locales";
+import { formatTemplate } from "@/lib/i18n/format";
 
 /** 公式LINE（予約相談） */
 const LINE_URL = "https://lin.ee/5z6HX4S";
@@ -26,7 +29,10 @@ const STORAGE_KEY = "booking-form-v2";
 
 type PlanOption = {
   slug: string;
+  /** 送信文・GAS解析用の値。常に日本語のプラン名（変更しないこと） */
   name: string;
+  /** 画面表示用のラベル。翻訳ページでは翻訳名、未指定なら name を表示 */
+  label?: string;
   kind: PlanPriceKind;
   /** /人 なら大人1名の料金、/組 なら1組の料金。要見積りは null */
   basePrice: number | null;
@@ -45,6 +51,12 @@ type Props = {
   staffNominationPrice: number;
   /** CV計測用の流入元（?from= の値。hero / header / floating / cta など） */
   from?: string;
+  /** 翻訳ページ用の表示文言（辞書全体）。未指定なら日本語（既定の挙動と完全に同じ）。
+      ※ LINE送信文（buildMessage）は常に日本語フォーマットのまま変えない
+        （スタッフ側の予約管理ツールが日本語ラベルで自動解析するため）。 */
+  dict?: Dictionary;
+  /** 翻訳ページのロケール（アクセスページ等への内部リンク生成に使用） */
+  locale?: Locale;
 };
 
 type PreferredTimeWindow =
@@ -174,10 +186,10 @@ ${v.totalText}${v.couponText ? `\n🎟 クーポン：${v.couponText}` : ""}
 const inputClass =
   "min-w-0 w-full max-w-full rounded-lg border border-teal-200/15 bg-[#050814]/80 px-4 py-3 text-base text-white placeholder:text-zinc-500 outline-none transition-colors focus:border-teal-200/70 sm:text-sm";
 
-function RequiredBadge() {
+function RequiredBadge({ label = "必須" }: { label?: string }) {
   return (
     <span className="ml-2 rounded bg-rose-500/15 px-1.5 py-0.5 text-[10px] font-semibold text-rose-300">
-      必須
+      {label}
     </span>
   );
 }
@@ -185,6 +197,7 @@ function RequiredBadge() {
 function ParticipantNumberInput({
   id,
   label,
+  unit = "人",
   value,
   onChange,
   inputRef,
@@ -193,6 +206,8 @@ function ParticipantNumberInput({
 }: {
   id: string;
   label: string;
+  /** 入力欄右端の単位表示。翻訳ページでは空文字にして数字だけにする */
+  unit?: string;
   value: string;
   onChange: (value: string) => void;
   inputRef?: Ref<HTMLInputElement>;
@@ -220,9 +235,11 @@ function ParticipantNumberInput({
           aria-invalid={invalid}
           className={`${inputClass} pr-10`}
         />
-        <span className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-sm text-zinc-500">
-          人
-        </span>
+        {unit && (
+          <span className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-sm text-zinc-500">
+            {unit}
+          </span>
+        )}
       </div>
     </div>
   );
@@ -234,7 +251,13 @@ export function BookingForm({
   pickupPrice,
   staffNominationPrice,
   from,
+  dict,
+  locale,
 }: Props) {
+  const t = dict?.booking;
+  const requiredText = dict?.common.required ?? "必須";
+  const accessHref = locale ? `/${locale}/access#shooting-locations` : "/access#shooting-locations";
+  const inadaNominationOption = dict?.planOptionOverlay.nomination.detail[0];
   const defaultPlanName =
     planOptions.find((p) => p.slug === defaultPlan)?.name ?? "";
 
@@ -291,15 +314,15 @@ export function BookingForm({
   const participantCountComplete = participantCount > 0 && participantCount <= 10;
   const requiredItems = [
     {
-      label: "撮影希望日",
+      label: t ? t.dateLabel : "撮影希望日",
       complete: Boolean(date) && date >= todayDateKey && !isSelectedDateClosed,
     },
-    { label: "希望時間帯", complete: Boolean(preferredTimeWindow) },
-    { label: "希望プラン", complete: Boolean(plan) },
-    { label: "お名前", complete: Boolean(name.trim()) },
-    { label: "参加人数・性別", complete: participantCountComplete },
-    { label: "携帯番号", complete: Boolean(phone.trim()) },
-    { label: "深夜料金への同意", complete: lateNightConsent },
+    { label: t ? t.timeWindowLabel : "希望時間帯", complete: Boolean(preferredTimeWindow) },
+    { label: t ? t.planLabel : "希望プラン", complete: Boolean(plan) },
+    { label: t ? t.nameLabel : "お名前", complete: Boolean(name.trim()) },
+    { label: t ? t.participantsLabel : "参加人数・性別", complete: participantCountComplete },
+    { label: t ? t.phoneLabel : "携帯番号", complete: Boolean(phone.trim()) },
+    { label: t ? t.lateNightConsent : "深夜料金への同意", complete: lateNightConsent },
   ];
   const incompleteRequiredItems = requiredItems.filter((item) => !item.complete);
   const completedRequiredCount = requiredItems.length - incompleteRequiredItems.length;
@@ -315,20 +338,26 @@ export function BookingForm({
   useEffect(() => {
     dateInputRef.current?.setCustomValidity(
       isSelectedDateClosed
-        ? "この日は満月期間のため、星空フォトの撮影をお休みしています。別の日程をお選びください。"
+        ? t
+          ? t.dateClosedNotice
+          : "この日は満月期間のため、星空フォトの撮影をお休みしています。別の日程をお選びください。"
         : "",
     );
-  }, [isSelectedDateClosed]);
+  }, [isSelectedDateClosed, t]);
 
   useEffect(() => {
     const message =
       participantCount <= 0
-        ? "参加人数を1名以上入力してください。"
+        ? t
+          ? t.participantsEmpty
+          : "参加人数を1名以上入力してください。"
         : participantCount <= 10
           ? ""
-          : "参加人数は10名までです。11名以上の場合はLINEでご相談ください。";
+          : t
+            ? t.participantsOver
+            : "参加人数は10名までです。11名以上の場合はLINEでご相談ください。";
     adultMaleRef.current?.setCustomValidity(message);
-  }, [participantCount]);
+  }, [participantCount, t]);
 
   // CV計測: フォーム開始（最初のフィールド操作で1回だけ送る）
   const formStartedRef = useRef(false);
@@ -715,9 +744,9 @@ export function BookingForm({
         onFocus={handleFormStart}
         className="cosmic-panel min-w-0 max-w-full rounded-2xl p-6 sm:p-8"
       >
-        <h2 className="text-lg font-bold text-white">予約内容を入力</h2>
+        <h2 className="text-lg font-bold text-white">{t ? t.formHeading : "予約内容を入力"}</h2>
         <p className="mt-1 text-xs text-zinc-500">
-          入力すると右（スマホは下）の送信文が自動で作られます。
+          {t ? t.formSubtext : "入力すると右（スマホは下）の送信文が自動で作られます。"}
         </p>
 
         <div
@@ -737,8 +766,12 @@ export function BookingForm({
               }`}
             >
               {incompleteRequiredItems.length === 0
-                ? "✓ 必須項目の入力が完了しました"
-                : `必須項目はあと${incompleteRequiredItems.length}個です`}
+                ? t
+                  ? t.progressComplete
+                  : "✓ 必須項目の入力が完了しました"
+                : t
+                  ? formatTemplate(t.progressRemaining, { n: incompleteRequiredItems.length })
+                  : `必須項目はあと${incompleteRequiredItems.length}個です`}
             </p>
             <span className="shrink-0 text-xs font-semibold text-zinc-400">
               {completedRequiredCount}/{requiredItems.length}
@@ -761,7 +794,8 @@ export function BookingForm({
           </div>
           {incompleteRequiredItems.length > 0 && (
             <p className="mt-2 text-xs leading-relaxed text-zinc-400">
-              未入力：{incompleteRequiredItems.map((item) => item.label).join("・")}
+              {t ? t.missingPrefix : "未入力："}
+              {incompleteRequiredItems.map((item) => item.label).join("・")}
             </p>
           )}
         </div>
@@ -769,8 +803,8 @@ export function BookingForm({
         <div className="mt-6 space-y-5">
           <div>
             <label htmlFor="date" className="mb-1.5 block text-sm font-medium text-zinc-200">
-              撮影希望日
-              <RequiredBadge />
+              {t ? t.dateLabel : "撮影希望日"}
+              <RequiredBadge label={requiredText} />
             </label>
             <input
               ref={dateInputRef}
@@ -784,7 +818,9 @@ export function BookingForm({
             />
             {isSelectedDateClosed && (
               <p role="alert" className="mt-2 text-xs font-medium text-rose-300">
-                この日は満月期間のため、星空フォトの撮影をお休みしています。別の日程をお選びください。
+                {t
+                  ? t.dateClosedNotice
+                  : "この日は満月期間のため、星空フォトの撮影をお休みしています。別の日程をお選びください。"}
               </p>
             )}
             <AvailabilityCalendar
@@ -802,15 +838,19 @@ export function BookingForm({
                   📍
                 </span>
                 <div>
-                  <p className="text-sm font-bold text-teal-100">主な撮影候補地があります</p>
+                  <p className="text-sm font-bold text-teal-100">
+                    {t ? t.locationsHintTitle : "主な撮影候補地があります"}
+                  </p>
                   <p className="mt-1 text-xs leading-relaxed text-zinc-300">
-                    前浜・友利博愛・白鳥岬周辺が主な候補です。最終的な集合場所は、その日の雲や風などを確認し、最もきれいに撮影できる場所を当日にLINEでご案内します。
+                    {t
+                      ? t.locationsHintText
+                      : "前浜・友利博愛・白鳥岬周辺が主な候補です。最終的な集合場所は、その日の雲や風などを確認し、最もきれいに撮影できる場所を当日にLINEでご案内します。"}
                   </p>
                   <Link
-                    href="/access#shooting-locations"
+                    href={accessHref}
                     className="cosmic-link mt-2 inline-flex text-xs font-semibold underline underline-offset-4"
                   >
-                    候補地と地図を確認する →
+                    {t ? t.locationsHintLink : "候補地と地図を確認する →"}
                   </Link>
                 </div>
               </div>
@@ -819,15 +859,16 @@ export function BookingForm({
 
           <fieldset>
             <legend className="mb-1.5 block text-sm font-medium text-zinc-200">
-              希望時間帯
-              <RequiredBadge />
+              {t ? t.timeWindowLabel : "希望時間帯"}
+              <RequiredBadge label={requiredText} />
             </legend>
             <p id="preferred-time-help" className="mb-3 text-xs leading-relaxed text-zinc-400">
-              ご希望に近い時間帯を1つ選んでください。
+              {t ? t.timeWindowHelp : "ご希望に近い時間帯を1つ選んでください。"}
             </p>
             <div className="grid gap-2 sm:grid-cols-3">
               {PREFERRED_TIME_WINDOWS.map((option) => {
                 const selected = preferredTimeWindow === option.value;
+                const translated = t?.timeWindows.find((w) => w.value === option.value);
                 return (
                   <label
                     key={option.value}
@@ -848,14 +889,14 @@ export function BookingForm({
                       className="sr-only"
                     />
                     <span className={`text-base font-bold ${selected ? "text-teal-100" : "text-white"}`}>
-                      {option.label}
+                      {translated?.label ?? option.label}
                     </span>
                     <span
                       className={`mt-1 text-[11px] leading-relaxed ${
                         option.value === "24:00〜翌4:00" ? "text-amber-200" : "text-zinc-400"
                       }`}
                     >
-                      {option.note}
+                      {translated?.note ?? option.note}
                     </span>
                   </label>
                 );
@@ -865,17 +906,21 @@ export function BookingForm({
               id="preferred-time-notice"
               className="mt-3 rounded-lg border border-amber-200/20 bg-amber-300/[0.06] p-3 text-xs leading-relaxed text-zinc-300"
             >
-              <p className="font-semibold text-amber-100">選択した時間帯は、あくまでご希望枠です。</p>
+              <p className="font-semibold text-amber-100">
+                {t ? t.timeWindowNoticeTitle : "選択した時間帯は、あくまでご希望枠です。"}
+              </p>
               <p className="mt-1">
-                月齢・星の位置・空き状況を確認し、原則としてご希望枠内で撮影時間を確定します。枠内での撮影が難しい場合は、LINEで別の時間をご提案します。
+                {t
+                  ? t.timeWindowNoticeText
+                  : "月齢・星の位置・空き状況を確認し、原則としてご希望枠内で撮影時間を確定します。枠内での撮影が難しい場合は、LINEで別の時間をご提案します。"}
               </p>
             </div>
           </fieldset>
 
           <div>
             <label htmlFor="plan" className="mb-1.5 block text-sm font-medium text-zinc-200">
-              希望プラン
-              <RequiredBadge />
+              {t ? t.planLabel : "希望プラン"}
+              <RequiredBadge label={requiredText} />
             </label>
             <select
               id="plan"
@@ -884,27 +929,27 @@ export function BookingForm({
               required
               className={`${inputClass} [color-scheme:dark]`}
             >
-              <option value="">選択してください</option>
+              <option value="">{t ? t.planPlaceholder : "選択してください"}</option>
               {planOptions.map((p) => (
                 <option key={p.slug} value={p.name}>
-                  {p.name}
+                  {p.label ?? p.name}
                 </option>
               ))}
-              <option value="相談して決めたい">相談して決めたい</option>
+              <option value="相談して決めたい">{t ? t.planUndecided : "相談して決めたい"}</option>
             </select>
           </div>
 
           <div>
             <label htmlFor="name" className="mb-1.5 block text-sm font-medium text-zinc-200">
-              お名前
-              <RequiredBadge />
+              {t ? t.nameLabel : "お名前"}
+              <RequiredBadge label={requiredText} />
             </label>
             <input
               id="name"
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="山田 太郎"
+              placeholder={t ? t.namePlaceholder : "山田 太郎"}
               required
               className={inputClass}
             />
@@ -912,22 +957,27 @@ export function BookingForm({
 
           <fieldset className="rounded-lg border border-teal-200/15 bg-[#050814]/45 p-4">
             <legend className="px-1 text-sm font-medium text-zinc-200">
-              参加人数
-              <RequiredBadge />
+              {t ? t.participantsLabel : "参加人数"}
+              <RequiredBadge label={requiredText} />
             </legend>
             <p id="participant-count-help" className="mb-4 text-xs leading-relaxed text-zinc-400">
-              男女別の人数を入力すると、大人・子どもの人数と合計が自動で計算されます。
+              {t ? t.participantsHelp : "男女別の人数を入力すると、大人・子どもの人数と合計が自動で計算されます。"}
             </p>
             <div className="space-y-4">
               <div className="rounded-lg border border-white/5 bg-white/[0.025] p-3">
                 <div className="mb-3 flex items-center justify-between gap-3">
-                  <p className="text-sm font-semibold text-white">大人（16才以上）</p>
-                  <p className="text-sm font-semibold text-teal-200">計 {adultsNum}人</p>
+                  <p className="text-sm font-semibold text-white">
+                    {t ? t.adultsHeading : "大人（16才以上）"}
+                  </p>
+                  <p className="text-sm font-semibold text-teal-200">
+                    {t ? `${t.totalLabel} ${adultsNum}` : `計 ${adultsNum}人`}
+                  </p>
                 </div>
                 <div className="grid grid-cols-2 gap-3">
                   <ParticipantNumberInput
                     id="adult-male"
-                    label="男性"
+                    label={t ? t.male : "男性"}
+                    unit={t ? "" : "人"}
                     value={adultMale}
                     onChange={setAdultMale}
                     inputRef={adultMaleRef}
@@ -936,7 +986,8 @@ export function BookingForm({
                   />
                   <ParticipantNumberInput
                     id="adult-female"
-                    label="女性"
+                    label={t ? t.female : "女性"}
+                    unit={t ? "" : "人"}
                     value={adultFemale}
                     onChange={setAdultFemale}
                     describedBy="participant-count-help participant-count-status"
@@ -946,20 +997,26 @@ export function BookingForm({
 
               <div className="rounded-lg border border-white/5 bg-white/[0.025] p-3">
                 <div className="mb-3 flex items-center justify-between gap-3">
-                  <p className="text-sm font-semibold text-white">子ども（0〜15才）</p>
-                  <p className="text-sm font-semibold text-teal-200">計 {childrenNum}人</p>
+                  <p className="text-sm font-semibold text-white">
+                    {t ? t.childrenHeading : "子ども（0〜15才）"}
+                  </p>
+                  <p className="text-sm font-semibold text-teal-200">
+                    {t ? `${t.totalLabel} ${childrenNum}` : `計 ${childrenNum}人`}
+                  </p>
                 </div>
                 <div className="grid grid-cols-2 gap-3">
                   <ParticipantNumberInput
                     id="child-male"
-                    label="男の子"
+                    label={t ? t.boy : "男の子"}
+                    unit={t ? "" : "人"}
                     value={childMale}
                     onChange={setChildMale}
                     describedBy="participant-count-help participant-count-status"
                   />
                   <ParticipantNumberInput
                     id="child-female"
-                    label="女の子"
+                    label={t ? t.girl : "女の子"}
+                    unit={t ? "" : "人"}
                     value={childFemale}
                     onChange={setChildFemale}
                     describedBy="participant-count-help participant-count-status"
@@ -977,17 +1034,23 @@ export function BookingForm({
               }`}
             >
               {participantCount <= 0
-                ? "参加人数を入力してください"
+                ? t
+                  ? t.participantsEmpty
+                  : "参加人数を入力してください"
                 : participantCount <= 10
-                  ? `✓ 合計 ${participantCount}人（大人${adultsNum}人・子ども${childrenNum}人）`
-                  : `合計${participantCount}人です。10人を超える場合はLINEでご相談ください`}
+                  ? t
+                    ? `✓ ${t.totalLabel} ${participantCount}（${t.adultsHeading} ${adultsNum}・${t.childrenHeading} ${childrenNum}）`
+                    : `✓ 合計 ${participantCount}人（大人${adultsNum}人・子ども${childrenNum}人）`
+                  : t
+                    ? t.participantsOver
+                    : `合計${participantCount}人です。10人を超える場合はLINEでご相談ください`}
             </p>
           </fieldset>
 
           <div>
             <label htmlFor="phone" className="mb-1.5 block text-sm font-medium text-zinc-200">
-              携帯番号
-              <RequiredBadge />
+              {t ? t.phoneLabel : "携帯番号"}
+              <RequiredBadge label={requiredText} />
             </label>
             <input
               id="phone"
@@ -1003,28 +1066,28 @@ export function BookingForm({
 
           <div>
             <label htmlFor="hotel" className="mb-1.5 block text-sm font-medium text-zinc-200">
-              宿泊施設名
+              {t ? t.hotelLabel : "宿泊施設名"}
             </label>
             <input
               id="hotel"
               type="text"
               value={hotel}
               onChange={(e) => setHotel(e.target.value)}
-              placeholder="〇〇リゾート宮古島"
+              placeholder={t ? t.hotelPlaceholder : "〇〇リゾート宮古島"}
               className={inputClass}
             />
           </div>
 
           <div>
             <label htmlFor="stay" className="mb-1.5 block text-sm font-medium text-zinc-200">
-              滞在期間
+              {t ? t.stayLabel : "滞在期間"}
             </label>
             <input
               id="stay"
               type="text"
               value={stay}
               onChange={(e) => setStay(e.target.value)}
-              placeholder="7/15〜7/18"
+              placeholder={t ? t.stayPlaceholder : "7/15〜7/18"}
               className={inputClass}
             />
           </div>
@@ -1032,7 +1095,7 @@ export function BookingForm({
           {/* オプション */}
           <fieldset>
             <legend className="mb-1.5 block text-sm font-medium text-zinc-200">
-              オプション（任意）
+              {t ? t.optionsLabel : "オプション（任意）"}
             </legend>
             <div className="space-y-2">
               <label className="flex min-w-0 items-center justify-between gap-2 rounded-lg border border-teal-200/15 bg-[#050814]/60 px-4 py-3 text-sm text-zinc-200">
@@ -1043,7 +1106,7 @@ export function BookingForm({
                     onChange={(e) => setPickup(e.target.checked)}
                     className="h-4 w-4 rounded border-teal-200/20 bg-[#050814] accent-teal-300"
                   />
-                  送迎（3名まで）
+                  {t ? t.pickupLabel : "送迎（3名まで）"}
                 </span>
                 <span className="shrink-0 text-amber-200">
                   +{formatPrice(pickupPrice)}
@@ -1054,7 +1117,7 @@ export function BookingForm({
                   htmlFor="staff-name"
                   className="mb-2 block text-sm font-medium text-zinc-200"
                 >
-                  カメラマン指名
+                  {t ? t.nominationLabel : "カメラマン指名"}
                 </label>
                 <select
                   id="staff-name"
@@ -1062,21 +1125,23 @@ export function BookingForm({
                   onChange={(e) => setStaffName(e.target.value)}
                   className={`${inputClass} [color-scheme:dark]`}
                 >
-                  <option value="">指名なし（おまかせ） ¥0</option>
+                  <option value="">{t ? t.nominationNone : "指名なし（おまかせ） ¥0"}</option>
                   <option value="稲田">
-                    稲田を指名 +{formatPrice(staffNominationPrice)}
+                    {inadaNominationOption ?? `稲田を指名 +${formatPrice(staffNominationPrice)}`}
                   </option>
                   {teamMembers.map((member) => (
                     <option key={member.name} value={member.name}>
-                      {member.name}を指名 ¥0
+                      {t ? `${member.name} — ¥0` : `${member.name}を指名 ¥0`}
                     </option>
                   ))}
                 </select>
                 <p className="mt-2 text-xs text-zinc-400">
-                  稲田の指名のみ＋{formatPrice(staffNominationPrice)}、その他のカメラマンは指名料無料です。
+                  {t
+                    ? t.nominationNote
+                    : `稲田の指名のみ＋${formatPrice(staffNominationPrice)}、その他のカメラマンは指名料無料です。`}
                 </p>
                 <p className="mt-1 text-[11px] leading-relaxed text-zinc-500">
-                  ※担当カメラマンによって写真のクオリティは変わりません。
+                  {t ? t.nominationNote2 : "※担当カメラマンによって写真のクオリティは変わりません。"}
                 </p>
               </div>
             </div>
@@ -1084,13 +1149,17 @@ export function BookingForm({
 
           <div className="rounded-lg border border-amber-200/20 bg-amber-300/5 p-4 text-sm leading-relaxed text-zinc-300">
             <p className="font-semibold text-amber-100">
-              ⚠️ 深夜料金について
+              {t ? t.lateNightTitle : "⚠️ 深夜料金について"}
             </p>
             <p id="late-night-fee-description" className="mt-1">
-              0:00〜0:59の撮影はお一人につき＋{formatPrice(LATE_NIGHT_FEES.midnight)}、1:00以降の撮影はお一人につき＋{formatPrice(LATE_NIGHT_FEES.afterOne)}の追加料金がかかります。
+              {t
+                ? t.lateNightText
+                : `0:00〜0:59の撮影はお一人につき＋${formatPrice(LATE_NIGHT_FEES.midnight)}、1:00以降の撮影はお一人につき＋${formatPrice(LATE_NIGHT_FEES.afterOne)}の追加料金がかかります。`}
             </p>
             <p className="mt-1 text-xs text-zinc-500">
-              ※撮影時間は月齢や当日の空模様に合わせて確定するため、ご希望の時間帯に関わらず全てのご予約で事前確認をお願いしています。
+              {t
+                ? t.lateNightNote
+                : "※撮影時間は月齢や当日の空模様に合わせて確定するため、ご希望の時間帯に関わらず全てのご予約で事前確認をお願いしています。"}
             </p>
             <label className="mt-3 flex items-start gap-3 rounded-lg border border-amber-200/25 bg-[#050814]/60 p-3 text-sm text-zinc-200">
               <input
@@ -1102,22 +1171,22 @@ export function BookingForm({
                 className="mt-0.5 h-4 w-4 shrink-0 rounded border-teal-200/20 bg-[#050814] accent-teal-300"
               />
               <span>
-                深夜帯になった場合の追加料金について了承しました
-                <RequiredBadge />
+                {t ? t.lateNightConsent : "深夜帯になった場合の追加料金について了承しました"}
+                <RequiredBadge label={requiredText} />
               </span>
             </label>
           </div>
 
           <div>
             <label htmlFor="instagram" className="mb-1.5 block text-sm font-medium text-zinc-200">
-              Instagram（任意）
+              {t ? t.instagramLabel : "Instagram（任意）"}
             </label>
             <input
               id="instagram"
               type="text"
               value={instagram}
               onChange={(e) => setInstagram(e.target.value)}
-              placeholder="instagram_id（@は不要）"
+              placeholder={t ? t.instagramPlaceholder : "instagram_id（@は不要）"}
               className={inputClass}
             />
             <label className="mt-3 flex items-center gap-2 text-sm text-zinc-300">
@@ -1127,21 +1196,21 @@ export function BookingForm({
                 onChange={(e) => setStory(e.target.checked)}
                 className="h-4 w-4 rounded border-teal-200/20 bg-[#050814] accent-teal-300"
               />
-              ストーリーへのタグ付けOK
+              {t ? t.storyConsent : "ストーリーへのタグ付けOK"}
             </label>
           </div>
 
           {/* クーポン */}
           <div>
             <label htmlFor="coupon" className="mb-1.5 block text-sm font-medium text-zinc-200">
-              クーポンコード（任意）
+              {t ? t.couponLabel : "クーポンコード（任意）"}
             </label>
             <input
               id="coupon"
               type="text"
               value={couponInput}
               onChange={(e) => setCouponInput(e.target.value)}
-              placeholder="お持ちの方は入力"
+              placeholder={t ? t.couponPlaceholder : "お持ちの方は入力"}
               autoComplete="off"
               autoCapitalize="off"
               autoCorrect="off"
@@ -1152,16 +1221,16 @@ export function BookingForm({
             <div aria-live="polite" className="mt-1.5 min-h-[1.25rem] text-xs">
               {coupon && discountAmount > 0 && (
                 <p className="font-medium text-emerald-300">
-                  適用：{coupon.code} −{formatPrice(discountAmount)}
+                  {t ? t.couponApplied : "適用"}：{coupon.code} −{formatPrice(discountAmount)}
                 </p>
               )}
               {coupon && discountAmount === 0 && subtotal == null && (
                 <p className="text-amber-200">
-                  このプランは概算が出ないため、お見積り時に適用します
+                  {t ? t.couponQuoteOnly : "このプランは概算が出ないため、お見積り時に適用します"}
                 </p>
               )}
               {couponInvalid && (
-                <p className="text-rose-300">クーポンが見つかりません</p>
+                <p className="text-rose-300">{t ? t.couponInvalid : "クーポンが見つかりません"}</p>
               )}
             </div>
           </div>
@@ -1170,9 +1239,11 @@ export function BookingForm({
         {/* お会計（概算） */}
         <div className="mt-6 rounded-lg border border-amber-200/25 bg-amber-300/5 p-5">
           <div className="flex items-baseline justify-between gap-3">
-            <span className="text-sm font-medium text-zinc-200">お会計（概算）</span>
+            <span className="text-sm font-medium text-zinc-200">
+              {t ? t.totalHeading : "お会計（概算）"}
+            </span>
             <span className="text-right text-xl font-bold text-amber-200">
-              {plan && total != null ? formatPrice(total) : totalText}
+              {plan && total != null ? formatPrice(total) : t ? t.totalPlaceholder : totalText}
             </span>
           </div>
           {breakdown.length > 0 && (
@@ -1192,21 +1263,25 @@ export function BookingForm({
             </p>
           )}
           <p className="mt-3 text-xs font-medium text-amber-100/80">
-            💴 お支払いは「現地にて現金決済のみ」です。
+            {t ? t.cashOnlyNote : "💴 お支払いは「現地にて現金決済のみ」です。"}
           </p>
           <p className="mt-1 text-xs text-zinc-500">
-            ※上記の概算には深夜料金は含まれていません。撮影時間の確定後、LINEで最終金額をご案内します。
+            {t
+              ? t.lateNightExcludedNote
+              : "※上記の概算には深夜料金は含まれていません。撮影時間の確定後、LINEで最終金額をご案内します。"}
           </p>
         </div>
 
         <div className="mt-6 flex items-center justify-between gap-3 border-t border-teal-200/10 pt-5">
-          <p className="text-xs text-zinc-500">入力内容はこの端末に自動保存されます</p>
+          <p className="text-xs text-zinc-500">
+            {t ? t.autoSaveNote : "入力内容はこの端末に自動保存されます"}
+          </p>
           <button
             type="button"
             onClick={handleClear}
             className="rounded-lg border border-teal-200/15 bg-slate-950/40 px-4 py-1.5 text-xs text-zinc-300 transition-colors hover:border-amber-200/60 hover:text-amber-100"
           >
-            入力内容をクリア
+            {t ? t.clearButton : "入力内容をクリア"}
           </button>
         </div>
       </form>
@@ -1214,9 +1289,9 @@ export function BookingForm({
       {/* プレビュー + アクション */}
       <div className="min-w-0 max-w-full lg:sticky lg:top-20 lg:self-start">
         <div className="cosmic-panel min-w-0 max-w-full rounded-2xl p-6 sm:p-8">
-          <h2 className="text-lg font-bold text-white">送信内容プレビュー</h2>
+          <h2 className="text-lg font-bold text-white">{t ? t.previewHeading : "送信内容プレビュー"}</h2>
           <p className="mt-1 text-xs text-zinc-500">
-            この内容をコピーして、公式LINEのトークに貼り付けて送信してください。
+            {t ? t.previewSubtext : "この内容をコピーして、公式LINEのトークに貼り付けて送信してください。"}
           </p>
 
           {/* モバイルは max-h で圧縮（中はスクロール可）。長大な全文でボタンが
@@ -1226,7 +1301,7 @@ export function BookingForm({
             readOnly
             value={message}
             rows={18}
-            aria-label="送信内容プレビュー"
+            aria-label={t ? t.previewHeading : "送信内容プレビュー"}
             className="mt-4 min-w-0 w-full max-w-full resize-none rounded-lg border border-teal-200/15 bg-[#03040a]/85 p-4 text-base leading-relaxed text-zinc-200 outline-none max-h-56 sm:max-h-none sm:text-xs"
           />
 
@@ -1234,12 +1309,14 @@ export function BookingForm({
           <div aria-live="polite" className="mt-4 min-h-[1.5rem]">
             {effectiveStatus === "copied" && (
               <p className="rounded-lg bg-emerald-500/15 px-3 py-2 text-sm font-medium text-emerald-300">
-                コピーしました。LINEで貼り付けて送信してください。
+                {t ? t.copiedNotice : "コピーしました。LINEで貼り付けて送信してください。"}
               </p>
             )}
             {effectiveStatus === "error" && (
               <p className="rounded-lg bg-rose-500/15 px-3 py-2 text-sm font-medium text-rose-300">
-                自動コピーできませんでした。プレビューを長押し／選択して手動でコピーしてください。
+                {t
+                  ? t.copyErrorNotice
+                  : "自動コピーできませんでした。プレビューを長押し／選択して手動でコピーしてください。"}
               </p>
             )}
           </div>
@@ -1251,7 +1328,7 @@ export function BookingForm({
               onClick={handleCopy}
               className="flex h-14 w-full items-center justify-center gap-2 rounded-lg border border-amber-200/70 bg-amber-300 text-base font-bold text-zinc-950 shadow-lg shadow-amber-300/15 transition-colors hover:bg-amber-200"
             >
-              📋 内容をコピーする
+              {t ? t.copyButton : "📋 内容をコピーする"}
             </button>
 
             <a
@@ -1265,11 +1342,13 @@ export function BookingForm({
                   : "border border-[#06C755]/60 bg-[#06C755]/10 text-[#5fe39a]"
               }`}
             >
-              💬 公式LINEを開く
+              {t ? t.lineButton : "💬 公式LINEを開く"}
             </a>
 
             <p className="text-center text-xs text-zinc-500">
-              ※自動では送信されません。LINEを開いたら、トークに貼り付け（ペースト）して送信してください。
+              {t
+                ? t.lineFinalNote
+                : "※自動では送信されません。LINEを開いたら、トークに貼り付け（ペースト）して送信してください。"}
             </p>
           </div>
         </div>
@@ -1289,8 +1368,12 @@ export function BookingForm({
             }`}
           >
             {incompleteRequiredItems.length === 0
-              ? "✓ 必須項目の入力が完了しました。コピーして送信へ"
-              : `必須項目 あと${incompleteRequiredItems.length}個（${completedRequiredCount}/${requiredItems.length}）`}
+              ? t
+                ? t.stickyComplete
+                : "✓ 必須項目の入力が完了しました。コピーして送信へ"
+              : t
+                ? formatTemplate(t.stickyRemaining, { n: incompleteRequiredItems.length })
+                : `必須項目 あと${incompleteRequiredItems.length}個（${completedRequiredCount}/${requiredItems.length}）`}
           </p>
           <div className="mt-2 grid grid-cols-2 gap-2">
             <button
@@ -1298,7 +1381,7 @@ export function BookingForm({
               onClick={handleCopy}
               className="flex h-12 items-center justify-center gap-1.5 rounded-lg border border-amber-200/70 bg-amber-300 text-sm font-bold text-zinc-950 transition-colors hover:bg-amber-200"
             >
-              📋 内容をコピー
+              {t ? t.stickyCopy : "📋 内容をコピー"}
             </button>
             <a
               href={LINE_URL}
@@ -1311,7 +1394,7 @@ export function BookingForm({
                   : "border border-[#06C755]/60 bg-[#06C755]/10 text-[#5fe39a]"
               }`}
             >
-              💬 LINEを開く
+              {t ? t.stickyLine : "💬 LINEを開く"}
             </a>
           </div>
         </div>

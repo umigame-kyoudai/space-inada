@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { buildMetadata } from "@/lib/seo";
+import { hreflangAlternates } from "@/lib/i18n/locales";
 import { Section } from "@/components/ui/Section";
 import { Breadcrumbs } from "@/components/layout/Breadcrumbs";
 import { CtaBooking } from "@/components/sections/CtaBooking";
@@ -12,6 +13,7 @@ export const metadata: Metadata = buildMetadata({
   description:
     "宮古島の星空フォトに関するよくある質問。天候・服装・支払い・キャンセル・お子様の参加・送迎・納品方法について回答します。",
   path: "/faq",
+  languages: hreflangAlternates("faq"),
 });
 
 export default function FaqPage() {

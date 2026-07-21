@@ -1,5 +1,6 @@
 import type { MetadataRoute } from "next";
 import { siteConfig } from "@/lib/seo";
+import { SUPPORTED_LOCALES } from "@/lib/i18n/locales";
 import { getPlans } from "@/data/plans";
 import { getPosts } from "@/data/posts";
 import { getTestimonials } from "@/data/testimonials";
@@ -150,5 +151,21 @@ export default function sitemap(): MetadataRoute.Sitemap {
     };
   });
 
-  return [...staticPages, ...planPages, ...postPages];
+  // 翻訳ページ（英語・韓国語・繁体字中国語）。主要ページのみ対応。
+  // 日本語ページの優先度より少し低く設定（新規追加のため）。
+  const localePages: MetadataRoute.Sitemap = SUPPORTED_LOCALES.flatMap((locale) => [
+    { url: `${base}/${locale}`, lastModified: siteUpdatedAt, changeFrequency: "weekly", priority: 0.9 },
+    { url: `${base}/${locale}/plans`, lastModified: planUpdatedAt, changeFrequency: "monthly", priority: 0.8 },
+    { url: `${base}/${locale}/booking`, lastModified: siteUpdatedAt, changeFrequency: "monthly", priority: 0.8 },
+    { url: `${base}/${locale}/access`, lastModified: siteUpdatedAt, changeFrequency: "yearly", priority: 0.4 },
+    { url: `${base}/${locale}/faq`, lastModified: siteUpdatedAt, changeFrequency: "monthly", priority: 0.5 },
+    ...plans.map((p) => ({
+      url: `${base}/${locale}/plans/${p.slug}`,
+      lastModified: new Date(p.updatedAt),
+      changeFrequency: "monthly" as const,
+      priority: p.comingSoon ? 0.4 : 0.7,
+    })),
+  ]);
+
+  return [...staticPages, ...planPages, ...postPages, ...localePages];
 }

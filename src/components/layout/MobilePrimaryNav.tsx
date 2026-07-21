@@ -3,6 +3,37 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { getTestimonials } from "@/data/testimonials";
+import { getDictionary } from "@/lib/i18n/dictionaries";
+import { SUPPORTED_LOCALES, type Locale } from "@/lib/i18n/locales";
+
+function detectLocale(pathname: string): Locale | "ja" {
+  for (const locale of SUPPORTED_LOCALES) {
+    if (pathname === `/${locale}` || pathname.startsWith(`/${locale}/`)) return locale;
+  }
+  return "ja";
+}
+
+function localizedPrimaryPages(locale: Locale) {
+  const dict = getDictionary(locale);
+  return [
+    { href: `/${locale}`, label: "Top", match: (path: string) => path === `/${locale}` },
+    {
+      href: `/${locale}/plans`,
+      label: dict.nav.plans,
+      match: (path: string) => path.startsWith(`/${locale}/plans`),
+    },
+    {
+      href: `/${locale}/access`,
+      label: dict.nav.access,
+      match: (path: string) => path.startsWith(`/${locale}/access`),
+    },
+    {
+      href: `/${locale}/booking`,
+      label: dict.nav.bookCta,
+      match: (path: string) => path.startsWith(`/${locale}/booking`),
+    },
+  ];
+}
 
 const primaryPages = [
   { href: "/", label: "ホーム", match: (path: string) => path === "/" },
@@ -35,15 +66,17 @@ const primaryPages = [
 
 export function MobilePrimaryNav() {
   const pathname = usePathname() ?? "/";
+  const locale = detectLocale(pathname);
+  const pages = locale === "ja" ? primaryPages : localizedPrimaryPages(locale);
 
   return (
     <nav
       aria-label="主要ページ"
       className={`grid h-12 border-t border-teal-200/10 bg-[#03040a]/94 md:hidden ${
-        primaryPages.length === 5 ? "grid-cols-5" : "grid-cols-4"
+        pages.length === 5 ? "grid-cols-5" : "grid-cols-4"
       }`}
     >
-      {primaryPages.map((item) => {
+      {pages.map((item) => {
         const active = item.match(pathname);
 
         return (

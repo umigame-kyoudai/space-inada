@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { buildMetadata, siteConfig } from "@/lib/seo";
+import { hreflangAlternates } from "@/lib/i18n/locales";
 import { Section } from "@/components/ui/Section";
 import { PlanCard } from "@/components/sections/PlanCard";
 import { TestimonialCard } from "@/components/sections/TestimonialCard";
@@ -21,6 +22,7 @@ export const metadata: Metadata = buildMetadata({
   title: { absolute: `宮古島の星空フォト・記念日撮影｜${siteConfig.name}` },
   description: siteConfig.description,
   path: "/",
+  languages: hreflangAlternates("home"),
 });
 
 const features = [

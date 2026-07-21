@@ -1,0 +1,11 @@
+import { HtmlLangSync } from "@/components/layout/HtmlLangSync";
+import { LOCALE_HTML_LANG } from "@/lib/i18n/locales";
+
+export default function EnLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <>
+      <HtmlLangSync lang={LOCALE_HTML_LANG.en} />
+      {children}
+    </>
+  );
+}

@@ -6,8 +6,24 @@ import Link from "next/link";
 
 type NavItem = { href: string; label: string };
 
+type Props = {
+  items: NavItem[];
+  /** 予約導線のリンク先・ラベル（翻訳ページ用）。未指定は日本語版の既定値。 */
+  bookingHref?: string;
+  bookingLabel?: string;
+  /** 翻訳ページから日本語サイトへ戻るリンク（指定時のみ表示） */
+  backToJapaneseHref?: string;
+  backToJapaneseLabel?: string;
+};
+
 /** スマホ用ハンバーガーメニュー（md未満で表示）。 */
-export function MobileMenu({ items }: { items: NavItem[] }) {
+export function MobileMenu({
+  items,
+  bookingHref = "/booking?from=mobile-menu",
+  bookingLabel = "LINEで予約・相談する",
+  backToJapaneseHref,
+  backToJapaneseLabel,
+}: Props) {
   const [open, setOpen] = useState(false);
 
   // Escで閉じる + 開いている間はスクロールロック
@@ -82,23 +98,31 @@ export function MobileMenu({ items }: { items: NavItem[] }) {
             </ul>
 
             <Link
-              href="/booking?from=mobile-menu"
+              href={bookingHref}
               data-ga-event="reservation_click"
               data-ga-button="mobile_menu"
               onClick={() => setOpen(false)}
               className="mt-8 flex h-14 items-center justify-center rounded-lg border border-amber-300/70 bg-amber-300 text-base font-bold text-zinc-950 shadow-lg shadow-amber-300/15"
             >
-              LINEで予約・相談する
+              {bookingLabel}
             </Link>
 
-            <div className="mt-8 flex justify-center gap-5 text-xs text-zinc-500">
-              <Link href="/privacy" onClick={() => setOpen(false)}>
-                プライバシーポリシー
-              </Link>
-              <Link href="/legal" onClick={() => setOpen(false)}>
-                特定商取引法に基づく表記
-              </Link>
-            </div>
+            {backToJapaneseHref ? (
+              <div className="mt-8 flex justify-center text-xs text-zinc-500">
+                <Link href={backToJapaneseHref} onClick={() => setOpen(false)}>
+                  {backToJapaneseLabel}
+                </Link>
+              </div>
+            ) : (
+              <div className="mt-8 flex justify-center gap-5 text-xs text-zinc-500">
+                <Link href="/privacy" onClick={() => setOpen(false)}>
+                  プライバシーポリシー
+                </Link>
+                <Link href="/legal" onClick={() => setOpen(false)}>
+                  特定商取引法に基づく表記
+                </Link>
+              </div>
+            )}
           </nav>
         </div>,
           document.body,

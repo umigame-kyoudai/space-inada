@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { buildMetadata } from "@/lib/seo";
+import { hreflangAlternates } from "@/lib/i18n/locales";
 import { Section } from "@/components/ui/Section";
 import { Breadcrumbs } from "@/components/layout/Breadcrumbs";
 import { BookingForm } from "@/components/booking/BookingForm";
@@ -15,6 +16,7 @@ export const metadata: Metadata = buildMetadata({
   description:
     "宮古島の星空フォト撮影の予約フォーム。入力内容をコピーして公式LINEから簡単に予約相談できます。",
   path: "/booking",
+  languages: hreflangAlternates("booking"),
 });
 
 const steps = [

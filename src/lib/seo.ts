@@ -83,6 +83,11 @@ type BuildMetadataInput = {
   };
   /** このルート自身の opengraph-image.tsx を使う場合 true（既定のルートOGを付与しない） */
   ownOgImage?: boolean;
+  /** hreflang（alternates.languages）。多言語ページがある場合に渡す。
+      例: { en: "/en/plans", ko: "/ko/plans", "zh-Hant": "/zh/plans", "x-default": "/plans" } */
+  languages?: Record<string, string>;
+  /** og:locale の上書き（多言語ページ用。例: "en_US"）。未指定は siteConfig.locale（ja_JP） */
+  ogLocale?: string;
 };
 
 /**
@@ -98,6 +103,8 @@ export function buildMetadata({
   type = "website",
   article,
   ownOgImage = false,
+  languages,
+  ogLocale,
 }: BuildMetadataInput): Metadata {
   const canonical = path;
   // 画像の決定ルール：
@@ -119,6 +126,7 @@ export function buildMetadata({
       canonical,
       // 全ページの <head> からフィードを発見できるようにする（クローラ・RSSリーダー向け）
       types: { "application/rss+xml": "/feed.xml" },
+      ...(languages ? { languages } : {}),
     },
     robots: noindex
       ? { index: false, follow: false }
@@ -139,7 +147,7 @@ export function buildMetadata({
       siteName: siteConfig.name,
       title: typeof title === "string" ? title : title?.absolute,
       description,
-      locale: siteConfig.locale,
+      locale: ogLocale ?? siteConfig.locale,
       ...(type === "article" && article
         ? {
             publishedTime: article.publishedTime,
