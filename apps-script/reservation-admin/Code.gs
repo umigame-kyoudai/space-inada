@@ -16,8 +16,14 @@ const RESERVATION_HEADERS = Object.freeze([
   'カメラマン指名', '場所指定', '深夜料金確認', 'Instagram', 'ストーリータグ',
   '候補時間①', '候補時間②', '候補時間③', '確定時間', '集合場所',
   'ステータス', '最終更新日時', '更新者', 'メモ', '参加者の性別内訳',
-  '希望時間帯', 'カレンダーイベントID',
+  '希望時間帯', 'カレンダーイベントID', '紹介スタッフ', '紹介コード',
 ]);
+
+const RESERVATION_COLUMNS = Object.freeze({
+  calendarEventId: RESERVATION_HEADERS.indexOf('カレンダーイベントID') + 1,
+  referralStaff: RESERVATION_HEADERS.indexOf('紹介スタッフ') + 1,
+  referralCode: RESERVATION_HEADERS.indexOf('紹介コード') + 1,
+});
 
 const CALENDAR_CONFIG = Object.freeze({
   eventMinutes: 60,
@@ -139,6 +145,8 @@ function saveReservation(payload) {
       booking.gender,
       booking.preferredTimeWindow,
       '',
+      booking.referralStaff,
+      booking.referralCode,
     ];
     const rowNumber = sheet.getLastRow() + 1;
     sheet.getRange(rowNumber, 1, 1, row.length).setValues([row]);
@@ -348,6 +356,8 @@ function parseBookingText_(rawText) {
     lateFee: extractLabeledValue_(options, ['深夜料金', '追加料金']),
     instagram: extractInstagramValue_(instagram),
     storyTag: extractLabeledValue_(instagram, ['ストーリータグ付け', 'ストーリータグ', 'ストーリーでタグ付け', 'タグ付け']),
+    referralStaff: extractLabeledValue_(text, ['紹介スタッフ']),
+    referralCode: extractLabeledValue_(text, ['紹介コード']),
   };
 }
 
@@ -480,6 +490,9 @@ function normalizeReservationUpdate_(payload, fallback) {
     meetingPlace: cleanText_(payload.meetingPlace != null ? payload.meetingPlace : fallback.meetingPlace),
     status: cleanText_(payload.status != null ? payload.status : fallback.status) || '未返信',
     memo: cleanMultiline_(payload.memo != null ? payload.memo : fallback.memo),
+    // 紹介情報は予約作成時のFirst Touchを維持し、管理画面からは変更しない。
+    referralStaff: cleanText_(fallback.referralStaff),
+    referralCode: cleanText_(fallback.referralCode),
   };
 }
 
@@ -526,7 +539,9 @@ function rowToReservation_(row, rowNumber) {
     memo: cleanMultiline_(row[25]),
     gender: cleanText_(row[26]),
     preferredTimeWindow: cleanText_(row[27]),
-    calendarEventId: cleanText_(row[28]),
+    calendarEventId: cleanText_(row[RESERVATION_COLUMNS.calendarEventId - 1]),
+    referralStaff: cleanText_(row[RESERVATION_COLUMNS.referralStaff - 1]),
+    referralCode: cleanText_(row[RESERVATION_COLUMNS.referralCode - 1]),
   };
 }
 
@@ -666,7 +681,7 @@ function applyCalendarSync_(sheet, reservation, staff) {
   try {
     const sync = syncCalendarEvent_(reservation);
     if (sync.eventId !== reservation.calendarEventId) {
-      sheet.getRange(reservation.rowNumber, RESERVATION_HEADERS.length).setValue(sync.eventId);
+      sheet.getRange(reservation.rowNumber, RESERVATION_COLUMNS.calendarEventId).setValue(sync.eventId);
       reservation.calendarEventId = sync.eventId;
     }
     warning = sync.warning;
@@ -766,19 +781,26 @@ function calendarEventDescription_(reservation) {
 
 function ensureReservationColumns_(sheet) {
   const needed = RESERVATION_HEADERS.length;
-  let created = false;
+  let changed = false;
   if (sheet.getMaxColumns() < needed) {
     sheet.insertColumnsAfter(sheet.getMaxColumns(), needed - sheet.getMaxColumns());
-    created = true;
+    changed = true;
   }
-  const lastHeader = cleanText_(sheet.getRange(1, needed).getDisplayValue());
-  if (lastHeader !== RESERVATION_HEADERS[needed - 1]) {
-    sheet.getRange(1, needed).setValue(RESERVATION_HEADERS[needed - 1]);
-    created = true;
+
+  // 自動追加する末尾3列だけを列名で固定し、既存28列の位置や内容には触れない。
+  const managedStart = RESERVATION_COLUMNS.calendarEventId;
+  const managedHeaders = RESERVATION_HEADERS.slice(managedStart - 1);
+  const currentHeaders = sheet
+    .getRange(1, managedStart, 1, managedHeaders.length)
+    .getDisplayValues()[0]
+    .map(cleanText_);
+  if (currentHeaders.some(function (header, index) { return header !== managedHeaders[index]; })) {
+    sheet.getRange(1, managedStart, 1, managedHeaders.length).setValues([managedHeaders]);
+    changed = true;
   }
-  if (created) {
-    // 挿入した列は隣の列（希望時間帯）の入力規則を引き継ぐため、イベントID列からは外す
-    sheet.getRange(1, needed, sheet.getMaxRows(), 1).clearDataValidations();
+  if (changed) {
+    // 追加列が希望時間帯の入力規則を引き継いでも、管理用列には適用しない。
+    sheet.getRange(1, managedStart, sheet.getMaxRows(), managedHeaders.length).clearDataValidations();
   }
 }
 

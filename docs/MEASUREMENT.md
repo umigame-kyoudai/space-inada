@@ -27,7 +27,7 @@
 
 ## 2. 実装済みのGA4イベント一覧
 
-全イベントに `page_path` / `page_title` が自動付与される。個人情報（氏名・電話番号・メール・フォーム入力内容）は送信しない。
+共通の `trackEvent` を使う全カスタムイベントに `page_path` / `page_title` が自動付与される。紹介Cookieがある場合は、個人情報ではない紹介コードを `referral_staff`（例: `sho`）として追加する。氏名・電話番号・メール・フォーム入力内容は送信しない。
 
 | イベント名 | 意味 | 主なパラメータ |
 |---|---|---|
@@ -61,6 +61,7 @@ GA4 で `line_click` と `form_submit` を「キーイベント」に設定す�
 
 予約ボタン経由の `/booking?from=...` パラメータ（hero / header / footer など）は
 `form_start` `form_submit` `line_click` の `from` として引き継がれる。
+紹介判定には別の `?ref=...` を使用し、`from` の値や既存計測は変更しない。
 
 ### 計測の追加方法
 

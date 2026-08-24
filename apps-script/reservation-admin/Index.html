@@ -255,6 +255,8 @@
     tbody tr:hover { background: #f4f9ff; }
     .customer-name { font-weight: 800; }
     .subtext { margin-top: 2px; color: var(--muted); font-size: 11px; }
+    .referral-badge { display: inline-flex; margin-top: 5px; padding: 3px 7px; border-radius: 999px; color: #075a61; background: #ddf5f3; font-size: 11px; font-weight: 800; }
+    .referral-badge[hidden] { display: none; }
     .status-chip { display: inline-flex; padding: 5px 9px; border-radius: 999px; color: #405169; background: #e8edf4; font-size: 11px; font-weight: 800; white-space: nowrap; }
     .status-chip[data-status="未返信"] { color: #a43f0d; background: #fff0e6; }
     .status-chip[data-status="時間確定"] { color: #11623d; background: #e7f7ee; }
@@ -480,6 +482,7 @@
     html[data-theme="dark"] th, html[data-theme="dark"] td { border-bottom-color: #223349; }
     html[data-theme="dark"] tbody tr:hover { background: #1c2c42; }
     html[data-theme="dark"] .reservation-card:active { background: #1c2c42; }
+    html[data-theme="dark"] .referral-badge { color: #85dfd8; background: #153638; }
     html[data-theme="dark"] .status-chip { color: #b7c6da; background: #23334a; }
     html[data-theme="dark"] .status-chip[data-status="未返信"] { color: #ffb08a; background: #3a2214; }
     html[data-theme="dark"] .status-chip[data-status="時間確定"] { color: #7fdcae; background: #143327; }
@@ -684,6 +687,7 @@
       <div>
         <h2 id="detailTitle">予約詳細</h2>
         <div id="detailId" class="subtext"></div>
+        <div id="detailReferral" class="referral-badge" hidden></div>
       </div>
       <button class="icon-button" id="closeDialogButton" aria-label="閉じる">×</button>
     </div>
@@ -1100,7 +1104,7 @@
       const targetDate = dateKeys[state.dateFilter] || '';
       const isShootingPlanned = (reservation) => reservation.status !== 'キャンセル';
       const filtered = state.reservations.filter((reservation) => {
-        const haystack = [reservation.id, reservation.name, reservation.shootDate, reservation.phone, reservation.hotel].join(' ').toLowerCase();
+        const haystack = [reservation.id, reservation.name, reservation.shootDate, reservation.phone, reservation.hotel, reservation.referralStaff, reservation.referralCode].join(' ').toLowerCase();
         return (!query || haystack.includes(query)) &&
           (!status || reservation.status === status) &&
           (!targetDate || (reservation.shootDate === targetDate && isShootingPlanned(reservation)));
@@ -1123,9 +1127,12 @@
 
       $('reservationRows').innerHTML = filtered.map((reservation) => {
         const time = reservationTimeLabel(reservation);
+        const referral = referralLabel(reservation);
         return '<tr data-id="' + escapeHtml(reservation.id) + '">' +
           '<td><strong>' + escapeHtml(formatShortDate(reservation.shootDate)) + '</strong><div class="subtext">' + escapeHtml(reservation.id) + '</div></td>' +
-          '<td><div class="customer-name">' + escapeHtml(reservation.name) + ' 様</div><div class="subtext">' + escapeHtml(reservation.gender || '性別内訳未入力') + '・大人' + reservation.adults + '・子ども' + reservation.children + '</div></td>' +
+          '<td><div class="customer-name">' + escapeHtml(reservation.name) + ' 様</div>' +
+            (referral ? '<div class="referral-badge">' + escapeHtml(referral) + '</div>' : '') +
+            '<div class="subtext">' + escapeHtml(reservation.gender || '性別内訳未入力') + '・大人' + reservation.adults + '・子ども' + reservation.children + '</div></td>' +
           '<td>' + escapeHtml(reservation.plan) + '</td>' +
           '<td>' + escapeHtml(time) + '</td>' +
           '<td>' + escapeHtml(reservation.photographer || '指名なし') + '</td>' +
@@ -1134,12 +1141,14 @@
         '</tr>';
       }).join('');
       $('reservationCards').innerHTML = filtered.map((reservation) => {
+        const referral = referralLabel(reservation);
         return '<button class="reservation-card" data-id="' + escapeHtml(reservation.id) + '">' +
           '<div class="reservation-card-top">' +
             '<span class="reservation-card-when">' + escapeHtml(formatCardDate(reservation.shootDate)) + '　' + escapeHtml(reservationTimeLabel(reservation)) + '</span>' +
             '<span class="status-chip" data-status="' + escapeHtml(reservation.status) + '">' + escapeHtml(reservation.status) + '</span>' +
           '</div>' +
           '<div class="reservation-card-name">' + escapeHtml(reservation.name) + ' 様</div>' +
+          (referral ? '<div class="referral-badge">' + escapeHtml(referral) + '</div>' : '') +
           '<div class="reservation-card-meta">' + escapeHtml(reservation.plan || 'プラン未定') + '・大人' + reservation.adults + '・子ども' + reservation.children +
             '・' + escapeHtml(reservation.photographer || '指名なし') + '</div>' +
         '</button>';
@@ -1158,6 +1167,12 @@
         reservation.preferredTimeWindow || '時間未定';
     }
 
+    function referralLabel(reservation) {
+      const staff = String(reservation.referralStaff || '').trim();
+      const code = String(reservation.referralCode || '').trim();
+      return staff || code ? '紹介：' + (staff || code) : '';
+    }
+
     function formatCardDate(key) {
       const parts = String(key || '').split('-');
       if (parts.length !== 3) return key || '日付未設定';
@@ -1172,6 +1187,9 @@
       state.selectedId = id;
       $('detailTitle').textContent = reservation.name + ' 様の予約';
       $('detailId').textContent = reservation.id + '　受付 ' + reservation.receivedAt;
+      const referral = referralLabel(reservation);
+      $('detailReferral').textContent = referral;
+      $('detailReferral').hidden = !referral;
       setValue('editShootDate', reservation.shootDate);
       setSelectValue('editPreferredTimeWindow', reservation.preferredTimeWindow);
       setSelectValue('editPlan', reservation.plan);
@@ -1292,6 +1310,8 @@
         lateFee: extractLabeledValueClient(options, ['深夜料金', '追加料金']),
         instagram: extractInstagramValueClient(instagram),
         storyTag: extractLabeledValueClient(instagram, ['ストーリータグ付け', 'ストーリータグ', 'ストーリーでタグ付け', 'タグ付け']),
+        referralStaff: extractLabeledValueClient(rawText, ['紹介スタッフ']),
+        referralCode: extractLabeledValueClient(rawText, ['紹介コード']),
       };
     }
 

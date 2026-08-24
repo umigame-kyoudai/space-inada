@@ -20,6 +20,11 @@ import { AvailabilityCalendar } from "@/components/booking/AvailabilityCalendar"
 import type { Dictionary } from "@/lib/i18n/dictionaries/types";
 import type { Locale } from "@/lib/i18n/locales";
 import { formatTemplate } from "@/lib/i18n/format";
+import {
+  formatReferralMessageLines,
+  getReferralStaffFromCookieString,
+  type ReferralStaff,
+} from "@/lib/referrals";
 
 /** 公式LINE（予約相談） */
 const LINE_URL = "https://lin.ee/5z6HX4S";
@@ -126,6 +131,7 @@ function buildMessage(v: {
   story: boolean;
   totalText: string;
   couponText: string;
+  referralStaff: ReferralStaff | null;
 }): string {
   const staffNominationText = !v.staffName
     ? "なし（おまかせ）"
@@ -180,6 +186,8 @@ ${v.totalText}${v.couponText ? `\n🎟 クーポン：${v.couponText}` : ""}
 内容を確認後、24時間以内にスタッフからLINEでご連絡します。
 ご希望日の月齢や星の位置を事前に確認し、最適な撮影時間をご提案します。
 集合場所は、その日の雲や風などの星空コンディションを確認したうえで、当日にご案内します。
+${v.referralStaff ? `
+${formatReferralMessageLines(v.referralStaff)}` : ""}
 ━━━━━━━━━━━━━━━━`;
 }
 
@@ -280,8 +288,18 @@ export function BookingForm({
   const [story, setStory] = useState(false);
   const [couponInput, setCouponInput] = useState("");
   const [status, setStatus] = useState<"idle" | "copied" | "error">("idle");
+  const [referralStaff, setReferralStaff] = useState<ReferralStaff | null>(null);
   // コピー／コピー失敗の操作対象だったメッセージ。現在のメッセージと違えば「古い」状態とみなす。
   const [actedMessage, setActedMessage] = useState("");
+
+  // Proxyが保存したFirst Touchの紹介コードを、ハイドレーション後にCookieから復元する。
+  useEffect(() => {
+    const storedReferral = getReferralStaffFromCookieString(document.cookie);
+    if (!storedReferral) return;
+    // SSRと初回描画は紹介なしのままにし、ハイドレーション差異を避ける。
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setReferralStaff(storedReferral);
+  }, []);
 
   const formRef = useRef<HTMLFormElement>(null);
   const dateInputRef = useRef<HTMLInputElement>(null);
@@ -500,6 +518,7 @@ export function BookingForm({
         story,
         totalText,
         couponText,
+        referralStaff,
       }),
     [
       date,
@@ -524,6 +543,7 @@ export function BookingForm({
       story,
       totalText,
       couponText,
+      referralStaff,
     ],
   );
 

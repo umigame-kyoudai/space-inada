@@ -12,6 +12,8 @@
  * イベントパラメータに絶対に含めないこと。
  */
 
+import { getReferralStaffFromCookieString } from "@/lib/referrals";
+
 declare global {
   interface Window {
     gtag?: (...args: unknown[]) => void;
@@ -53,9 +55,11 @@ export function trackEvent(
   params: Record<string, unknown> = {},
 ): void {
   if (!isGaEnabled()) return;
+  const referralStaff = getReferralStaffFromCookieString(document.cookie);
   gaPush("event", action, {
     page_path: window.location.pathname + window.location.search,
     page_title: document.title,
     ...params,
+    ...(referralStaff ? { referral_staff: referralStaff.code } : {}),
   });
 }
