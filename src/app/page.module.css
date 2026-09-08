@@ -109,13 +109,26 @@
   text-underline-offset: 4px;
 }
 @media (max-width: 767px) {
+  .serviceStrip {
+    display: none;
+  }
+  .homePlans {
+    padding-block: 1.75rem 2rem;
+  }
+  .homePlans :global(.eyebrow) {
+    margin-bottom: 5px;
+    font-size: 9px;
+  }
+  .homePlans :global(.section-heading-link) {
+    gap: 0.75rem;
+  }
   .introduction,
   .movie {
     grid-template-columns: 1fr;
     gap: 2rem;
   }
   .introduction p {
-    font-size: 12px;
+    font-size: 13px;
   }
   .gallery {
     grid-template-columns: 1fr 1fr;

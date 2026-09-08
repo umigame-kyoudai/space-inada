@@ -33,6 +33,9 @@
   line-height: 2.5;
   color: var(--color-muted);
 }
+.description span {
+  display: block;
+}
 .actions {
   display: flex;
   flex-wrap: wrap;
@@ -144,72 +147,170 @@
     display: none;
   }
 }
-@media (max-width: 767px) {
-  .hero {
-    grid-template-columns: 1fr;
-    padding-top: 0;
-    padding-bottom: 2rem;
-  }
-  .copy {
-    padding: 2.75rem 0 1.5rem;
-  }
-  .intro {
-    margin-top: 1.5rem;
-    font-size: 10px;
-  }
-  .title {
-    margin-top: 0.7rem;
-    font-size: clamp(2.2rem, 8vw, 3.25rem);
-    line-height: 1.65;
-  }
-  .description {
-    margin-top: 1.1rem;
-    font-size: 11px;
-    line-height: 2.25;
-  }
-  .description br {
-    display: none;
-  }
-  .actions {
-    margin-top: 1.5rem;
-    gap: 1.2rem;
-  }
-  .note {
-    font-size: 9px;
-  }
-  .scroll {
-    display: none;
-  }
-  .photos {
-    margin-top: 0.5rem;
-    padding-left: 1rem;
-    padding-bottom: 1.5rem;
-  }
-  .mainPhoto {
-    height: auto;
-    aspect-ratio: 1 / 1.12;
-    border-top-left-radius: 90px;
-  }
-  .smallPhoto {
-    width: 25%;
-    left: -0.5rem;
-    bottom: 4.5rem;
-    border-width: 4px;
-  }
-  .photoCaption {
-    padding: 2rem 1.25rem 1.3rem;
-  }
-  .photoCaption span:first-child {
-    font-size: 18px;
-  }
-  .photoCaption span:last-child {
-    font-size: 6px;
-  }
-}
 .translatedTitle {
   margin-top: 2rem;
   padding-right: 1rem;
   font-size: clamp(2rem, 3.5vw, 3.3rem);
   line-height: 1.45;
   text-wrap: balance;
+}
+@media (min-width: 768px) and (max-width: 1023px) and (max-height: 500px) {
+  .hero {
+    padding: 1rem 1.25rem 1.5rem;
+  }
+  .copy {
+    padding: 0 1rem 0 0;
+  }
+  .intro {
+    margin-top: 8px;
+    font-size: 10px;
+  }
+  .title {
+    margin-top: 4px;
+    font-size: 28px;
+    line-height: 1.35;
+  }
+  .description {
+    margin-top: 8px;
+    font-size: 11px;
+    line-height: 1.7;
+  }
+  .description span,
+  .note,
+  .scroll,
+  .smallPhoto,
+  .photoCaption,
+  .sideNote {
+    display: none;
+  }
+  .actions {
+    margin-top: 12px;
+    gap: 12px;
+  }
+  .actions > a {
+    min-height: 44px;
+    padding: 10px 12px;
+    gap: 8px;
+  }
+  .photos {
+    padding: 0;
+  }
+  .mainPhoto {
+    height: 272px;
+    border-top-left-radius: 64px;
+  }
+}
+@media (max-width: 767px) {
+  .hero {
+    grid-template-columns: 1fr;
+    grid-template-areas: "scene" "details";
+    padding: 0;
+  }
+  .copy {
+    display: contents;
+  }
+  .headline {
+    grid-area: scene;
+    align-self: start;
+    position: relative;
+    z-index: 1;
+    padding: 1.75rem 1.5rem;
+    color: white;
+  }
+  .headline :global(.eyebrow) {
+    color: white;
+    font-size: 9px;
+    letter-spacing: 0.18em;
+  }
+  .intro {
+    margin-top: 12px;
+    color: white;
+    font-size: 11px;
+  }
+  .title {
+    margin-top: 12px;
+    color: white;
+    font-size: clamp(30px, 8.2vw, 38px);
+    letter-spacing: 0.08em;
+    line-height: 1.45;
+    text-shadow: 0 2px 14px rgb(4 20 27 / 35%);
+  }
+  .details {
+    grid-area: details;
+    padding: 1.1rem 1.25rem 1.4rem;
+    border-bottom: 1px solid var(--color-line);
+  }
+  .description {
+    margin: 0;
+    color: var(--color-ink-soft);
+    font-size: 13px;
+    line-height: 1.8;
+  }
+  .description span {
+    display: none;
+  }
+  .actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: stretch;
+    margin-top: 14px;
+    gap: 10px;
+  }
+  .actions > a {
+    justify-content: center;
+    min-height: 48px;
+    padding: 10px 8px;
+    gap: 10px;
+    font-size: 12px;
+    line-height: 1.5;
+    text-align: center;
+  }
+  .consult {
+    border: 1px solid var(--color-accent);
+    border-radius: 4px;
+  }
+  .note,
+  .scroll,
+  .smallPhoto,
+  .sideNote,
+  .photoCaption {
+    display: none;
+  }
+  .photos {
+    grid-area: scene;
+    height: clamp(300px, 42svh, 390px);
+    margin: 0;
+    padding: 0;
+  }
+  .mainPhoto {
+    height: 100%;
+    aspect-ratio: auto;
+    border-radius: 0 0 32px 0;
+  }
+  .mainPhoto img {
+    object-position: 50% 64%;
+  }
+  .mainPhoto::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      155deg,
+      rgb(4 20 27 / 78%),
+      rgb(4 20 27 / 26%) 48%,
+      transparent 76%
+    );
+  }
+  .translatedTitle {
+    max-width: 30rem;
+    margin-top: 18px;
+    padding: 0;
+    font-size: clamp(27px, 7.5vw, 36px);
+    line-height: 1.35;
+    letter-spacing: 0.01em;
+    text-wrap: balance;
+  }
+  .translatedDescription {
+    font-size: 12px;
+  }
 }

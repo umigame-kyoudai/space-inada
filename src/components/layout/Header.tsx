@@ -10,7 +10,7 @@ import { HeaderAutoHide } from "./HeaderAutoHide";
 export function Header() {
   return (
     <header className="site-header">
-      <Container className="flex h-18 max-w-[1440px] items-center justify-between gap-2 sm:gap-5 md:h-20">
+      <Container className="flex h-16 max-w-[1440px] items-center justify-between gap-2 sm:gap-5 md:h-20">
         <Link href="/" aria-label={`${siteConfig.name} ホーム`}>
           <Brand />
         </Link>

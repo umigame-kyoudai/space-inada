@@ -3,6 +3,7 @@ import { Section } from "@/components/ui/Section";
 import { Button } from "@/components/ui/Button";
 import { ImageSlot } from "@/components/media/ImageSlot";
 import { IntlPlanCard } from "./IntlPlanCard";
+import { PlanCarousel } from "@/components/sections/PlanCarousel";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import type { Locale } from "@/lib/i18n/locales";
 import { getPlans } from "@/data/plans";
@@ -16,26 +17,39 @@ export function IntlHomePage({ locale }: { locale: Locale }) {
   return (
     <>
       {/* Hero */}
-      <section className={styles.hero}>
+      <section
+        id="home-hero"
+        className={styles.hero}
+        aria-labelledby="hero-title"
+      >
         <div className={styles.copy}>
-          <p className="eyebrow">{dict.home.heroKicker}</p>
-          <h1 className={`${styles.title} ${styles.translatedTitle}`}>
-            {dict.home.heroTitle}
-          </h1>
-          <p className="mt-5 max-w-md text-sm leading-8 text-muted">
-            {dict.home.heroSubtitle}
-          </p>
-          <div className="mb-8 mt-8 flex flex-wrap gap-3">
-            <Button
-              href={`/${locale}/booking`}
-              gaEvent="reservation_click"
-              gaButton="hero"
+          <div className={styles.headline}>
+            <p className="eyebrow">{dict.home.heroKicker}</p>
+            <h1
+              id="hero-title"
+              className={`${styles.title} ${styles.translatedTitle}`}
             >
-              {dict.home.heroCta}
-            </Button>
-            <Button href={`/${locale}/plans`} variant="outline">
-              {dict.home.heroSecondaryCta}
-            </Button>
+              {dict.home.heroTitle}
+            </h1>
+          </div>
+          <div className={styles.details}>
+            <p
+              className={`${styles.description} ${styles.translatedDescription}`}
+            >
+              {dict.home.heroSubtitle}
+            </p>
+            <div className={styles.actions}>
+              <Button
+                href={`/${locale}/booking`}
+                gaEvent="reservation_click"
+                gaButton="hero"
+              >
+                {dict.home.heroCta}
+              </Button>
+              <Button href={`/${locale}/plans`} variant="outline">
+                {dict.home.heroSecondaryCta}
+              </Button>
+            </div>
           </div>
         </div>
         <div className={styles.photos}>
@@ -52,6 +66,31 @@ export function IntlHomePage({ locale }: { locale: Locale }) {
           </figure>
         </div>
       </section>
+
+      {/* プラン紹介 */}
+      <Section className="cosmic-band">
+        <div className="flex items-end justify-between gap-4">
+          <h2 className="cosmic-title text-2xl sm:text-3xl">
+            {dict.home.plansTitle}
+          </h2>
+          <Link
+            href={`/${locale}/plans`}
+            className="cosmic-link shrink-0 text-sm font-semibold underline underline-offset-4"
+          >
+            {dict.home.plansViewAll} →
+          </Link>
+        </div>
+        <PlanCarousel label={dict.home.plansTitle} locale={locale}>
+          {plans.map((plan) => (
+            <IntlPlanCard
+              key={plan.slug}
+              plan={plan}
+              locale={locale}
+              dict={dict}
+            />
+          ))}
+        </PlanCarousel>
+      </Section>
 
       {/* 選ばれる理由 */}
       <Section>
@@ -98,31 +137,6 @@ export function IntlHomePage({ locale }: { locale: Locale }) {
                 </p>
               </div>
             </article>
-          ))}
-        </div>
-      </Section>
-
-      {/* プラン紹介 */}
-      <Section className="cosmic-band">
-        <div className="flex items-end justify-between gap-4">
-          <h2 className="cosmic-title text-2xl sm:text-3xl">
-            {dict.home.plansTitle}
-          </h2>
-          <Link
-            href={`/${locale}/plans`}
-            className="cosmic-link shrink-0 text-sm font-semibold underline underline-offset-4"
-          >
-            {dict.home.plansViewAll} →
-          </Link>
-        </div>
-        <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {plans.map((plan) => (
-            <IntlPlanCard
-              key={plan.slug}
-              plan={plan}
-              locale={locale}
-              dict={dict}
-            />
           ))}
         </div>
       </Section>

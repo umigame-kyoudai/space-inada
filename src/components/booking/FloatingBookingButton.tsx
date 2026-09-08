@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import { SUPPORTED_LOCALES, type Locale } from "@/lib/i18n/locales";
 
@@ -22,7 +23,22 @@ export function FloatingBookingButton() {
   const pathname = usePathname() ?? "/";
   const locale = detectLocale(pathname);
   const bookingPath = locale === "ja" ? "/booking" : `/${locale}/booking`;
+  const isHome = pathname === "/" || pathname === `/${locale}`;
+  const [heroState, setHeroState] = useState({ pathname: "", visible: true });
+
+  useEffect(() => {
+    if (!isHome) return;
+    const hero = document.getElementById("home-hero");
+    if (!hero) return;
+    const observer = new IntersectionObserver(([entry]) => {
+      setHeroState({ pathname, visible: entry.isIntersecting });
+    });
+    observer.observe(hero);
+    return () => observer.disconnect();
+  }, [isHome, pathname]);
+
   if (pathname.startsWith(bookingPath)) return null;
+  if (isHome && (heroState.pathname !== pathname || heroState.visible)) return null;
 
   const label =
     locale === "ja" ? "LINEで予約" : getDictionary(locale).nav.bookCta;

@@ -4,6 +4,7 @@ import { hreflangAlternates } from "@/lib/i18n/locales";
 import { Section } from "@/components/ui/Section";
 import { Breadcrumbs } from "@/components/layout/Breadcrumbs";
 import { PlanCard } from "@/components/sections/PlanCard";
+import { PlanCarousel } from "@/components/sections/PlanCarousel";
 import { PlanComparison } from "@/components/sections/PlanComparison";
 import { CtaBooking } from "@/components/sections/CtaBooking";
 import { JsonLd } from "@/components/seo/JsonLd";
@@ -39,32 +40,24 @@ export default function PlansPage() {
   };
 
   return (
-    <Section>
+    <Section className="plans-page">
       <JsonLd data={itemList} />
       <Breadcrumbs items={[{ name: "撮影プラン", path: "/plans" }]} />
-      <h1 className="cosmic-title mt-6 text-3xl sm:text-4xl">
-        宮古島の星空フォト 撮影プラン
+      <h1 className="cosmic-title mt-5 text-2xl sm:text-4xl">
+        星空フォトの撮影プラン
       </h1>
       <p className="mt-4 max-w-2xl text-sm leading-relaxed text-muted">
-        気軽なカジュアルから、記念日・プロポーズの特別な撮影まで。ご希望や人数、シーンに合わせてお選びいただけます。
+        カップル・ご家族・記念日に。料金と撮影内容を比べてお選びください。
       </p>
-      <p className="mt-3 max-w-2xl text-sm font-medium text-accent">
-        撮影データは全プラン{DELIVERY_TIME_LABEL}にオンラインで納品します。
+      <p className="mt-3 max-w-2xl text-xs leading-6 font-medium text-accent">
+        撮影データは{DELIVERY_TIME_LABEL}にオンライン納品。
       </p>
 
-      <div
-        aria-label="撮影プラン一覧"
-        className="plans-grid mt-12"
-      >
+      <PlanCarousel label="撮影プラン一覧">
         {plans.map((plan) => (
-          <div
-            key={plan.slug}
-            className="min-w-0"
-          >
-            <PlanCard plan={plan} />
-          </div>
+          <PlanCard key={plan.slug} plan={plan} />
         ))}
-      </div>
+      </PlanCarousel>
 
       <h2 className="mt-20 text-2xl font-bold text-accent">料金・内容の比較</h2>
       <p className="mt-3 text-sm text-muted">
@@ -75,16 +68,15 @@ export default function PlansPage() {
       </div>
 
       {/* オプション・追加料金 */}
-      <h2 className="mt-20 text-2xl font-bold text-accent">オプション・追加料金</h2>
+      <h2 className="mt-20 text-2xl font-bold text-accent">
+        オプション・追加料金
+      </h2>
       <p className="mt-3 text-sm text-muted">
         ご予約時に選べるオプションと、撮影時間に応じてかかる追加料金です。
       </p>
       <div className="mt-6 grid gap-5 sm:grid-cols-2">
         {options.map((opt) => (
-          <div
-            key={opt.name}
-            className="cosmic-panel rounded-lg p-6"
-          >
+          <div key={opt.name} className="cosmic-panel rounded-lg p-6">
             <div className="flex items-baseline justify-between gap-3">
               <h3 className="text-lg font-bold text-ink">{opt.name}</h3>
               <span className="text-base font-bold text-accent">

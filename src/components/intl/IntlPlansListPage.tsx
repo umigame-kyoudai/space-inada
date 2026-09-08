@@ -1,6 +1,7 @@
 import { Section } from "@/components/ui/Section";
 import { Button } from "@/components/ui/Button";
 import { IntlPlanCard } from "./IntlPlanCard";
+import { PlanCarousel } from "@/components/sections/PlanCarousel";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import type { Locale } from "@/lib/i18n/locales";
 import { getPlans } from "@/data/plans";
@@ -16,18 +17,31 @@ export function IntlPlansListPage({ locale }: { locale: Locale }) {
   ];
 
   return (
-    <Section>
-      <h1 className="cosmic-title mt-6 text-3xl sm:text-4xl">{dict.plansList.title}</h1>
-      <p className="mt-4 max-w-2xl text-sm leading-relaxed text-muted">{dict.plansList.lead}</p>
-      <p className="mt-3 max-w-2xl text-sm font-medium text-accent">{dict.plansList.deliveryNote}</p>
+    <Section className="plans-page">
+      <h1 className="cosmic-title mt-5 text-2xl sm:text-4xl">
+        {dict.plansList.title}
+      </h1>
+      <p className="mt-4 max-w-2xl text-sm leading-relaxed text-muted">
+        {dict.plansList.lead}
+      </p>
+      <p className="mt-3 max-w-2xl text-sm font-medium text-accent">
+        {dict.plansList.deliveryNote}
+      </p>
 
-      <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+      <PlanCarousel label={dict.plansList.title} locale={locale}>
         {plans.map((plan) => (
-          <IntlPlanCard key={plan.slug} plan={plan} locale={locale} dict={dict} />
+          <IntlPlanCard
+            key={plan.slug}
+            plan={plan}
+            locale={locale}
+            dict={dict}
+          />
         ))}
-      </div>
+      </PlanCarousel>
 
-      <h2 className="mt-20 text-2xl font-bold text-accent">{dict.plansList.optionsTitle}</h2>
+      <h2 className="mt-20 text-2xl font-bold text-accent">
+        {dict.plansList.optionsTitle}
+      </h2>
       <p className="mt-3 text-sm text-muted">{dict.plansList.optionsLead}</p>
       <div className="mt-6 grid gap-5 sm:grid-cols-2">
         {optionOverlays.map((opt) => (
@@ -43,7 +57,11 @@ export function IntlPlansListPage({ locale }: { locale: Locale }) {
       </div>
 
       <div className="mt-20 flex justify-center">
-        <Button href={`/${locale}/booking`} gaEvent="reservation_click" gaButton="plans_list">
+        <Button
+          href={`/${locale}/booking`}
+          gaEvent="reservation_click"
+          gaButton="plans_list"
+        >
           {dict.plansList.ctaHeading}
         </Button>
       </div>

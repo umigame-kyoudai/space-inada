@@ -5,6 +5,7 @@ import { hreflangAlternates } from "@/lib/i18n/locales";
 import { Section } from "@/components/ui/Section";
 import { Container } from "@/components/ui/Container";
 import { PlanCard } from "@/components/sections/PlanCard";
+import { PlanCarousel } from "@/components/sections/PlanCarousel";
 import { TestimonialCard } from "@/components/sections/TestimonialCard";
 import { CtaBooking } from "@/components/sections/CtaBooking";
 import { Hero } from "@/components/sections/Hero";
@@ -60,7 +61,7 @@ const journey = [
 ];
 
 export default function Home() {
-  const plans = getBookablePlans().slice(0, 3);
+  const plans = getBookablePlans();
   const posts = getPosts().slice(0, 3);
   const testimonials = getTestimonials().slice(0, 3);
   return (
@@ -73,6 +74,26 @@ export default function Home() {
           <span>{DELIVERY_TIME_LABEL}に納品</span>
         </Container>
       </div>
+
+      <Section id="plans" className={`cosmic-band ${styles.homePlans}`}>
+        <SectionHeading
+          eyebrow="PHOTO PLANS"
+          title="撮影プラン"
+          href="/plans"
+          linkLabel="一覧・料金比較"
+        />
+        <p className="mt-3 text-xs leading-6 text-muted">
+          大切な人や、旅のスタイルに合わせて。
+        </p>
+        <PlanCarousel label="おすすめの撮影プラン">
+          {plans.map((plan) => (
+            <PlanCard key={plan.slug} plan={plan} />
+          ))}
+        </PlanCarousel>
+        <p className="mt-4 text-xs leading-6 text-muted">
+          全プラン、{DELIVERY_TIME_LABEL}にオンライン納品。
+        </p>
+      </Section>
 
       <Section id="experience">
         <div className={styles.introduction}>
@@ -94,30 +115,6 @@ export default function Home() {
             KEY PHOTOが、宮古島の夜を思い出の一枚に残します。
           </p>
         </div>
-      </Section>
-
-      <Section id="plans" className="cosmic-band">
-        <SectionHeading
-          eyebrow="PHOTO PLANS"
-          title="あなたらしい、一枚を。"
-          href="/plans"
-          linkLabel="すべての撮影プラン"
-          subtitle="旅のスタイルや、一緒に過ごす人に合わせて。"
-        />
-        <div className="plans-grid mt-10" aria-label="おすすめの撮影プラン">
-          {plans.map((plan) => (
-            <PlanCard key={plan.slug} plan={plan} />
-          ))}
-        </div>
-        <p className="mt-7 text-center text-xs leading-7 text-muted">
-          プロポーズや電飾を使った撮影も。
-          <Link
-            href="/plans"
-            className="cosmic-link underline underline-offset-4"
-          >
-            特別な日のプランを見る
-          </Link>
-        </p>
       </Section>
 
       <Section id="gallery">

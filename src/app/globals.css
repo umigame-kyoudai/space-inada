@@ -8,7 +8,7 @@
   --color-line: #d8e1dc;
   --color-ink: #213b40;
   --color-ink-soft: #415958;
-  --color-muted: #627472;
+  --color-muted: #566966;
   --color-accent: #315e59;
   --color-accent-hover: #234e49;
   --color-night: #102b32;
@@ -242,7 +242,8 @@
   }
   .plan-card-image {
     position: relative;
-    aspect-ratio: 4 / 3;
+    flex-shrink: 0;
+    aspect-ratio: 16 / 9;
     overflow: hidden;
     background: var(--color-night);
   }
@@ -254,11 +255,11 @@
   }
   .plan-card-badge {
     position: absolute;
-    top: 14px;
-    left: 14px;
+    top: 10px;
+    left: 10px;
     border-radius: 2px;
     background: var(--color-paper);
-    padding: 7px 11px;
+    padding: 5px 9px;
     color: var(--color-accent);
     font-size: 10px;
   }
@@ -266,17 +267,68 @@
     display: flex;
     flex: 1;
     flex-direction: column;
-    padding: 1.5rem;
+    padding: 14px 16px 0;
+  }
+  .plan-card-audience {
+    overflow: hidden;
+    color: var(--color-muted);
+    font-size: 11px;
+    line-height: 1.6;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .plan-card-title {
+    margin-top: 5px;
+    color: var(--color-ink);
+    font-family: var(--font-display), serif;
+    font-size: 18px;
+    font-weight: 500;
+    line-height: 1.5;
+    text-wrap: pretty;
   }
   .plan-card-price {
-    margin-top: 1.5rem;
-    padding-block: 1.2rem;
-    border-block: 1px solid var(--color-line);
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 6px;
+    margin-block: 9px 12px;
   }
-  .plans-grid {
+  .plan-card-amount {
+    color: var(--color-ink);
+    font-size: 20px;
+    font-weight: 500;
+    line-height: 1.5;
+  }
+  .plan-card-price > span {
+    color: var(--color-muted);
+    font-size: 10px;
+  }
+  .plan-card-meta {
     display: grid;
-    gap: 1.5rem;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: 1fr 1.4fr;
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+  .plan-card-meta dt {
+    color: var(--color-muted);
+    font-size: 10px;
+    line-height: 1.6;
+  }
+  .plan-card-meta dd {
+    margin-top: 3px;
+    color: var(--color-ink);
+    font-size: 12px;
+    line-height: 1.6;
+  }
+  .plan-card-link {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 44px;
+    margin-top: auto;
+    border-top: 1px solid var(--color-line);
+    color: var(--color-accent);
+    font-size: 12px;
   }
   .booking-cta {
     position: relative;
@@ -311,20 +363,24 @@
   }
 }
 
-@media (max-width: 1023px) {
-  .plans-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
 @media (max-width: 767px) {
   html[data-header-collapsed="true"] .site-header:not(:focus-within) {
-    transform: translateY(-4.5rem);
+    transform: translateY(-4rem);
+  }
+  .cosmic-section {
+    padding-block: 2.75rem;
+  }
+  .section-heading {
+    gap: 1rem;
+  }
+  .section-heading h2 {
+    font-size: 24px;
+  }
+  .plans-page {
+    padding-top: 1.75rem;
   }
 }
 @media (max-width: 639px) {
-  .plans-grid {
-    grid-template-columns: minmax(0, 1fr);
-  }
   .brand-wordmark {
     font-size: 19px;
   }

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { DELIVERY_TIME_LABEL, planPriceLabel, type Plan } from "@/data/plans";
+import { planPriceLabel, type Plan } from "@/data/plans";
 import { ImageSlot } from "@/components/media/ImageSlot";
 import { planImages } from "@/data/images";
 
@@ -15,7 +15,7 @@ export function PlanCard({ plan }: { plan: Plan }) {
       <div className="plan-card-image">
         <ImageSlot
           asset={planImages(plan)[0]}
-          sizes="(max-width: 639px) 100vw, (max-width: 1023px) 50vw, 380px"
+          sizes="(max-width: 767px) 76vw, 312px"
         />
         {plan.badge && <span className="plan-card-badge">{plan.badge}</span>}
         {plan.comingSoon && (
@@ -25,42 +25,31 @@ export function PlanCard({ plan }: { plan: Plan }) {
         )}
       </div>
       <div className="plan-card-content">
-        <p className="text-[10px] leading-6 tracking-wide text-muted">
+        <p className="plan-card-audience">
           {plan.forWhom.join(" · ")}
         </p>
-        <h3 className="mt-2 font-serif text-xl font-medium leading-relaxed text-ink">
+        <h3 className="plan-card-title">
           {plan.name}
         </h3>
-        <p className="mt-2 text-xs leading-6 text-muted">{plan.tagline}</p>
         <div className="plan-card-price">
-          <p className="text-[10px] text-muted">料金（税込）</p>
-          <p className="mt-1 text-xl font-medium tracking-wide text-ink">
+          <p className="plan-card-amount">
             {planPriceLabel(plan)}
           </p>
-          <ul className="mt-2 space-y-1 text-[10px] leading-relaxed text-muted">
-            {plan.pricingDetail.slice(0, 3).map((line) => (
-              <li key={line}>{line}</li>
-            ))}
-          </ul>
+          {typeof plan.priceFrom === "number" && <span>税込</span>}
         </div>
-        <dl className="my-5 grid grid-cols-2 gap-3 text-xs">
+        <dl className="plan-card-meta">
           <div>
-            <dt className="text-[10px] text-muted">撮影時間</dt>
-            <dd className="mt-2 text-ink">
+            <dt>撮影時間</dt>
+            <dd>
               {plan.durationMin ? `約${plan.durationMin}分` : "応相談"}
             </dd>
           </div>
           <div>
-            <dt className="text-[10px] text-muted">納品データ</dt>
-            <dd className="mt-2 text-ink">{plan.deliveryCount}</dd>
+            <dt>納品データ</dt>
+            <dd>{plan.deliveryCount}</dd>
           </div>
         </dl>
-        {!plan.comingSoon && (
-          <p className="mb-4 text-[10px] text-muted">
-            {DELIVERY_TIME_LABEL}にオンライン納品
-          </p>
-        )}
-        <span className="mt-auto flex items-center justify-between border-t border-line pt-4 text-xs text-accent">
+        <span className="plan-card-link">
           プラン詳細を見る
           <span
             aria-hidden="true"

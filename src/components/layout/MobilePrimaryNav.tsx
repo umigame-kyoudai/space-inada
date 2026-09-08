@@ -72,7 +72,7 @@ export function MobilePrimaryNav() {
   return (
     <nav
       aria-label="主要ページ"
-      className={`grid h-12 border-t border-line bg-paper md:hidden ${
+      className={`grid h-11 border-t border-line bg-paper md:hidden ${
         pages.length === 5 ? "grid-cols-5" : "grid-cols-4"
       }`}
     >

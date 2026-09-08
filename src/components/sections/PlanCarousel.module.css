@@ -1,0 +1,86 @@
+.carousel {
+  --gutter: clamp(1.25rem, 4.5vw, 4rem);
+  margin: 1.5rem calc(-1 * var(--gutter)) 0;
+}
+.track {
+  position: relative;
+  display: flex;
+  align-items: stretch;
+  gap: 1rem;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x mandatory;
+  scroll-padding-inline: var(--gutter);
+  scrollbar-width: none;
+  padding: 8px var(--gutter) 12px;
+  list-style: none;
+}
+.track::-webkit-scrollbar {
+  display: none;
+}
+.slide {
+  flex: 0 0 min(76vw, 288px);
+  min-width: 0;
+  scroll-snap-align: start;
+}
+.controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  min-height: 48px;
+  margin: 0 var(--gutter);
+}
+.status {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.2rem 1rem;
+}
+.counter {
+  color: var(--color-ink);
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+}
+.counter span {
+  color: var(--color-muted);
+}
+.hint {
+  color: var(--color-muted);
+  font-size: 11px;
+}
+.buttons {
+  display: flex;
+  flex-shrink: 0;
+  gap: 4px;
+}
+.buttons button {
+  display: grid;
+  width: 44px;
+  height: 44px;
+  place-items: center;
+  border: 1px solid var(--color-line);
+  border-radius: 50%;
+  background: var(--color-paper);
+  color: var(--color-accent);
+}
+.buttons button:hover {
+  border-color: var(--color-accent);
+  background: white;
+}
+@media (min-width: 768px) {
+  .carousel {
+    margin-top: 2rem;
+  }
+  .slide {
+    flex-basis: 312px;
+  }
+}
+@media (max-width: 400px) {
+  .status {
+    display: grid;
+  }
+  .hint {
+    font-size: 10px;
+  }
+}
