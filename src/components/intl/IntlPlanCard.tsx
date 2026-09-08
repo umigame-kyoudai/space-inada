@@ -59,7 +59,7 @@ export function IntlPlanCard({
           </div>
           <div>
             <dt>{dict.planDetail.deliveryLabel}</dt>
-            <dd>{plan.deliveryCount}</dd>
+            <dd>{overlay.deliveryCount}</dd>
           </div>
         </dl>
         <span className="plan-card-link">

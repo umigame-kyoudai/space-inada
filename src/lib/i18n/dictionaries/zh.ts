@@ -87,6 +87,7 @@ export const zh: Dictionary = {
   },
   planOverlay: {
     casual: {
+      deliveryCount: "約 8 張",
       name: "輕鬆體驗方案",
       badge: "輕鬆入門！",
       tagline: "輕鬆體驗宮古島的星空攝影。",
@@ -95,6 +96,7 @@ export const zh: Dictionary = {
       features: ["輕鬆享受的星空攝影體驗", "以滿天星空為背景拍攝", "不擅擺姿勢也沒問題，專人親切指導"],
     },
     standard: {
+      deliveryCount: "全部照片",
       name: "標準方案",
       badge: "人氣 No.1！",
       tagline: "整整 30 分鐘盡情拍攝！紀念日・家庭・情侶的經典首選。",
@@ -103,6 +105,7 @@ export const zh: Dictionary = {
       features: ["30 分鐘充分拍攝", "全數交付拍攝檔案", "最適合紀念日・家庭・情侶"],
     },
     family: {
+      deliveryCount: "約 10 張",
       name: "家庭方案",
       badge: "全家共同的回憶",
       tagline: "適合全家人一起拍攝。",
@@ -111,6 +114,7 @@ export const zh: Dictionary = {
       features: ["最多 10 人可一起拍攝全家福", "以星空為背景的大合照", "攜帶小孩也能安心參加"],
     },
     creative: {
+      deliveryCount: "全部照片",
       name: "創意方案",
       badge: "獨一無二的拍攝✨",
       tagline: "運用燈飾打造與眾不同的特別一刻（限情侶／夫妻）。",
@@ -119,6 +123,7 @@ export const zh: Dictionary = {
       features: ["運用燈飾打造獨特效果", "燈飾造型 3 張＋一般拍攝", "全數交付拍攝檔案"],
     },
     propose: {
+      deliveryCount: "依需求安排",
       name: "求婚方案",
       badge: "一生一次的回憶",
       tagline: "在宮古島的星空下，成就人生最重要的驚喜。",
@@ -127,6 +132,7 @@ export const zh: Dictionary = {
       features: ["事前仔細規劃驚喜流程", "絕不錯過關鍵瞬間", "提供戒指・佈置等協助"],
     },
     "space-inada": {
+      deliveryCount: "即將公開",
       name: "Space 稻田 太空梭星空之旅",
       badge: "即將推出",
       tagline: "以彷彿搭乘太空梭出發的沉浸式體驗，展開一場宮古島星空之旅。即將推出。",
@@ -196,9 +202,27 @@ export const zh: Dictionary = {
     ],
   },
   booking: {
+    calendarToggle: "查看可拍攝日期",
+    optionalDetailsTitle: "加購選項與其他資訊",
+    optionalDetailsHint: "接送、住宿、Instagram 或優惠碼（選填）",
+    optionalDetailsFilled: "已填寫 {n} 個選填項目",
+    shootingDetailsTitle: "拍攝時間與集合地點說明",
+    continueButton: "繼續填寫必填項目",
+    participantsEstimate: "填寫人數後顯示預估金額",
+    quoteEstimate: "請透過 LINE 洽詢報價",
+    groupLimitNote: "每組最多 {max} 人。{over} 人以上請透過 LINE 洽詢。",
+    groupPriceNote: "不論參加人數，皆以每組計費。",
+    breakdownAdults: "成人 {n} 人 × {price}",
+    breakdownChildren: "兒童 {n} 人 × {price}",
+    breakdownGroup: "{plan} · 1 組 {price}",
+    breakdownPickup: "接送 +{price}",
+    breakdownNomination: "指定攝影師：{name} +{price}",
+    breakdownCoupon: "優惠碼（{code}）−{price}",
+    progressLabel: "必填項目填寫進度",
+    calendar: {"title": "拍攝日期月曆", "previous": "上個月", "next": "下個月", "available": "非滿月公休期間", "closed": "滿月期間暫停拍攝", "past": "已截止", "closedShort": "公休", "selected": "已選擇：{date}", "note": "此月曆顯示滿月期間的公休日。實際空位及天候是否適合拍攝，將透過 LINE 確認。"},
     title: "透過 LINE 預約・洽詢",
-    lead: "請於下方表單輸入內容，系統將自動產生要傳送給官方 LINE 的訊息。依序點選「複製訊息內容」→「開啟官方 LINE」，並貼上聊天室後傳送即可。",
-    steps: ["填寫預約內容", "確認自動產生的訊息", "點選「複製訊息內容」", "點選「開啟官方 LINE」", "貼上 LINE 並傳送"],
+    lead: "填寫預約內容後，複製產生的訊息，貼到 LINE 聊天室並傳送。",
+    steps: ["填寫內容", "複製訊息", "透過 LINE 傳送"],
     formHeading: "請輸入預約內容",
     formSubtext: "輸入內容後，右側（手機版為下方）的傳送訊息會自動產生。",
     progressComplete: "✓ 必填項目已全部完成",

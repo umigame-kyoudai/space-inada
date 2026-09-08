@@ -79,6 +79,7 @@ export type Dictionary = {
       name: string;
       badge?: string;
       tagline: string;
+      deliveryCount: string;
       forWhom: string[];
       pricingDetail: string[];
       features: string[];
@@ -133,6 +134,34 @@ export type Dictionary = {
     items: { q: string; a: string }[];
   };
   booking: {
+    calendarToggle: string;
+    optionalDetailsTitle: string;
+    optionalDetailsHint: string;
+    optionalDetailsFilled: string;
+    shootingDetailsTitle: string;
+    continueButton: string;
+    participantsEstimate: string;
+    quoteEstimate: string;
+    groupLimitNote: string;
+    groupPriceNote: string;
+    breakdownAdults: string;
+    breakdownChildren: string;
+    breakdownGroup: string;
+    breakdownPickup: string;
+    breakdownNomination: string;
+    breakdownCoupon: string;
+    progressLabel: string;
+    calendar: {
+      title: string;
+      previous: string;
+      next: string;
+      available: string;
+      closed: string;
+      past: string;
+      closedShort: string;
+      selected: string;
+      note: string;
+    };
     title: string;
     lead: string;
     steps: string[];

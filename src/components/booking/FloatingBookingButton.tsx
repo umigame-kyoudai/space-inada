@@ -24,21 +24,35 @@ export function FloatingBookingButton() {
   const locale = detectLocale(pathname);
   const bookingPath = locale === "ja" ? "/booking" : `/${locale}/booking`;
   const isHome = pathname === "/" || pathname === `/${locale}`;
-  const [heroState, setHeroState] = useState({ pathname: "", visible: true });
+  const [visibility, setVisibility] = useState({ pathname: "", hidden: true });
 
   useEffect(() => {
-    if (!isHome) return;
-    const hero = document.getElementById("home-hero");
-    if (!hero) return;
-    const observer = new IntersectionObserver(([entry]) => {
-      setHeroState({ pathname, visible: entry.isIntersecting });
-    });
-    observer.observe(hero);
+    if (pathname.startsWith(bookingPath)) return;
+    // ページ内の予約導線を優先し、追従ボタンによる遮蔽やプラン指定の取り違えを防ぐ。
+    const targets: Element[] = Array.from(
+      document.querySelectorAll<HTMLAnchorElement>(
+        "main a[href], footer a[href]",
+      ),
+    ).filter((link) => new URL(link.href).pathname === bookingPath);
+    const hero = isHome ? document.getElementById("home-hero") : null;
+    if (hero) targets.push(hero);
+    const visibleTargets = new Set<Element>();
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) visibleTargets.add(entry.target);
+          else visibleTargets.delete(entry.target);
+        }
+        setVisibility({ pathname, hidden: visibleTargets.size > 0 });
+      },
+      { rootMargin: "0px 0px 96px 0px" },
+    );
+    targets.forEach((target) => observer.observe(target));
     return () => observer.disconnect();
-  }, [isHome, pathname]);
+  }, [bookingPath, isHome, pathname]);
 
   if (pathname.startsWith(bookingPath)) return null;
-  if (isHome && (heroState.pathname !== pathname || heroState.visible)) return null;
+  if (visibility.pathname !== pathname || visibility.hidden) return null;
 
   const label =
     locale === "ja" ? "LINEで予約" : getDictionary(locale).nav.bookCta;

@@ -87,6 +87,7 @@ export const ko: Dictionary = {
   },
   planOverlay: {
     casual: {
+      deliveryCount: "약 8장",
       name: "캐주얼 플랜",
       badge: "가볍게 체험!",
       tagline: "부담 없이 미야코지마 별사진을 체험해 보세요.",
@@ -95,6 +96,7 @@ export const ko: Dictionary = {
       features: ["부담 없이 즐기는 별사진 체험", "쏟아지는 별하늘을 배경으로 촬영", "포즈가 서툴러도 친절한 디렉팅으로 안심"],
     },
     standard: {
+      deliveryCount: "전체 사진",
       name: "스탠다드 플랜",
       badge: "인기 No.1!",
       tagline: "30분 꽉 채워 촬영! 기념일・가족・커플의 정석 플랜.",
@@ -103,6 +105,7 @@ export const ko: Dictionary = {
       features: ["30분 동안 충분히 촬영", "촬영 데이터 전체 전달", "기념일・가족・커플에게 최적"],
     },
     family: {
+      deliveryCount: "약 10장",
       name: "패밀리 플랜",
       badge: "가족 모두의 추억으로",
       tagline: "온 가족이 함께하는 촬영에.",
@@ -111,6 +114,7 @@ export const ko: Dictionary = {
       features: ["최대 10명까지 가족 모두 함께 촬영", "별하늘을 배경으로 한 단체 컷", "아이 동반도 안심"],
     },
     creative: {
+      deliveryCount: "전체 사진",
       name: "크리에이티브 플랜",
       badge: "특별한 촬영✨",
       tagline: "조명 장식을 활용한, 다른 곳에는 없는 특별한 한 컷 (커플・부부 한정).",
@@ -119,6 +123,7 @@ export const ko: Dictionary = {
       features: ["조명 장식을 활용한 특별한 연출", "조명 연출 3컷 + 일반 촬영", "촬영 데이터 전체 전달"],
     },
     propose: {
+      deliveryCount: "상담 후 결정",
       name: "프러포즈 플랜",
       badge: "일생의 추억을",
       tagline: "미야코지마의 별하늘 아래에서, 인생 최고의 서프라이즈를.",
@@ -127,6 +132,7 @@ export const ko: Dictionary = {
       features: ["서프라이즈 진행을 사전에 꼼꼼히 설계", "결정적 순간을 놓치지 않는 촬영", "반지・장식 등 연출 지원"],
     },
     "space-inada": {
+      deliveryCount: "공개 예정",
       name: "스페이스 이나다 스페이스셔틀 별하늘 투어",
       badge: "출시 예정",
       tagline: "마치 스페이스셔틀에 탑승하는 듯한 몰입형 연출로 미야코지마의 별하늘을 여행하는 특별한 투어. 출시 예정.",
@@ -197,9 +203,27 @@ export const ko: Dictionary = {
     ],
   },
   booking: {
+    calendarToggle: "촬영 가능한 날짜 확인",
+    optionalDetailsTitle: "옵션 및 추가 정보",
+    optionalDetailsHint: "픽업·숙소·Instagram·쿠폰 (선택)",
+    optionalDetailsFilled: "선택 항목 {n}개 입력됨",
+    shootingDetailsTitle: "촬영 시간 및 집합 장소 안내",
+    continueButton: "다음 필수 항목 입력",
+    participantsEstimate: "인원을 입력하면 예상 금액이 표시됩니다",
+    quoteEstimate: "견적은 LINE으로 문의해 주세요",
+    groupLimitNote: "1팀 최대 {max}명입니다. {over}명 이상은 LINE으로 문의해 주세요.",
+    groupPriceNote: "인원수와 관계없이 팀당 요금입니다.",
+    breakdownAdults: "성인 {n}명 × {price}",
+    breakdownChildren: "어린이 {n}명 × {price}",
+    breakdownGroup: "{plan} · 1팀 {price}",
+    breakdownPickup: "픽업 +{price}",
+    breakdownNomination: "촬영 담당: {name} +{price}",
+    breakdownCoupon: "쿠폰 ({code}) −{price}",
+    progressLabel: "필수 항목 입력 진행 상황",
+    calendar: {"title": "촬영 날짜 달력", "previous": "이전 달", "next": "다음 달", "available": "보름달 휴무 기간 외", "closed": "보름달 기간 촬영 휴무", "past": "접수 종료", "closedShort": "휴무", "selected": "선택: {date}", "note": "보름달 기간의 촬영 휴무일을 표시합니다. 실제 예약 가능 여부와 날씨에 따른 촬영 여부는 LINE으로 확정합니다."},
     title: "LINE으로 예약・상담하기",
-    lead: "아래 폼에 입력하시면 공식 LINE으로 보낼 문장이 자동으로 만들어집니다. \"메시지 복사하기\" → \"공식 LINE 열기\" 순서로 진행하여 대화창에 붙여넣고 전송해 주세요.",
-    steps: ["예약 내용 입력", "자동 생성된 메시지 확인", "\"메시지 복사하기\" 누르기", "\"공식 LINE 열기\" 누르기", "LINE에 붙여넣고 전송"],
+    lead: "예약 내용을 입력한 뒤, 만들어진 메시지를 복사하여 LINE 대화창에 붙여넣고 보내 주세요.",
+    steps: ["예약 내용 입력", "메시지 복사", "LINE으로 전송"],
     formHeading: "예약 내용을 입력해 주세요",
     formSubtext: "입력하시면 오른쪽(모바일은 아래)의 전송 문장이 자동으로 만들어집니다.",
     progressComplete: "✓ 필수 항목 입력이 완료되었습니다",

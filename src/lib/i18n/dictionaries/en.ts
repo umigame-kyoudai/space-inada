@@ -101,6 +101,7 @@ export const en: Dictionary = {
   },
   planOverlay: {
     casual: {
+      deliveryCount: "About 8 photos",
       name: "Casual Plan",
       badge: "Easy & simple",
       tagline: "An easy way to experience Miyakojima's starry sky photography.",
@@ -113,6 +114,7 @@ export const en: Dictionary = {
       ],
     },
     standard: {
+      deliveryCount: "All photos",
       name: "Standard Plan",
       badge: "Most popular",
       tagline: "A full 30 minutes of shooting — our most popular choice for anniversaries, families and couples.",
@@ -125,6 +127,7 @@ export const en: Dictionary = {
       ],
     },
     family: {
+      deliveryCount: "About 10 photos",
       name: "Family Plan",
       badge: "A memory for everyone",
       tagline: "For shooting with your whole family.",
@@ -141,6 +144,7 @@ export const en: Dictionary = {
       ],
     },
     creative: {
+      deliveryCount: "All photos",
       name: "Creative Plan",
       badge: "Something different ✨",
       tagline: "A one-of-a-kind shoot with string lights (couples / married partners only).",
@@ -153,6 +157,7 @@ export const en: Dictionary = {
       ],
     },
     propose: {
+      deliveryCount: "Tailored to your request",
       name: "Proposal Plan",
       badge: "A lifelong memory",
       tagline: "The most important surprise of your life, under Miyakojima's stars.",
@@ -165,6 +170,7 @@ export const en: Dictionary = {
       ],
     },
     "space-inada": {
+      deliveryCount: "Coming soon",
       name: "Space Inada — Space Shuttle Starry Sky Tour",
       badge: "Coming soon",
       tagline:
@@ -268,15 +274,27 @@ export const en: Dictionary = {
     ],
   },
   booking: {
+    calendarToggle: "Check shooting dates",
+    optionalDetailsTitle: "Options & other details",
+    optionalDetailsHint: "Pickup, hotel, Instagram or coupon (optional)",
+    optionalDetailsFilled: "{n} optional fields filled in",
+    shootingDetailsTitle: "Shooting time & meeting point",
+    continueButton: "Continue filling in",
+    participantsEstimate: "Enter participants to see the estimate",
+    quoteEstimate: "Please contact us for a quote",
+    groupLimitNote: "Up to {max} people per group. For {over} or more, please ask us on LINE.",
+    groupPriceNote: "The price is per group, regardless of the number of participants.",
+    breakdownAdults: "Adults {n} × {price}",
+    breakdownChildren: "Children {n} × {price}",
+    breakdownGroup: "{plan} · 1 group {price}",
+    breakdownPickup: "Pickup +{price}",
+    breakdownNomination: "Photographer: {name} +{price}",
+    breakdownCoupon: "Coupon ({code}) −{price}",
+    progressLabel: "Required fields completed",
+    calendar: {"title": "Shooting dates", "previous": "Previous month", "next": "Next month", "available": "Outside full-moon closure", "closed": "Closed around full moon", "past": "No longer available", "closedShort": "Closed", "selected": "Selected: {date}", "note": "This calendar shows full-moon closures. Availability and weather suitability will be confirmed on LINE."},
     title: "Book or Ask via LINE",
-    lead: "Fill in the form below and a message will be created automatically for our official LINE. Tap \"Copy message\" then \"Open official LINE\", and paste it into the chat to send.",
-    steps: [
-      "Fill in your booking details",
-      "Check the auto-generated message",
-      "Tap \"Copy message\"",
-      "Tap \"Open official LINE\"",
-      "Paste into LINE and send",
-    ],
+    lead: "Enter your details, then copy the message and send it in our LINE chat.",
+    steps: ["Enter details", "Copy message", "Send on LINE"],
     formHeading: "Enter your booking details",
     formSubtext: "As you fill this in, the message on the right (below, on mobile) is created automatically.",
     progressComplete: "✓ All required fields are complete",

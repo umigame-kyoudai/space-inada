@@ -74,7 +74,7 @@ export function IntlPlanDetailPage({ locale, plan }: { locale: Locale; plan: Pla
         </div>
         <div className="cosmic-panel rounded-xl p-5">
           <dt className="text-xs text-muted">{dict.planDetail.deliveryLabel}</dt>
-          <dd className="mt-1 text-base font-semibold text-ink">{plan.deliveryCount}</dd>
+          <dd className="mt-1 text-base font-semibold text-ink">{overlay.deliveryCount}</dd>
         </div>
       </dl>
 

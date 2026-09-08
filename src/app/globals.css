@@ -87,6 +87,66 @@
     position: relative;
     padding-block: clamp(3.5rem, 7vw, 6rem);
   }
+  .booking-steps {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem 1rem;
+    margin-top: 1rem;
+    font-size: 0.75rem;
+    color: var(--color-ink-soft);
+  }
+  .booking-steps li {
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+  }
+  .booking-steps li > span {
+    display: grid;
+    place-items: center;
+    width: 1.25rem;
+    height: 1.25rem;
+    border-radius: 50%;
+    background: var(--color-mist);
+    color: var(--color-accent);
+    font-weight: 600;
+  }
+  .booking-disclosure > summary {
+    display: flex;
+    min-height: 2.75rem;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    color: var(--color-accent);
+    font-size: 0.75rem;
+    font-weight: 500;
+  }
+  .booking-disclosure > summary > span[aria-hidden] {
+    flex-shrink: 0;
+    font-size: 1rem;
+  }
+  .booking-disclosure[open] > summary > span[aria-hidden] {
+    transform: rotate(45deg);
+  }
+  .booking-form-layout :is(input, select, textarea, summary, button, a) {
+    scroll-margin-block: 5rem 8rem;
+  }
+  .plan-comparison-scroll {
+    isolation: isolate;
+    scroll-padding-left: 5rem;
+  }
+  .plan-comparison-scroll th[scope="row"],
+  .plan-comparison-scroll thead th:first-child {
+    position: sticky;
+    left: 0;
+    z-index: 1;
+    background: var(--color-paper);
+    box-shadow: 1px 0 var(--color-line);
+  }
+  @media (max-height: 520px) {
+    .booking-sticky-actions {
+      display: none;
+    }
+  }
   .cosmic-band {
     background: var(--color-mist);
   }
@@ -379,6 +439,10 @@
   .plans-page {
     padding-top: 1.75rem;
   }
+}
+.booking-page {
+  padding-top: 2rem;
+  padding-bottom: calc(8rem + env(safe-area-inset-bottom));
 }
 @media (max-width: 639px) {
   .brand-wordmark {
