@@ -3,20 +3,21 @@ import Link from "next/link";
 import { buildMetadata, siteConfig } from "@/lib/seo";
 import { hreflangAlternates } from "@/lib/i18n/locales";
 import { Section } from "@/components/ui/Section";
+import { Container } from "@/components/ui/Container";
 import { PlanCard } from "@/components/sections/PlanCard";
 import { TestimonialCard } from "@/components/sections/TestimonialCard";
 import { CtaBooking } from "@/components/sections/CtaBooking";
 import { Hero } from "@/components/sections/Hero";
 import { SectionHeading } from "@/components/sections/SectionHeading";
-import { GalleryMasonry } from "@/components/sections/GalleryMasonry";
 import { VideoPlayer } from "@/components/media/VideoPlayer";
 import { ImageSlot } from "@/components/media/ImageSlot";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { videoJsonLd } from "@/lib/jsonld";
-import { galleryImages, postImage, shootingVideo } from "@/data/images";
-import { DELIVERY_TIME_LABEL, getPlans } from "@/data/plans";
+import { galleryImages, shootingVideo } from "@/data/images";
+import { DELIVERY_TIME_LABEL, getBookablePlans } from "@/data/plans";
 import { getPosts } from "@/data/posts";
 import { getTestimonials } from "@/data/testimonials";
+import styles from "./page.module.css";
 
 export const metadata: Metadata = buildMetadata({
   title: { absolute: `宮古島の星空フォト・記念日撮影｜${siteConfig.name}` },
@@ -27,210 +28,237 @@ export const metadata: Metadata = buildMetadata({
 
 const features = [
   {
-    title: "宮古島だからこそ撮れる星空",
-    text: "光害が少なく空気の澄んだ宮古島は、天の川まで肉眼で見える国内屈指の星空エリア。スマホでは残せない夜空を背景に撮影します。",
+    title: "星空も、表情も美しく。",
+    text: "星空と人物を両立する専用ライティング。ポーズもご案内するので、撮影がはじめてでも安心です。",
   },
   {
-    title: "人物も星空も美しく",
-    text: "星空と人物を両立する専用ライティングと構図設計。記念日・家族・カップル、それぞれの瞬間を作品として残します。",
+    title: "その夜、いちばんの場所へ。",
+    text: "月齢や雲、風の様子を見ながら、当日の星空に合わせて宮古島内の撮影スポットをご案内します。",
   },
   {
-    title: "天候・月齢に合わせた提案",
-    text: "当日の雲の動きや月齢を読み、最も星が見えるスポットへご案内。限られた晴れ間を最大限に活かします。",
+    title: "旅の余韻が残るうちに。",
+    text: `${DELIVERY_TIME_LABEL}にオンラインで納品。大切な人と、旅の思い出をすぐに共有できます。`,
   },
 ];
-
 const journey = [
   {
-    step: "01",
-    title: "月齢と雲を読む",
-    text: "ご希望日をもとに、星が見えやすい時間帯と撮影条件を確認します。",
+    title: "予約・ご相談",
+    text: "ご希望の日程・人数・プランをフォームに入力し、公式LINEからご相談ください。",
   },
   {
-    step: "02",
-    title: "夜空に合わせて場所を決める",
-    text: "当日の風向き・雲量・街明かりを見ながら、宮古島内の最適なスポットへご案内します。",
+    title: "集合場所のご案内",
+    text: "天候と月齢を確認し、撮影に合う時間とスポットをご案内します。",
   },
   {
-    step: "03",
-    title: "星空と人物を一緒に残す",
-    text: "専用ライティングで、星空の奥行きと表情のどちらも美しく写します。",
+    title: "星空の下で撮影",
+    text: "星を眺めながら、リラックスして。構図やポーズはお任せください。",
   },
   {
-    step: "04",
-    title: "旅の余韻ごと納品",
-    text: `${DELIVERY_TIME_LABEL}にオンラインでデータをお渡し。旅行中から、宮古島の夜を何度でも見返せます。`,
+    title: "写真をお届け",
+    text: `${DELIVERY_TIME_LABEL}にデータをお届け。あの夜が、いつでも見返せる一枚に。`,
   },
 ];
 
 export default function Home() {
-  const plans = getPlans();
+  const plans = getBookablePlans().slice(0, 3);
   const posts = getPosts().slice(0, 3);
   const testimonials = getTestimonials().slice(0, 3);
-
   return (
     <>
-      {/* Hero */}
       <Hero />
+      <div className={styles.serviceStrip}>
+        <Container className="flex flex-wrap items-center justify-center gap-x-12 gap-y-3 py-5">
+          <span>宮古島の星空を知るフォトグラファー</span>
+          <span>カップル・家族・記念日の撮影</span>
+          <span>{DELIVERY_TIME_LABEL}に納品</span>
+        </Container>
+      </div>
 
-      {/* 撮影の様子（動画） */}
+      <Section id="experience">
+        <div className={styles.introduction}>
+          <div>
+            <p className="eyebrow mb-4">BEYOND THE DAYLIGHT</p>
+            <h2 className="cosmic-title text-2xl sm:text-3xl">
+              宮古島の魅力は、
+              <br />
+              日が沈んでからも。
+            </h2>
+          </div>
+          <p className="max-w-lg text-sm leading-8 text-muted">
+            青い海を楽しんだ、その日の夜。
+            <br />
+            街明かりから少し離れると、満天の星が待っています。
+            <br />
+            ふたりで見上げた空も、家族で笑った時間も。
+            <br />
+            KEY PHOTOが、宮古島の夜を思い出の一枚に残します。
+          </p>
+        </div>
+      </Section>
+
+      <Section id="plans" className="cosmic-band">
+        <SectionHeading
+          eyebrow="PHOTO PLANS"
+          title="あなたらしい、一枚を。"
+          href="/plans"
+          linkLabel="すべての撮影プラン"
+          subtitle="旅のスタイルや、一緒に過ごす人に合わせて。"
+        />
+        <div className="plans-grid mt-10" aria-label="おすすめの撮影プラン">
+          {plans.map((plan) => (
+            <PlanCard key={plan.slug} plan={plan} />
+          ))}
+        </div>
+        <p className="mt-7 text-center text-xs leading-7 text-muted">
+          プロポーズや電飾を使った撮影も。
+          <Link
+            href="/plans"
+            className="cosmic-link underline underline-offset-4"
+          >
+            特別な日のプランを見る
+          </Link>
+        </p>
+      </Section>
+
+      <Section id="gallery">
+        <SectionHeading
+          eyebrow="MEMORIES UNDER THE STARS"
+          title="この星空の下で、生まれた思い出。"
+          href="/gallery"
+          linkLabel="ギャラリーを見る"
+        />
+        <div className={styles.gallery}>
+          {galleryImages.slice(0, 4).map((asset, i) => (
+            <Link
+              href="/gallery"
+              key={asset.src ?? i}
+              className={styles.galleryPhoto}
+              aria-label={`${asset.alt}などの撮影ギャラリーを見る`}
+            >
+              <ImageSlot asset={asset} sizes="(max-width: 767px) 50vw, 40vw" />
+              <span aria-hidden="true" className={styles.galleryArrow}>
+                ↗
+              </span>
+            </Link>
+          ))}
+        </div>
+        <p className="mt-5 text-right text-[10px] tracking-wide text-muted">
+          KEY PHOTOが宮古島で撮影した、実際のお写真です。
+        </p>
+      </Section>
+
       <Section className="cosmic-band">
+        <div className={styles.movie}>
+          <div>
+            <p className="eyebrow">THE EXPERIENCE</p>
+            <h2 className="cosmic-title mt-4 text-2xl sm:text-3xl">
+              写真を撮る時間も、
+              <br />
+              旅の思い出に。
+            </h2>
+            <p className="mt-5 max-w-sm text-xs leading-7 text-muted">
+              夜風を感じながら、星を探して、少し笑って。はじめての星空撮影の雰囲気を、動画でご覧ください。
+            </p>
+            <Link href="/about" className="section-heading-link mt-5">
+              私たちについて<span aria-hidden="true">↗</span>
+            </Link>
+          </div>
+          <div className="overflow-hidden rounded-md bg-night">
+            <VideoPlayer video={shootingVideo} />
+          </div>
+        </div>
         {shootingVideo.src && (
           <JsonLd
             data={videoJsonLd({
               name: "宮古島 星空フォト撮影の様子",
               description:
-                "宮古島の満天の星空のもとで行う星空フォト撮影の様子。プロのフォトグラファーが記念日・カップル・家族の一枚を撮影します。",
+                "宮古島の満天の星空のもとで行う星空フォト撮影の様子。",
               contentPath: shootingVideo.src,
               uploadDate: "2026-06-06",
             })}
           />
         )}
-        <div className="reveal-up text-center">
-          <p className="cosmic-kicker text-sm font-semibold tracking-widest">MOVIE</p>
-          <h2 className="cosmic-title mt-3 text-2xl font-bold sm:text-3xl">撮影の様子</h2>
-          <p className="mx-auto mt-4 max-w-2xl text-sm leading-relaxed text-zinc-400">
-            宮古島の星空のもとで、どんなふうに撮影が進むのか。当日の雰囲気を動画でご覧ください。
-          </p>
-        </div>
-        <div className="cosmic-panel reveal-up delay-100 mt-8 overflow-hidden rounded-2xl bg-black">
-          <VideoPlayer video={shootingVideo} />
-        </div>
-      </Section>
-
-      {/* 選ばれる理由 */}
-      <Section>
-        <h2 className="cosmic-title reveal-up text-center text-2xl font-bold sm:text-3xl">
-          宮古島の星空フォトが選ばれる理由
-        </h2>
-        <div className="mt-12 grid gap-6 sm:grid-cols-3">
-          {features.map((f, i) => (
-            <div
-              key={f.title}
-              className={`cosmic-panel reveal-up rounded-2xl p-6 ${i === 1 ? "delay-100" : i === 2 ? "delay-200" : ""}`}
-            >
-              <h3 className="text-lg font-bold text-teal-100">{f.title}</h3>
-              <p className="mt-3 text-sm leading-relaxed text-zinc-400">{f.text}</p>
-            </div>
-          ))}
-        </div>
-      </Section>
-
-      {/* 予約から納品まで */}
-      <Section className="cosmic-band">
-        <div className="reveal-up text-center">
-          <p className="cosmic-kicker text-sm font-semibold tracking-widest">FLOW</p>
-          <h2 className="cosmic-title mt-3 text-2xl font-bold sm:text-3xl">
-            宮古島の夜へ向かう流れ
-          </h2>
-          <p className="mx-auto mt-4 max-w-2xl text-sm leading-relaxed text-zinc-400">
-            ご予約から撮影、納品まで。夜空のコンディションに合わせて進めるため、はじめての方でも安心してお越しいただけます。
-          </p>
-        </div>
-
-        <div className="mission-line mt-12 space-y-5">
-          {journey.map((item, i) => (
-            <article
-              key={item.step}
-              className={`cosmic-panel reveal-up grid gap-4 rounded-2xl p-5 sm:w-[76%] sm:grid-cols-[5rem_1fr] sm:p-6 ${
-                i % 2 === 0 ? "sm:mr-auto" : "sm:ml-auto"
-              } ${i === 1 ? "delay-100" : i === 2 ? "delay-200" : i === 3 ? "delay-300" : ""}`}
-            >
-              <div className="flex h-12 w-12 items-center justify-center rounded-lg border border-amber-200/50 bg-amber-300/10 text-sm font-bold text-amber-200">
-                {item.step}
-              </div>
-              <div>
-                <h3 className="text-lg font-bold text-white">{item.title}</h3>
-                <p className="mt-2 text-sm leading-relaxed text-zinc-400">
-                  {item.text}
-                </p>
-              </div>
+        <div className={styles.features}>
+          {features.map((feature) => (
+            <article key={feature.title}>
+              <h3 className="font-serif text-lg font-medium text-ink">
+                {feature.title}
+              </h3>
+              <p className="mt-3 text-xs leading-7 text-muted">
+                {feature.text}
+              </p>
             </article>
           ))}
         </div>
       </Section>
 
-      {/* プラン紹介 */}
-      <Section className="cosmic-band">
-        <SectionHeading title="撮影プラン" href="/plans" />
-        <div
-          aria-label="撮影プラン一覧"
-          className="-mx-5 mt-10 flex snap-x snap-mandatory gap-4 overflow-x-auto scroll-px-5 px-5 pb-5 [-webkit-overflow-scrolling:touch] [scrollbar-width:none] sm:mx-0 sm:grid sm:grid-cols-2 sm:gap-5 sm:overflow-visible sm:px-0 sm:pb-0 lg:grid-cols-3 [&::-webkit-scrollbar]:hidden"
-        >
-          {plans.map((plan, i) => (
-            <div
-              key={plan.slug}
-              className={`reveal-up w-[78%] max-w-[20rem] shrink-0 snap-start sm:w-auto sm:max-w-none sm:shrink ${i % 3 === 1 ? "delay-100" : i % 3 === 2 ? "delay-200" : ""}`}
-            >
-              <PlanCard plan={plan} />
-            </div>
-          ))}
-        </div>
-      </Section>
-
-      {/* ギャラリー抜粋 */}
       <Section>
-        <SectionHeading title="撮影ギャラリー" href="/gallery" reveal />
-        <GalleryMasonry
-          images={galleryImages.slice(0, 6)}
-          className="mt-10"
-          reveal
+        <SectionHeading
+          eyebrow="HOW IT WORKS"
+          title="ご予約から、写真のお届けまで。"
+          href="/faq"
+          linkLabel="よくある質問"
         />
+        <ol className={styles.journey}>
+          {journey.map((item, i) => (
+            <li key={item.title}>
+              <span className={styles.step}>0{i + 1}</span>
+              <h3 className="mt-5 text-sm font-medium text-ink">
+                {item.title}
+              </h3>
+              <p className="mt-3 text-xs leading-7 text-muted">{item.text}</p>
+            </li>
+          ))}
+        </ol>
       </Section>
 
-      {/* コラム */}
-      <Section>
-        <SectionHeading title="星空フォトコラム" href="/blog" reveal />
-        <div className="mt-10 grid gap-5 sm:grid-cols-3">
-          {posts.map((post, i) => (
+      <Section className="border-y border-line">
+        <SectionHeading
+          eyebrow="JOURNAL"
+          title="宮古島の夜を、もっと楽しむ。"
+          href="/blog"
+          linkLabel="コラムを読む"
+        />
+        <div className={styles.journal}>
+          {posts.map((post) => (
             <Link
               key={post.slug}
               href={`/blog/${post.slug}`}
-              className={`cosmic-panel cosmic-panel-hover reveal-up group flex flex-col overflow-hidden rounded-2xl ${i === 1 ? "delay-100" : i === 2 ? "delay-200" : ""}`}
+              className={styles.journalEntry}
             >
-              <figure className="relative aspect-[16/9] w-full overflow-hidden">
-                <ImageSlot
-                  asset={postImage(post)}
-                  sizes="(max-width: 640px) 100vw, 33vw"
-                  className="transition-transform duration-500 group-hover:scale-105"
-                />
-                <div className="absolute inset-x-0 bottom-0 h-12 bg-gradient-to-t from-slate-950/70 to-transparent" />
-              </figure>
-              <div className="p-6">
-                <h3 className="text-base font-bold text-white group-hover:text-teal-100">
-                  {post.title}
-                </h3>
-                <p className="mt-3 text-sm leading-relaxed text-zinc-400">
-                  {post.excerpt}
-                </p>
-              </div>
+              <h3 className="text-sm font-medium leading-7 text-ink">
+                {post.title}
+              </h3>
+              <p className="mt-3 line-clamp-3 text-xs leading-6 text-muted">
+                {post.excerpt}
+              </p>
+              <span className="mt-auto pt-6 text-xs text-accent">
+                記事を読む <span aria-hidden="true">↗</span>
+              </span>
             </Link>
           ))}
         </div>
       </Section>
 
-      {/* お客様の声（実際の声が1件以上あるときだけ表示。data/testimonials.ts に追加すると自動で有効化） */}
       {testimonials.length > 0 && (
-        <Section className="cosmic-band">
-          <SectionHeading title="お客様の声" href="/voice" reveal />
+        <Section>
+          <SectionHeading
+            eyebrow="GUEST STORIES"
+            title="お客様の声"
+            href="/voice"
+          />
           <div className="mt-10 grid gap-5 sm:grid-cols-3">
-            {testimonials.map((t, i) => (
-              <div
-                key={`${t.name}-${t.date}`}
-                className={`reveal-up ${i === 1 ? "delay-100" : i === 2 ? "delay-200" : ""}`}
-              >
-                <TestimonialCard testimonial={t} />
-              </div>
+            {testimonials.map((item) => (
+              <TestimonialCard
+                key={`${item.name}-${item.date}`}
+                testimonial={item}
+              />
             ))}
           </div>
         </Section>
       )}
-
-      {/* CTA */}
       <Section>
-        <div className="reveal-up">
-          <CtaBooking />
-        </div>
+        <CtaBooking />
       </Section>
     </>
   );

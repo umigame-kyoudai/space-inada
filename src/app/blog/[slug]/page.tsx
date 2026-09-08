@@ -60,16 +60,16 @@ export default async function BlogPostPage({ params }: Props) {
 
       <article className="mt-6">
         <header>
-          <div className="flex flex-wrap items-center gap-3 text-xs text-zinc-500">
+          <div className="flex flex-wrap items-center gap-3 text-xs text-muted">
             <time dateTime={post.publishedAt}>公開：{post.publishedAt}</time>
             {post.updatedAt !== post.publishedAt && (
               <time dateTime={post.updatedAt}>更新：{post.updatedAt}</time>
             )}
           </div>
-          <h1 className="cosmic-title mt-3 text-3xl font-bold leading-tight sm:text-4xl">
+          <h1 className="cosmic-title mt-3 text-3xl leading-tight sm:text-4xl">
             {post.title}
           </h1>
-          <p className="mt-4 leading-relaxed text-zinc-400">{post.excerpt}</p>
+          <p className="mt-4 leading-relaxed text-muted">{post.excerpt}</p>
         </header>
 
         <div className="cosmic-panel relative mt-8 aspect-[16/9] w-full overflow-hidden rounded-lg">
@@ -89,7 +89,7 @@ export default async function BlogPostPage({ params }: Props) {
 
       {relatedPosts.length > 0 && (
         <section className="mt-16">
-          <h2 className="text-xl font-bold text-teal-100">関連するコラム</h2>
+          <h2 className="text-xl font-bold text-accent">関連するコラム</h2>
           <ul className="mt-6 grid gap-4 sm:grid-cols-2">
             {relatedPosts.map((rp) => (
               <li key={rp.slug}>
@@ -97,10 +97,10 @@ export default async function BlogPostPage({ params }: Props) {
                   href={`/blog/${rp.slug}`}
                   className="cosmic-panel cosmic-panel-hover group block rounded-lg p-5"
                 >
-                  <h3 className="text-sm font-bold text-white group-hover:text-teal-100">
+                  <h3 className="text-sm font-bold text-ink group-hover:text-accent">
                     {rp.title}
                   </h3>
-                  <p className="mt-2 line-clamp-2 text-xs leading-relaxed text-zinc-400">
+                  <p className="mt-2 line-clamp-2 text-xs leading-relaxed text-muted">
                     {rp.excerpt}
                   </p>
                 </Link>

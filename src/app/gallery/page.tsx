@@ -21,10 +21,10 @@ export default function GalleryPage() {
       <JsonLd data={imageGalleryJsonLd(galleryImages)} />
       <Breadcrumbs items={[{ name: "撮影ギャラリー", path: "/gallery" }]} />
 
-      <h1 className="cosmic-title mt-6 text-3xl font-bold sm:text-4xl">
+      <h1 className="cosmic-title mt-6 text-3xl sm:text-4xl">
         撮影ギャラリー
       </h1>
-      <p className="mt-4 max-w-2xl text-sm leading-relaxed text-zinc-400">
+      <p className="mt-4 max-w-2xl text-sm leading-relaxed text-muted">
         宮古島の星空のもとで撮影した作品の数々。天の川を背景にしたカップルフォト、プロポーズの瞬間、家族の笑顔——ここでしか残せない一枚をご覧ください。
       </p>
 
@@ -32,10 +32,10 @@ export default function GalleryPage() {
 
       {/* JSON-LD の license / acquireLicensePage が指すセクション */}
       <div id="image-license" className="mt-16 max-w-2xl">
-        <h2 className="text-lg font-semibold text-zinc-200">
+        <h2 className="text-lg font-semibold text-ink">
           掲載写真の著作権・ご利用について
         </h2>
-        <p className="mt-3 text-sm leading-relaxed text-zinc-400">
+        <p className="mt-3 text-sm leading-relaxed text-muted">
           当サイトに掲載している写真の著作権は、すべて{siteConfig.name}
           （撮影：{siteConfig.author.name}）に帰属します。
           無断での転載・複製・二次利用はご遠慮ください。

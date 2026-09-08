@@ -1,0 +1,215 @@
+.hero {
+  display: grid;
+  grid-template-columns: 0.9fr 1.1fr;
+  width: 100%;
+  max-width: 1440px;
+  margin: auto;
+  padding: 2rem clamp(1.25rem, 4.5vw, 4rem) 3.5rem;
+}
+.copy {
+  align-self: center;
+  position: relative;
+  z-index: 1;
+  padding: 3rem 1rem 0 0;
+}
+.intro {
+  margin-top: 2.6rem;
+  color: var(--color-ink-soft);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+}
+.title {
+  margin-top: 1.2rem;
+  font-family: var(--font-display), serif;
+  font-size: clamp(2.4rem, 4.3vw, 4.1rem);
+  font-weight: 400;
+  letter-spacing: 0.06em;
+  line-height: 1.7;
+  text-wrap: nowrap;
+}
+.description {
+  margin-top: 1.8rem;
+  font-size: 12px;
+  line-height: 2.5;
+  color: var(--color-muted);
+}
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1.6rem;
+  margin-top: 2rem;
+}
+.consult {
+  display: inline-flex;
+  align-items: center;
+  gap: 1rem;
+  min-height: 44px;
+  font-size: 12px;
+  color: var(--color-accent);
+  border-bottom: 1px solid var(--color-line);
+}
+.note {
+  margin-top: 1.3rem;
+  color: var(--color-muted);
+  font-size: 10px;
+  letter-spacing: 0.03em;
+}
+.scroll {
+  display: inline-flex;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 3rem;
+  min-height: 44px;
+  font-size: 9px;
+  letter-spacing: 0.12em;
+  color: var(--color-muted);
+}
+.scroll span {
+  font-size: 21px;
+  color: var(--color-accent);
+}
+.photos {
+  position: relative;
+  min-width: 0;
+  padding-left: 1.5rem;
+  padding-bottom: 2rem;
+}
+.mainPhoto {
+  position: relative;
+  height: clamp(540px, 49vw, 700px);
+  overflow: hidden;
+  border-radius: 160px 4px 4px 4px;
+  background: var(--color-night);
+}
+.mainPhoto img {
+  object-position: 50% 50%;
+}
+.photoCaption {
+  position: absolute;
+  inset: auto 0 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 3rem 1.6rem 1.7rem;
+  background: linear-gradient(transparent, rgb(4 20 27 / 85%));
+  color: white;
+}
+.photoCaption span:first-child {
+  font-family: var(--font-display), serif;
+  font-size: 20px;
+  font-style: italic;
+}
+.photoCaption span:last-child {
+  font-size: 7px;
+  letter-spacing: 0.15em;
+}
+.smallPhoto {
+  position: absolute;
+  bottom: 6.5rem;
+  left: -2.2rem;
+  width: 26%;
+  aspect-ratio: 3 / 4;
+  overflow: hidden;
+  border: 6px solid var(--color-paper);
+  border-radius: 3px;
+  box-shadow: 0 10px 30px rgb(16 43 50 / 12%);
+}
+.smallPhoto img {
+  object-position: 50% 75%;
+}
+.sideNote {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  font-size: 9px;
+  color: var(--color-muted);
+  letter-spacing: 0.18em;
+}
+@media (max-width: 1100px) and (min-width: 768px) {
+  .hero {
+    grid-template-columns: 1fr 1fr;
+  }
+  .title {
+    font-size: clamp(2.1rem, 4.2vw, 3rem);
+  }
+  .actions {
+    gap: 1rem;
+  }
+  .smallPhoto {
+    left: -0.8rem;
+  }
+  .photoCaption span:last-child {
+    display: none;
+  }
+}
+@media (max-width: 767px) {
+  .hero {
+    grid-template-columns: 1fr;
+    padding-top: 0;
+    padding-bottom: 2rem;
+  }
+  .copy {
+    padding: 2.75rem 0 1.5rem;
+  }
+  .intro {
+    margin-top: 1.5rem;
+    font-size: 10px;
+  }
+  .title {
+    margin-top: 0.7rem;
+    font-size: clamp(2.2rem, 8vw, 3.25rem);
+    line-height: 1.65;
+  }
+  .description {
+    margin-top: 1.1rem;
+    font-size: 11px;
+    line-height: 2.25;
+  }
+  .description br {
+    display: none;
+  }
+  .actions {
+    margin-top: 1.5rem;
+    gap: 1.2rem;
+  }
+  .note {
+    font-size: 9px;
+  }
+  .scroll {
+    display: none;
+  }
+  .photos {
+    margin-top: 0.5rem;
+    padding-left: 1rem;
+    padding-bottom: 1.5rem;
+  }
+  .mainPhoto {
+    height: auto;
+    aspect-ratio: 1 / 1.12;
+    border-top-left-radius: 90px;
+  }
+  .smallPhoto {
+    width: 25%;
+    left: -0.5rem;
+    bottom: 4.5rem;
+    border-width: 4px;
+  }
+  .photoCaption {
+    padding: 2rem 1.25rem 1.3rem;
+  }
+  .photoCaption span:first-child {
+    font-size: 18px;
+  }
+  .photoCaption span:last-child {
+    font-size: 6px;
+  }
+}
+.translatedTitle {
+  margin-top: 2rem;
+  padding-right: 1rem;
+  font-size: clamp(2rem, 3.5vw, 3.3rem);
+  line-height: 1.45;
+  text-wrap: balance;
+}

@@ -25,10 +25,10 @@ export default function NotFound() {
   return (
     <Section className="text-center">
       <p className="cosmic-kicker text-sm font-semibold tracking-widest">404</p>
-      <h1 className="cosmic-title mt-4 text-3xl font-bold sm:text-4xl">
+      <h1 className="cosmic-title mt-4 text-3xl sm:text-4xl">
         お探しのページは見つかりませんでした
       </h1>
-      <p className="mx-auto mt-4 max-w-xl text-sm leading-relaxed text-zinc-400">
+      <p className="mx-auto mt-4 max-w-xl text-sm leading-relaxed text-muted">
         URLが変更されたか、削除された可能性があります。
         下のリンクから目的のページをお探しください。
       </p>
@@ -49,7 +49,7 @@ export default function NotFound() {
         <ul className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-sm">
           {links.map((l) => (
             <li key={l.href}>
-              <Link href={l.href} className="text-zinc-300 hover:text-teal-200">
+              <Link href={l.href} className="text-ink-soft hover:text-accent">
                 {l.label}
               </Link>
             </li>

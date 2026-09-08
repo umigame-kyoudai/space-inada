@@ -1,0 +1,147 @@
+.serviceStrip {
+  border-block: 1px solid var(--color-line);
+  font-size: 10px;
+  color: var(--color-muted);
+  letter-spacing: 0.03em;
+}
+.serviceStrip span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.7rem;
+}
+.serviceStrip span::before {
+  content: "";
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: #78988c;
+}
+.introduction {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+  gap: 4rem;
+  padding-block: 1rem;
+}
+.gallery {
+  display: grid;
+  grid-template-columns: 1.15fr 1fr 1fr;
+  grid-template-rows: 240px 240px;
+  gap: 1rem;
+  margin-top: 2.5rem;
+}
+.galleryPhoto {
+  position: relative;
+  min-width: 0;
+  overflow: hidden;
+  border-radius: 4px;
+  background: var(--color-night);
+}
+.galleryPhoto:first-child {
+  grid-row: span 2;
+}
+.galleryPhoto:nth-child(2) {
+  grid-column: span 2;
+}
+.galleryPhoto img {
+  transition: transform 500ms ease;
+}
+.galleryPhoto:hover img {
+  transform: scale(1.035);
+}
+.galleryArrow {
+  position: absolute;
+  bottom: 12px;
+  right: 12px;
+  display: grid;
+  width: 32px;
+  height: 32px;
+  place-items: center;
+  border-radius: 50%;
+  background: rgb(255 255 255 / 92%);
+  color: var(--color-ink);
+  font-size: 13px;
+}
+.movie {
+  display: grid;
+  grid-template-columns: 0.8fr 1.2fr;
+  align-items: center;
+  gap: 4rem;
+}
+.features {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 3rem;
+  margin-top: 3.5rem;
+  padding-top: 2.5rem;
+  border-top: 1px solid #cad8cf;
+}
+.journey {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 2rem;
+  margin-top: 3rem;
+}
+.journey li {
+  position: relative;
+  border-top: 1px solid #b6cbbf;
+  padding-top: 1.5rem;
+}
+.step {
+  color: var(--color-accent);
+  font-family: var(--font-display), serif;
+  font-size: 27px;
+}
+.journal {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2.5rem;
+  margin-top: 2.5rem;
+}
+.journalEntry {
+  display: flex;
+  flex-direction: column;
+  border-top: 1px solid var(--color-line);
+  padding-top: 1.5rem;
+}
+.journalEntry:hover h3 {
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+@media (max-width: 767px) {
+  .introduction,
+  .movie {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+  .introduction p {
+    font-size: 12px;
+  }
+  .gallery {
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 230px 160px;
+    gap: 0.65rem;
+  }
+  .galleryPhoto:first-child {
+    grid-row: auto;
+  }
+  .galleryPhoto:nth-child(2) {
+    grid-column: auto;
+  }
+  .features {
+    grid-template-columns: 1fr;
+    gap: 1.8rem;
+    margin-top: 2rem;
+  }
+  .journey {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 2rem 1.5rem;
+  }
+  .journal {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+  .journalEntry {
+    padding-top: 1.5rem;
+  }
+}

@@ -11,7 +11,7 @@ export type Crumb = { name: string; path: string };
 export function Breadcrumbs({ items }: { items: Crumb[] }) {
   const all: Crumb[] = [{ name: "ホーム", path: "/" }, ...items];
   return (
-    <nav aria-label="パンくず" className="text-sm text-zinc-400">
+    <nav aria-label="パンくず" className="text-sm text-muted">
       <JsonLd data={breadcrumbJsonLd(all)} />
       <ol className="flex flex-wrap items-center gap-1.5">
         {all.map((c, i) => {
@@ -19,11 +19,11 @@ export function Breadcrumbs({ items }: { items: Crumb[] }) {
           return (
             <li key={c.path} className="flex items-center gap-1.5">
               {isLast ? (
-                <span aria-current="page" className="text-zinc-300">
+                <span aria-current="page" className="text-ink-soft">
                   {c.name}
                 </span>
               ) : (
-                <Link href={c.path} className="hover:text-white">
+                <Link href={c.path} className="hover:text-ink">
                   {c.name}
                 </Link>
               )}

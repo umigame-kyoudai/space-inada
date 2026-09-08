@@ -72,7 +72,7 @@ export function MobilePrimaryNav() {
   return (
     <nav
       aria-label="主要ページ"
-      className={`grid h-12 border-t border-teal-200/10 bg-[#03040a]/94 md:hidden ${
+      className={`grid h-12 border-t border-line bg-paper md:hidden ${
         pages.length === 5 ? "grid-cols-5" : "grid-cols-4"
       }`}
     >
@@ -92,8 +92,8 @@ export function MobilePrimaryNav() {
             aria-current={active ? "page" : undefined}
             className={`relative flex min-w-0 items-center justify-center transition-colors ${
               active
-                ? "text-amber-100"
-                : "text-zinc-400 hover:text-teal-100"
+                ? "text-accent"
+                : "text-muted hover:text-accent"
             }`}
           >
             <span className="text-xs font-semibold tracking-[0.08em]">
@@ -101,7 +101,7 @@ export function MobilePrimaryNav() {
             </span>
             <span
               aria-hidden
-              className={`absolute inset-x-3 bottom-0 h-0.5 origin-center rounded-full bg-gradient-to-r from-amber-300 via-teal-200 to-pink-300 transition-transform duration-300 ${
+              className={`absolute inset-x-3 bottom-0 h-0.5 origin-center rounded-full bg-accent transition-transform duration-300 ${
                 active ? "scale-x-100" : "scale-x-0"
               }`}
             />

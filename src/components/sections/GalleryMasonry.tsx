@@ -87,7 +87,7 @@ export function GalleryMasonry({
               >
                 <ImageSlot
                   asset={img}
-                  sizes="(max-width: 640px) 50vw, 33vw"
+                  sizes="(max-width: 1240px) 50vw, 560px"
                   priority={i < priorityCount}
                 />
                 {img.src && (
@@ -106,6 +106,7 @@ export function GalleryMasonry({
 
       {/* ライトボックス */}
       <dialog
+        data-gallery-dialog
         ref={dialogRef}
         onClose={() => setOpenIndex(null)}
         onKeyDown={(e) => {

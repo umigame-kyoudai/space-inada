@@ -22,24 +22,24 @@ export default function FaqPage() {
       <JsonLd data={faqJsonLd(faqs)} />
       <Breadcrumbs items={[{ name: "よくある質問", path: "/faq" }]} />
 
-      <h1 className="cosmic-title mt-6 text-3xl font-bold sm:text-4xl">よくある質問</h1>
-      <p className="mt-4 max-w-2xl text-sm leading-relaxed text-zinc-400">
+      <h1 className="cosmic-title mt-6 text-3xl sm:text-4xl">よくある質問</h1>
+      <p className="mt-4 max-w-2xl text-sm leading-relaxed text-muted">
         天候、服装、お支払い、キャンセル、お子様の参加、送迎、納品方法についてお答えします。その他のご質問もお気軽にお問い合わせください。
       </p>
 
-      <div className="cosmic-panel mt-12 divide-y divide-teal-200/10 rounded-lg px-5">
+      <div className="cosmic-panel mt-12 divide-y divide-line rounded-lg px-5">
         {faqs.map((f) => (
           <details key={f.q} className="group py-5">
-            <summary className="flex cursor-pointer items-center justify-between gap-4 text-base font-semibold text-white">
+            <summary className="flex cursor-pointer items-center justify-between gap-4 text-base font-semibold text-ink">
               {f.q}
               <span
                 aria-hidden
-                className="text-teal-200 transition-transform group-open:rotate-45"
+                className="text-accent transition-transform group-open:rotate-45"
               >
                 ＋
               </span>
             </summary>
-            <p className="mt-3 text-sm leading-relaxed text-zinc-400">{f.a}</p>
+            <p className="mt-3 text-sm leading-relaxed text-muted">{f.a}</p>
           </details>
         ))}
       </div>

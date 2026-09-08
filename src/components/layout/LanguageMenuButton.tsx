@@ -79,9 +79,9 @@ export function LanguageMenuButton() {
         aria-haspopup="true"
         aria-expanded={open}
         aria-label={`Language / 言語: ${LOCALE_LABELS[current]}`}
-        className="flex h-10 items-center gap-1.5 rounded-lg border border-teal-200/15 bg-white/[0.03] px-2.5 text-sm font-semibold text-zinc-100 transition-colors hover:border-amber-200/50 hover:bg-white/10"
+        className="flex h-11 items-center gap-1.5 rounded px-2 text-sm font-semibold text-ink transition-colors hover:border-line hover:bg-mist"
       >
-        <span aria-hidden className="text-base leading-none">🌐</span>
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="1.3" /><ellipse cx="12" cy="12" rx="4" ry="9" stroke="currentColor" strokeWidth="1.3" /><path d="M3 12h18" stroke="currentColor" strokeWidth="1.3" /></svg>
         <span>{SHORT_LABEL[current]}</span>
       </button>
 
@@ -89,7 +89,7 @@ export function LanguageMenuButton() {
         <div
           role="menu"
           aria-label="Language / 言語"
-          className="absolute right-0 top-[calc(100%+8px)] z-[70] w-44 overflow-hidden rounded-xl border border-teal-200/15 bg-[#0a0e1a] shadow-2xl shadow-black/40"
+          className="absolute right-0 top-[calc(100%+8px)] z-[70] w-44 overflow-hidden rounded-xl border border-line bg-white shadow-2xl shadow-black/40"
         >
           {order.map((locale) => {
             const active = locale === current;
@@ -101,13 +101,13 @@ export function LanguageMenuButton() {
                 onClick={() => setOpen(false)}
                 className={`flex items-center justify-between gap-2 px-4 py-3 text-sm transition-colors ${
                   active
-                    ? "bg-teal-200/10 font-bold text-teal-200"
-                    : "text-zinc-200 hover:bg-white/5 hover:text-amber-100"
+                    ? "bg-mist font-bold text-accent"
+                    : "text-ink hover:bg-mist hover:text-accent"
                 }`}
               >
                 {LOCALE_LABELS[locale]}
                 {active && (
-                  <span aria-hidden className="text-teal-200">
+                  <span aria-hidden className="text-accent">
                     ✓
                   </span>
                 )}

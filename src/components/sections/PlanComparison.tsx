@@ -17,7 +17,7 @@ function PlanActions({ plan, compact = false }: { plan: Plan; compact?: boolean 
         data-ga-event="plan_click"
         data-ga-button="plan_comparison"
         data-ga-plan={plan.name}
-        className="inline-flex min-h-10 items-center justify-center rounded-lg border border-teal-200/25 bg-slate-950/35 px-2 font-semibold text-teal-100 transition-colors hover:border-teal-200/60 hover:bg-teal-300/10"
+        className="inline-flex min-h-10 items-center justify-center rounded-lg border border-line bg-mist px-2 font-semibold text-accent transition-colors hover:border-line hover:bg-mist"
       >
         詳細を見る
       </Link>
@@ -26,7 +26,7 @@ function PlanActions({ plan, compact = false }: { plan: Plan; compact?: boolean 
         data-ga-event="reservation_click"
         data-ga-button="plan_comparison"
         data-ga-plan={plan.name}
-        className="inline-flex min-h-10 items-center justify-center rounded-lg border border-amber-200/70 bg-amber-300 px-2 font-bold text-zinc-950 transition-colors hover:bg-teal-200"
+        className="inline-flex min-h-10 items-center justify-center rounded-lg border border-line bg-accent px-2 font-bold text-on-accent transition-colors hover:bg-accent-hover"
       >
         予約する
       </Link>
@@ -40,26 +40,26 @@ function MobileComparisonCard({ plan, index }: { plan: Plan; index: number }) {
   return (
     <article
       className={`cosmic-panel relative overflow-hidden rounded-2xl p-4 sm:p-5 ${
-        popular ? "border-amber-200/55 shadow-[0_18px_60px_rgba(251,191,36,0.1)]" : ""
+        popular ? "border-line shadow-none" : ""
       }`}
     >
       {popular && (
-        <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-amber-300 via-teal-200 to-amber-300" />
+        <div className="absolute inset-x-0 top-0 h-1 bg-accent" />
       )}
 
       <header className="flex items-start justify-between gap-3">
         <div className="min-w-0">
-          <p className="text-[10px] font-semibold tracking-[0.2em] text-teal-200/65">
+          <p className="text-[10px] font-semibold tracking-[0.2em] text-accent">
             PLAN {String(index + 1).padStart(2, "0")}
           </p>
-          <h3 className="mt-1 text-lg font-bold text-white">{plan.name}</h3>
+          <h3 className="mt-1 text-lg font-bold text-ink">{plan.name}</h3>
         </div>
         {plan.badge && (
           <span
             className={`shrink-0 rounded-full px-2.5 py-1 text-[10px] font-bold ${
               popular
-                ? "border border-amber-100/70 bg-amber-300 text-zinc-950"
-                : "border border-teal-200/20 bg-teal-300/10 text-teal-100"
+                ? "border border-line bg-accent text-on-accent"
+                : "border border-line bg-mist text-accent"
             }`}
           >
             {plan.badge}
@@ -67,49 +67,49 @@ function MobileComparisonCard({ plan, index }: { plan: Plan; index: number }) {
         )}
       </header>
 
-      <p className="mt-2 min-h-10 text-xs leading-relaxed text-zinc-400">
+      <p className="mt-2 min-h-10 text-xs leading-relaxed text-muted">
         {plan.tagline}
       </p>
 
-      <div className="mt-4 rounded-xl border border-amber-200/20 bg-amber-300/[0.07] px-4 py-3">
-        <p className="text-[10px] font-semibold tracking-[0.16em] text-amber-200/65">
+      <div className="mt-4 rounded-xl border border-line bg-mist px-4 py-3">
+        <p className="text-[10px] font-semibold tracking-[0.16em] text-accent">
           料金（税込）
         </p>
-        <p className="mt-1 text-xl font-bold text-amber-100">{planPriceLabel(plan)}</p>
-        <p className="mt-1 text-[10px] leading-relaxed text-zinc-500">
+        <p className="mt-1 text-xl font-bold text-accent">{planPriceLabel(plan)}</p>
+        <p className="mt-1 text-[10px] leading-relaxed text-muted">
           {plan.pricingDetail.slice(0, 2).join(" ／ ")}
         </p>
       </div>
 
       <dl className="mt-3 grid grid-cols-2 gap-2">
-        <div className="rounded-xl border border-white/10 bg-slate-950/35 p-3">
-          <dt className="text-[10px] text-zinc-500">撮影時間</dt>
-          <dd className="mt-1 text-base font-bold text-white">{durationLabel(plan)}</dd>
+        <div className="rounded-xl border border-line bg-mist p-3">
+          <dt className="text-[10px] text-muted">撮影時間</dt>
+          <dd className="mt-1 text-base font-bold text-ink">{durationLabel(plan)}</dd>
         </div>
-        <div className="rounded-xl border border-white/10 bg-slate-950/35 p-3">
-          <dt className="text-[10px] text-zinc-500">納品データ</dt>
-          <dd className="mt-1 text-sm font-bold leading-snug text-white">
+        <div className="rounded-xl border border-line bg-mist p-3">
+          <dt className="text-[10px] text-muted">納品データ</dt>
+          <dd className="mt-1 text-sm font-bold leading-snug text-ink">
             {plan.deliveryCount}
           </dd>
         </div>
       </dl>
 
-      <div className="mt-3 rounded-xl border border-teal-200/10 bg-teal-300/[0.05] p-3">
-        <p className="text-[10px] font-semibold tracking-[0.14em] text-teal-100/60">
+      <div className="mt-3 rounded-xl border border-line bg-mist p-3">
+        <p className="text-[10px] font-semibold tracking-[0.14em] text-accent">
           こんな方におすすめ
         </p>
         <div className="mt-2 flex flex-wrap gap-1.5">
           {plan.forWhom.map((item) => (
             <span
               key={item}
-              className="rounded-full border border-teal-200/15 bg-teal-300/10 px-2.5 py-1 text-[10px] font-medium text-teal-100"
+              className="rounded-full border border-line bg-mist px-2.5 py-1 text-[10px] font-medium text-accent"
             >
               {item}
             </span>
           ))}
         </div>
-        <p className="mt-3 border-t border-white/10 pt-3 text-xs leading-relaxed text-zinc-300">
-          <span className="mr-2 text-amber-300" aria-hidden>
+        <p className="mt-3 border-t border-line pt-3 text-xs leading-relaxed text-ink-soft">
+          <span className="mr-2 text-accent" aria-hidden>
             +
           </span>
           {plan.features[0]}
@@ -134,8 +134,8 @@ function DesktopCell({
 }) {
   return (
     <td
-      className={`border-l border-white/10 p-3 align-top ${
-        isPopular(plan) ? "bg-amber-300/[0.055]" : ""
+      className={`border-l border-line p-3 align-top ${
+        isPopular(plan) ? "bg-mist" : ""
       } ${className}`}
     >
       {children}
@@ -147,16 +147,16 @@ function DesktopCell({
 export function PlanComparison({ plans }: { plans: Plan[] }) {
   return (
     <section aria-label="プラン料金・内容比較">
-      <div className="mb-4 flex items-center gap-3 rounded-xl border border-amber-200/20 bg-amber-300/[0.06] px-4 py-3">
+      <div className="mb-4 flex items-center gap-3 rounded-xl border border-line bg-mist px-4 py-3">
         <span
           aria-hidden
-          className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-amber-300 text-sm font-black text-zinc-950"
+          className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-accent text-sm font-black text-on-accent"
         >
           1
         </span>
-        <p className="text-xs leading-relaxed text-zinc-300 sm:text-sm">
+        <p className="text-xs leading-relaxed text-ink-soft sm:text-sm">
           迷ったら、撮影時間30分・データ全て納品の
-          <strong className="mx-1 text-amber-100">スタンダードプラン</strong>
+          <strong className="mx-1 text-accent">スタンダードプラン</strong>
           がおすすめです。
         </p>
       </div>
@@ -179,33 +179,33 @@ export function PlanComparison({ plans }: { plans: Plan[] }) {
             ))}
           </colgroup>
           <thead>
-            <tr className="border-b border-teal-200/15">
-              <th scope="col" className="p-3 text-[10px] font-semibold text-zinc-500">
+            <tr className="border-b border-line">
+              <th scope="col" className="p-3 text-[10px] font-semibold text-muted">
                 比較項目
               </th>
               {plans.map((plan, index) => (
                 <th
                   key={plan.slug}
                   scope="col"
-                  className={`relative border-l border-white/10 p-3 align-top ${
-                    isPopular(plan) ? "bg-amber-300/[0.075]" : ""
+                  className={`relative border-l border-line p-3 align-top ${
+                    isPopular(plan) ? "bg-mist" : ""
                   }`}
                 >
                   {isPopular(plan) && (
-                    <span className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-amber-300 via-teal-200 to-amber-300" />
+                    <span className="absolute inset-x-0 top-0 h-1 bg-accent" />
                   )}
-                  <span className="block text-[9px] tracking-[0.18em] text-teal-200/55">
+                  <span className="block text-[9px] tracking-[0.18em] text-accent">
                     PLAN {String(index + 1).padStart(2, "0")}
                   </span>
-                  <span className="mt-1 block text-sm font-bold leading-snug text-white">
+                  <span className="mt-1 block text-sm font-bold leading-snug text-ink">
                     {plan.name}
                   </span>
                   {plan.badge && (
                     <span
                       className={`mt-2 inline-flex rounded-full px-2 py-0.5 text-[9px] font-bold ${
                         isPopular(plan)
-                          ? "bg-amber-300 text-zinc-950"
-                          : "border border-teal-200/15 bg-teal-300/10 text-teal-100"
+                          ? "bg-accent text-on-accent"
+                          : "border border-line bg-mist text-accent"
                       }`}
                     >
                       {plan.badge}
@@ -216,43 +216,43 @@ export function PlanComparison({ plans }: { plans: Plan[] }) {
             </tr>
           </thead>
           <tbody>
-            <tr className="border-b border-white/10">
-              <th scope="row" className="p-3 font-medium text-zinc-500">
+            <tr className="border-b border-line">
+              <th scope="row" className="p-3 font-medium text-muted">
                 料金
                 <span className="mt-0.5 block text-[9px] font-normal">税込</span>
               </th>
               {plans.map((plan) => (
                 <DesktopCell key={plan.slug} plan={plan}>
-                  <strong className="text-sm leading-snug text-amber-100">
+                  <strong className="text-sm leading-snug text-accent">
                     {planPriceLabel(plan)}
                   </strong>
                 </DesktopCell>
               ))}
             </tr>
-            <tr className="border-b border-white/10">
-              <th scope="row" className="p-3 font-medium text-zinc-500">
+            <tr className="border-b border-line">
+              <th scope="row" className="p-3 font-medium text-muted">
                 撮影時間
               </th>
               {plans.map((plan) => (
                 <DesktopCell key={plan.slug} plan={plan}>
-                  <strong className="text-sm text-white">{durationLabel(plan)}</strong>
+                  <strong className="text-sm text-ink">{durationLabel(plan)}</strong>
                 </DesktopCell>
               ))}
             </tr>
-            <tr className="border-b border-white/10">
-              <th scope="row" className="p-3 font-medium text-zinc-500">
+            <tr className="border-b border-line">
+              <th scope="row" className="p-3 font-medium text-muted">
                 納品
               </th>
               {plans.map((plan) => (
                 <DesktopCell key={plan.slug} plan={plan}>
-                  <span className="font-semibold leading-relaxed text-zinc-200">
+                  <span className="font-semibold leading-relaxed text-ink">
                     {plan.deliveryCount}
                   </span>
                 </DesktopCell>
               ))}
             </tr>
-            <tr className="border-b border-white/10">
-              <th scope="row" className="p-3 font-medium text-zinc-500">
+            <tr className="border-b border-line">
+              <th scope="row" className="p-3 font-medium text-muted">
                 おすすめ
               </th>
               {plans.map((plan) => (
@@ -261,7 +261,7 @@ export function PlanComparison({ plans }: { plans: Plan[] }) {
                     {plan.forWhom.map((item) => (
                       <span
                         key={item}
-                        className="rounded-full border border-teal-200/15 bg-teal-300/10 px-2 py-1 text-[9px] leading-none text-teal-100"
+                        className="rounded-full border border-line bg-mist px-2 py-1 text-[9px] leading-none text-accent"
                       >
                         {item}
                       </span>
@@ -270,14 +270,14 @@ export function PlanComparison({ plans }: { plans: Plan[] }) {
                 </DesktopCell>
               ))}
             </tr>
-            <tr className="border-b border-white/10">
-              <th scope="row" className="p-3 font-medium text-zinc-500">
+            <tr className="border-b border-line">
+              <th scope="row" className="p-3 font-medium text-muted">
                 主な内容
               </th>
               {plans.map((plan) => (
                 <DesktopCell key={plan.slug} plan={plan}>
-                  <p className="leading-relaxed text-zinc-300">
-                    <span className="mr-1.5 text-amber-300" aria-hidden>
+                  <p className="leading-relaxed text-ink-soft">
+                    <span className="mr-1.5 text-accent" aria-hidden>
                       +
                     </span>
                     {plan.features[0]}
@@ -286,7 +286,7 @@ export function PlanComparison({ plans }: { plans: Plan[] }) {
               ))}
             </tr>
             <tr>
-              <th scope="row" className="p-3 font-medium text-zinc-500">
+              <th scope="row" className="p-3 font-medium text-muted">
                 選ぶ
               </th>
               {plans.map((plan) => (

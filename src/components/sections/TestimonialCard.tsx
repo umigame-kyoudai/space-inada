@@ -4,9 +4,9 @@ import type { Testimonial } from "@/data/testimonials";
 
 function Stars({ rating }: { rating: number }) {
   return (
-    <span className="text-amber-200" aria-label={`5段階中${rating}`}>
+    <span className="text-accent" aria-label={`5段階中${rating}`}>
       {"★".repeat(rating)}
-      <span className="text-zinc-600">{"★".repeat(5 - rating)}</span>
+      <span className="text-muted">{"★".repeat(5 - rating)}</span>
     </span>
   );
 }
@@ -20,16 +20,16 @@ export function TestimonialCard({ testimonial }: { testimonial: Testimonial }) {
         {plan && (
           <Link
             href={`/plans/${plan.slug}`}
-            className="rounded-md border border-teal-200/15 bg-teal-300/10 px-2.5 py-0.5 text-xs text-teal-200 hover:border-amber-200/50 hover:text-amber-100"
+            className="rounded-md border border-line bg-mist px-2.5 py-0.5 text-xs text-accent hover:border-line hover:text-accent"
           >
             {plan.name}
           </Link>
         )}
       </div>
-      <blockquote className="mt-4 flex-1 text-sm leading-relaxed text-zinc-300">
+      <blockquote className="mt-4 flex-1 text-sm leading-relaxed text-ink-soft">
         {testimonial.body}
       </blockquote>
-      <figcaption className="mt-5 text-xs text-zinc-500">
+      <figcaption className="mt-5 text-xs text-muted">
         {testimonial.name}・{testimonial.area}
       </figcaption>
     </figure>

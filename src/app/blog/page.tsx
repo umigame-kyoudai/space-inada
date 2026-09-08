@@ -38,8 +38,8 @@ export default function BlogPage() {
       <JsonLd data={blogJsonLd} />
       <Breadcrumbs items={[{ name: "コラム", path: "/blog" }]} />
 
-      <h1 className="cosmic-title mt-6 text-3xl font-bold sm:text-4xl">星空フォトコラム</h1>
-      <p className="mt-4 max-w-2xl text-sm leading-relaxed text-zinc-400">
+      <h1 className="cosmic-title mt-6 text-3xl sm:text-4xl">星空フォトコラム</h1>
+      <p className="mt-4 max-w-2xl text-sm leading-relaxed text-muted">
         宮古島で星空を楽しむ・撮るための知識を発信。見頃の時期や天の川、プロポーズ撮影、夜観光まで、撮影のプロがお届けします。
       </p>
 
@@ -58,11 +58,11 @@ export default function BlogPage() {
               />
             </div>
             <div className="flex flex-1 flex-col p-6">
-              <time className="text-xs text-zinc-500">{post.publishedAt}</time>
-              <h2 className="mt-2 text-lg font-bold text-white group-hover:text-teal-100">
+              <time className="text-xs text-muted">{post.publishedAt}</time>
+              <h2 className="mt-2 text-lg font-bold text-ink group-hover:text-accent">
                 {post.title}
               </h2>
-              <p className="mt-3 flex-1 text-sm leading-relaxed text-zinc-400">
+              <p className="mt-3 flex-1 text-sm leading-relaxed text-muted">
                 {post.excerpt}
               </p>
             </div>

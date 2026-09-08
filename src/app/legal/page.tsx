@@ -90,15 +90,15 @@ export default function LegalPage() {
     <Section>
       <Breadcrumbs items={[{ name: "特定商取引法に基づく表記", path: "/legal" }]} />
 
-      <h1 className="cosmic-title mt-6 text-3xl font-bold sm:text-4xl">
+      <h1 className="cosmic-title mt-6 text-3xl sm:text-4xl">
         特定商取引法に基づく表記
       </h1>
 
-      <dl className="cosmic-panel mt-12 divide-y divide-teal-200/10 rounded-lg px-5 text-sm">
+      <dl className="cosmic-panel mt-12 divide-y divide-line rounded-lg px-5 text-sm">
         {rows.map((row) => (
           <div key={row.term} className="grid gap-1 py-5 sm:grid-cols-[14rem_1fr] sm:gap-6">
-            <dt className="font-semibold text-zinc-200">{row.term}</dt>
-            <dd className="leading-relaxed text-zinc-400">{row.desc}</dd>
+            <dt className="font-semibold text-ink">{row.term}</dt>
+            <dd className="leading-relaxed text-muted">{row.desc}</dd>
           </div>
         ))}
       </dl>

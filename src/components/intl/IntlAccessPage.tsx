@@ -11,23 +11,23 @@ export function IntlAccessPage({ locale }: { locale: Locale }) {
 
   return (
     <Section>
-      <h1 className="cosmic-title mt-6 text-3xl font-bold sm:text-4xl">{a.title}</h1>
-      <p className="mt-4 max-w-2xl text-sm leading-relaxed text-zinc-400">{a.lead}</p>
+      <h1 className="cosmic-title mt-6 text-3xl sm:text-4xl">{a.title}</h1>
+      <p className="mt-4 max-w-2xl text-sm leading-relaxed text-muted">{a.lead}</p>
 
       <dl className="mt-8 grid gap-4 sm:grid-cols-3">
         <div className="cosmic-panel rounded-xl p-5">
-          <dt className="text-xs text-zinc-500">{a.areaLabel}</dt>
-          <dd className="mt-1 text-base font-semibold text-white">{siteConfig.contact.areaServed}</dd>
+          <dt className="text-xs text-muted">{a.areaLabel}</dt>
+          <dd className="mt-1 text-base font-semibold text-ink">{siteConfig.contact.areaServed}</dd>
         </div>
         <div className="cosmic-panel rounded-xl p-5">
-          <dt className="text-xs text-zinc-500">{a.hoursLabel}</dt>
-          <dd className="mt-1 text-base font-semibold text-white">{siteConfig.hours.label}</dd>
-          <p className="mt-1 text-xs text-zinc-500">{siteConfig.hours.description}</p>
+          <dt className="text-xs text-muted">{a.hoursLabel}</dt>
+          <dd className="mt-1 text-base font-semibold text-ink">{siteConfig.hours.label}</dd>
+          <p className="mt-1 text-xs text-muted">{siteConfig.hours.description}</p>
         </div>
         <div className="cosmic-panel rounded-xl p-5">
-          <dt className="text-xs text-zinc-500">{a.bookingLabel}</dt>
-          <dd className="mt-1 text-base font-semibold text-white">{a.bookingValue}</dd>
-          <p className="mt-1 text-xs text-zinc-500">{a.bookingNote}</p>
+          <dt className="text-xs text-muted">{a.bookingLabel}</dt>
+          <dd className="mt-1 text-base font-semibold text-ink">{a.bookingValue}</dd>
+          <p className="mt-1 text-xs text-muted">{a.bookingNote}</p>
         </div>
       </dl>
 
@@ -41,7 +41,7 @@ export function IntlAccessPage({ locale }: { locale: Locale }) {
             className="absolute inset-0 h-full w-full"
           />
         </div>
-        <p className="mt-3 text-xs text-zinc-500">
+        <p className="mt-3 text-xs text-muted">
           {a.mapNote}{" "}
           <a href={mapLink()} target="_blank" rel="noopener noreferrer" className="cosmic-link underline">
             {a.mapOpenLink}
@@ -51,31 +51,31 @@ export function IntlAccessPage({ locale }: { locale: Locale }) {
 
       <div className="mt-12 space-y-12">
         <section>
-          <h2 className="text-2xl font-bold text-teal-100">{a.meetingTitle}</h2>
-          <p className="mt-4 leading-relaxed text-zinc-300">{a.meetingText}</p>
+          <h2 className="text-2xl font-bold text-accent">{a.meetingTitle}</h2>
+          <p className="mt-4 leading-relaxed text-ink-soft">{a.meetingText}</p>
         </section>
 
         <section id="shooting-locations" className="scroll-mt-28">
           <div className="flex flex-wrap items-end justify-between gap-3">
             <div>
-              <p className="text-xs font-semibold tracking-[0.18em] text-amber-200">{a.locationsKicker}</p>
-              <h2 className="mt-2 text-2xl font-bold text-teal-100">{a.locationsTitle}</h2>
+              <p className="text-xs font-semibold tracking-[0.18em] text-accent">{a.locationsKicker}</p>
+              <h2 className="mt-2 text-2xl font-bold text-accent">{a.locationsTitle}</h2>
             </div>
-            <span className="rounded-full border border-teal-200/20 bg-teal-200/[0.07] px-3 py-1 text-xs text-teal-100">
+            <span className="rounded-full border border-line bg-mist px-3 py-1 text-xs text-accent">
               {a.locationsBadge}
             </span>
           </div>
-          <p className="mt-4 max-w-3xl leading-relaxed text-zinc-300">{a.locationsLead}</p>
+          <p className="mt-4 max-w-3xl leading-relaxed text-ink-soft">{a.locationsLead}</p>
           <div className="mt-6 grid gap-4 sm:grid-cols-3">
             {shootingLocations.map((location, index) => (
               <article key={location.name} className="cosmic-panel rounded-xl p-5">
                 <div className="flex items-center justify-between gap-3">
-                  <span className="flex h-8 w-8 items-center justify-center rounded-full bg-amber-300 text-sm font-black text-zinc-950">
+                  <span className="flex h-8 w-8 items-center justify-center rounded-full bg-accent text-sm font-black text-on-accent">
                     {index + 1}
                   </span>
-                  <span className="text-[11px] text-zinc-500">{a.locationCandidateLabel}</span>
+                  <span className="text-[11px] text-muted">{a.locationCandidateLabel}</span>
                 </div>
-                <h3 className="mt-5 text-lg font-bold text-white">{location.name}</h3>
+                <h3 className="mt-5 text-lg font-bold text-ink">{location.name}</h3>
                 <a
                   href={location.mapUrl}
                   target="_blank"
@@ -88,20 +88,20 @@ export function IntlAccessPage({ locale }: { locale: Locale }) {
               </article>
             ))}
           </div>
-          <div className="mt-5 rounded-xl border border-amber-200/25 bg-amber-300/[0.07] p-4">
-            <p className="text-sm font-bold text-amber-100">{a.finalNoticeTitle}</p>
-            <p className="mt-1 text-sm leading-relaxed text-zinc-300">{a.finalNoticeText}</p>
+          <div className="mt-5 rounded-xl border border-line bg-mist p-4">
+            <p className="text-sm font-bold text-accent">{a.finalNoticeTitle}</p>
+            <p className="mt-1 text-sm leading-relaxed text-ink-soft">{a.finalNoticeText}</p>
           </div>
         </section>
 
         <section>
-          <h2 className="text-2xl font-bold text-teal-100">{a.whyTitle}</h2>
-          <p className="mt-4 leading-relaxed text-zinc-300">{a.whyText}</p>
+          <h2 className="text-2xl font-bold text-accent">{a.whyTitle}</h2>
+          <p className="mt-4 leading-relaxed text-ink-soft">{a.whyText}</p>
         </section>
 
         <section>
-          <h2 className="text-2xl font-bold text-teal-100">{a.transferTitle}</h2>
-          <p className="mt-4 leading-relaxed text-zinc-300">{a.transferText}</p>
+          <h2 className="text-2xl font-bold text-accent">{a.transferTitle}</h2>
+          <p className="mt-4 leading-relaxed text-ink-soft">{a.transferText}</p>
         </section>
       </div>
 

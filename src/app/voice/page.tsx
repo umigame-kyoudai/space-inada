@@ -41,13 +41,13 @@ export default function VoicePage() {
       )}
       <Breadcrumbs items={[{ name: "お客様の声", path: "/voice" }]} />
 
-      <h1 className="cosmic-title mt-6 text-3xl font-bold sm:text-4xl">
+      <h1 className="cosmic-title mt-6 text-3xl sm:text-4xl">
         お客様の声・口コミ
       </h1>
 
       {testimonials.length > 0 ? (
         <>
-          <p className="mt-4 max-w-2xl text-sm leading-relaxed text-zinc-400">
+          <p className="mt-4 max-w-2xl text-sm leading-relaxed text-muted">
             宮古島の星空フォトをご利用いただいた皆さまの感想です。プロポーズや記念日、家族旅行など、それぞれの大切な瞬間をお手伝いしました。
           </p>
 
@@ -58,7 +58,7 @@ export default function VoicePage() {
           </div>
         </>
       ) : (
-        <p className="mt-4 max-w-2xl text-sm leading-relaxed text-zinc-400">
+        <p className="mt-4 max-w-2xl text-sm leading-relaxed text-muted">
           撮影にご参加いただいたお客様の声を、順次こちらでご紹介していきます。撮影の雰囲気は、撮影ギャラリーやInstagramでもご覧いただけます。
         </p>
       )}

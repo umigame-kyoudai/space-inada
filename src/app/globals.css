@@ -1,707 +1,337 @@
 @import "tailwindcss";
 
 @theme inline {
-  --font-sans: var(--font-sans);
+  --font-sans: var(--font-body);
+  --font-serif: var(--font-display);
+  --color-paper: #f5f7f5;
+  --color-mist: #eaf0ed;
+  --color-line: #d8e1dc;
+  --color-ink: #213b40;
+  --color-ink-soft: #415958;
+  --color-muted: #627472;
+  --color-accent: #315e59;
+  --color-accent-hover: #234e49;
+  --color-night: #102b32;
+  --color-on-accent: #ffffff;
+  --color-on-photo: #ffffff;
 }
 
-html {
-  scroll-behavior: smooth;
-}
-
-/* ───────── 日本語の改行を自然に整える ─────────
-   - auto-phrase: 文節単位で改行（「カップル」等の語中分断を防ぐ。対応外ブラウザは無視＝無害）
-   - line-break: strict: 小書き仮名や約物の前で不自然に折り返さない
-   - 見出しは balance で行幅を均等化、本文は pretty で行末の孤立文字を防ぐ */
-body {
-  word-break: auto-phrase;
-  line-break: strict;
-}
-h1,
-h2,
-h3,
-h4 {
-  text-wrap: balance;
-}
-p,
-li,
-blockquote,
-figcaption {
-  text-wrap: pretty;
-}
-
-/* 星空背景は静的に描画する。
-   以前は background-position の無限アニメ（star-drift）で流していたが、
-   ページ全体の再ペイントが常時走り、モバイルでの発熱・電池消費と
-   スクロールのカクつきの原因になるため停止した（星の動きはヒーロー内の
-   オーロラ・流星などコンポジタで済む装飾に集約）。 */
-body {
-  font-family: var(--font-sans), -apple-system, "Hiragino Kaku Gothic ProN",
-    "Yu Gothic", Meiryo, sans-serif;
-  background-color: #03040a;
-  background-image:
-    linear-gradient(115deg, rgba(45, 212, 191, 0.1), transparent 32%),
-    linear-gradient(245deg, rgba(244, 114, 182, 0.08), transparent 36%),
-    radial-gradient(circle, rgba(255, 255, 255, 0.5) 0 1px, transparent 1.7px),
-    radial-gradient(circle, rgba(251, 191, 36, 0.35) 0 1px, transparent 1.6px),
-    radial-gradient(circle, rgba(94, 234, 212, 0.25) 0 1px, transparent 1.5px);
-  background-position:
-    0 0,
-    100% 0,
-    18px 32px,
-    72px 112px,
-    136px 58px;
-  background-size:
-    100% 100%,
-    100% 100%,
-    180px 180px,
-    240px 240px,
-    320px 320px;
-}
-
-::selection {
-  background: rgba(45, 212, 191, 0.35);
-  color: #fff;
-}
-
-.cosmic-page {
-  min-height: 100%;
-  background:
-    linear-gradient(180deg, rgba(3, 4, 10, 0.08), rgba(3, 4, 10, 0.72) 42%, #03040a),
-    repeating-linear-gradient(
-      90deg,
-      rgba(148, 163, 184, 0.04) 0,
-      rgba(148, 163, 184, 0.04) 1px,
-      transparent 1px,
-      transparent 96px
-    ),
-    repeating-linear-gradient(
-      0deg,
-      rgba(148, 163, 184, 0.035) 0,
-      rgba(148, 163, 184, 0.035) 1px,
-      transparent 1px,
-      transparent 96px
-    );
-  background-color: #03040a;
-}
-
-.cosmic-section {
-  position: relative;
-  /* clip にする理由: hidden はスクロールコンテナ扱いになり、
-     子孫の position: sticky（予約フォームのプレビュー等）が効かなくなる。
-     clip なら装飾のはみ出しは切りつつ sticky はビューポート基準で動く。 */
-  overflow: clip;
-}
-
-.cosmic-section::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  background:
-    linear-gradient(120deg, transparent 0 32%, rgba(94, 234, 212, 0.06) 44%, transparent 58%),
-    linear-gradient(78deg, transparent 0 64%, rgba(251, 191, 36, 0.05) 74%, transparent 86%);
-  opacity: 0.85;
-  /* 全セクション同時の無限アニメは描画コストが嵩むため静的表示にする
-     （動く装飾はヒーロー内に集約） */
-}
-
-.cosmic-section::after {
-  content: "";
-  position: absolute;
-  inset: 4% 0;
-  pointer-events: none;
-  background:
-    radial-gradient(circle at 12% 28%, rgba(255, 255, 255, 0.72) 0 1px, transparent 1.8px),
-    radial-gradient(circle at 36% 72%, rgba(94, 234, 212, 0.55) 0 1px, transparent 1.8px),
-    radial-gradient(circle at 68% 18%, rgba(252, 211, 77, 0.5) 0 1px, transparent 1.8px),
-    radial-gradient(circle at 88% 62%, rgba(255, 255, 255, 0.62) 0 1px, transparent 1.8px);
-  opacity: 0.26;
-}
-
-.cosmic-section > * {
-  position: relative;
-  z-index: 1;
-}
-
-.cosmic-band {
-  background:
-    linear-gradient(180deg, rgba(5, 8, 20, 0.98), rgba(3, 4, 10, 0.94)),
-    repeating-linear-gradient(
-      90deg,
-      rgba(94, 234, 212, 0.045) 0,
-      rgba(94, 234, 212, 0.045) 1px,
-      transparent 1px,
-      transparent 112px
-    );
-  background-color: #050814;
-}
-
-.cosmic-panel {
-  border: 1px solid rgba(148, 163, 184, 0.18);
-  /* backdrop-filter: blur() は多数のパネルで同時に使うとモバイルGPUの負荷が
-     大きい。背面はほぼ一様な暗色背景なので、不透明度を少し上げた
-     グラデーションでガラス感を再現し blur は使わない（blurはヘッダーのみ）。 */
-  background:
-    linear-gradient(180deg, rgba(15, 23, 42, 0.86), rgba(8, 13, 26, 0.8)),
-    linear-gradient(135deg, rgba(45, 212, 191, 0.08), rgba(251, 191, 36, 0.04) 42%, rgba(244, 114, 182, 0.06));
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.07),
-    0 18px 60px rgba(0, 0, 0, 0.28);
-}
-
-.cosmic-panel-hover {
-  transition:
-    border-color 180ms ease,
-    background 180ms ease,
-    transform 180ms ease,
-    box-shadow 180ms ease;
-}
-
-.cosmic-panel-hover:hover {
-  border-color: rgba(94, 234, 212, 0.5);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.1),
-    0 22px 70px rgba(13, 148, 136, 0.18);
-  transform: translateY(-2px);
-}
-
-.cosmic-progress {
-  transform-origin: left center;
-  background: linear-gradient(90deg, #fcd34d, #5eead4, #f9a8d4);
-  box-shadow: 0 0 18px rgba(94, 234, 212, 0.42);
-}
-
-.cosmic-kicker {
-  color: #fcd34d;
-  text-shadow: 0 0 18px rgba(251, 191, 36, 0.42);
-}
-
-.cosmic-title {
-  color: #fff;
-  text-shadow:
-    0 0 22px rgba(94, 234, 212, 0.22),
-    0 0 44px rgba(251, 191, 36, 0.12);
-}
-
-.cosmic-aurora-stage {
-  position: absolute;
-  inset: 0;
-  z-index: 2;
-  overflow: hidden;
-  pointer-events: none;
-  mix-blend-mode: screen;
-}
-
-.cosmic-aurora {
-  position: absolute;
-  width: 75vw;
-  height: 38vh;
-  border-radius: 50%;
-  filter: blur(46px);
-  opacity: 0.16;
-  will-change: transform, opacity;
-}
-
-.cosmic-aurora-one {
-  --aurora-start-angle: -13deg;
-  --aurora-end-angle: -6deg;
-  left: -18%;
-  top: 13%;
-  background: linear-gradient(105deg, transparent 8%, rgba(45, 212, 191, 0.58), rgba(56, 189, 248, 0.2) 64%, transparent 88%);
-  transform: rotate(var(--aurora-start-angle));
-  animation: aurora-conduct 16s ease-in-out infinite alternate;
-}
-
-.cosmic-aurora-two {
-  --aurora-start-angle: 11deg;
-  --aurora-end-angle: 5deg;
-  right: -22%;
-  top: 27%;
-  background: linear-gradient(75deg, transparent 4%, rgba(244, 114, 182, 0.25), rgba(252, 211, 77, 0.38) 58%, transparent 88%);
-  transform: rotate(var(--aurora-start-angle));
-  animation: aurora-conduct 20s ease-in-out -7s infinite alternate-reverse;
-}
-
-.cosmic-viewfinder {
-  position: absolute;
-  inset: 10% 7%;
-  z-index: 4;
-  pointer-events: none;
-  opacity: 0.38;
-}
-
-.cosmic-viewfinder-corner {
-  position: absolute;
-  width: clamp(2rem, 5vw, 4.5rem);
-  height: clamp(2rem, 5vw, 4.5rem);
-  border-color: rgba(255, 255, 255, 0.38);
-}
-
-.cosmic-viewfinder-tl {
-  left: 0;
-  top: 0;
-  border-left: 1px solid;
-  border-top: 1px solid;
-}
-
-.cosmic-viewfinder-tr {
-  right: 0;
-  top: 0;
-  border-right: 1px solid;
-  border-top: 1px solid;
-}
-
-.cosmic-viewfinder-bl {
-  bottom: 0;
-  left: 0;
-  border-bottom: 1px solid;
-  border-left: 1px solid;
-}
-
-.cosmic-viewfinder-br {
-  bottom: 0;
-  right: 0;
-  border-bottom: 1px solid;
-  border-right: 1px solid;
-}
-
-.cosmic-focus-ring {
-  position: absolute;
-  left: 50%;
-  top: 48%;
-  width: clamp(4.5rem, 11vw, 8rem);
-  aspect-ratio: 1;
-  border: 1px solid rgba(94, 234, 212, 0.48);
-  border-left-color: rgba(252, 211, 77, 0.7);
-  border-radius: 50%;
-  box-shadow:
-    0 0 32px rgba(94, 234, 212, 0.12),
-    inset 0 0 24px rgba(94, 234, 212, 0.08);
-  transform: translate(-50%, -50%);
-  animation: focus-lock 7s ease-in-out infinite;
-}
-
-.cosmic-focus-dot {
-  position: absolute;
-  left: 50%;
-  top: 48%;
-  width: 4px;
-  height: 4px;
-  border-radius: 50%;
-  background: #fde68a;
-  box-shadow: 0 0 16px rgba(252, 211, 77, 0.85);
-  transform: translate(-50%, -50%);
-  animation: focus-dot 7s ease-in-out infinite;
-}
-
-.cosmic-score {
-  position: absolute;
-  inset: 17% -3% auto;
-  z-index: 3;
-  width: 106%;
-  height: 48%;
-  pointer-events: none;
-  overflow: visible;
-  opacity: 0.44;
-}
-
-.cosmic-score-line {
-  fill: none;
-  stroke-width: 1.15;
-  stroke-linecap: round;
-  stroke-dasharray: 0.08 0.035;
-  vector-effect: non-scaling-stroke;
-  animation: score-flow 16s linear infinite;
-}
-
-.cosmic-score-line-one {
-  stroke: rgba(94, 234, 212, 0.44);
-}
-
-.cosmic-score-line-two {
-  stroke: rgba(252, 211, 77, 0.32);
-  animation-direction: reverse;
-  animation-duration: 21s;
-}
-
-.cosmic-score-note {
-  fill: #fff;
-  filter: drop-shadow(0 0 8px rgba(94, 234, 212, 0.9));
-  transform-box: fill-box;
-  transform-origin: center;
-  animation: star-note 4.8s ease-in-out infinite;
-}
-
-.cosmic-score-note.note-two {
-  animation-delay: -1s;
-  fill: #fde68a;
-}
-
-.cosmic-score-note.note-three {
-  animation-delay: -2.1s;
-}
-
-.cosmic-score-note.note-four {
-  animation-delay: -3.2s;
-  fill: #99f6e4;
-}
-
-.cosmic-score-note.note-five {
-  animation-delay: -4s;
-}
-
-.cosmic-meteor {
-  position: absolute;
-  z-index: 4;
-  height: 1px;
-  width: 11rem;
-  border-radius: 999px;
-  background: linear-gradient(90deg, transparent, rgba(94, 234, 212, 0.9), rgba(252, 211, 77, 0.8), transparent);
-  filter: drop-shadow(0 0 10px rgba(94, 234, 212, 0.45));
-  opacity: 0;
-  transform: translate3d(0, 0, 0) rotate(-13deg);
-  animation: meteor-flight 9s linear infinite;
-}
-
-.cosmic-meteor-one {
-  left: 9%;
-  top: 22%;
-}
-
-.cosmic-meteor-two {
-  right: 3%;
-  top: 40%;
-  animation-delay: 3.4s;
-  animation-duration: 11s;
-}
-
-.cosmic-meteor-three {
-  left: 42%;
-  bottom: 19%;
-  animation-delay: 6.2s;
-  animation-duration: 12s;
-}
-
-.cosmic-orbit-map {
-  position: absolute;
-  inset: 9% 8%;
-  z-index: 3;
-  pointer-events: none;
-  opacity: 0.35;
-}
-
-.cosmic-orbit-map::before,
-.cosmic-orbit-map::after {
-  content: "";
-  position: absolute;
-  inset: 14% 18%;
-  border: 1px solid rgba(94, 234, 212, 0.18);
-  border-left-color: transparent;
-  border-right-color: transparent;
-  transform: rotate(-8deg);
-  animation: orbit-breathe 10s ease-in-out infinite;
-}
-
-.cosmic-orbit-map::after {
-  inset: 24% 7%;
-  border-color: rgba(252, 211, 77, 0.14);
-  border-top-color: transparent;
-  transform: rotate(13deg);
-  animation-delay: -4s;
-}
-
-.cosmic-link {
-  color: #5eead4;
-  transition: color 160ms ease, text-shadow 160ms ease;
-}
-
-.cosmic-link:hover {
-  color: #fde68a;
-  text-shadow: 0 0 16px rgba(251, 191, 36, 0.35);
-}
-
-.cosmic-photo-stage::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  background:
-    radial-gradient(circle at 72% 22%, rgba(255, 255, 255, 0.58) 0 1px, transparent 1.8px),
-    radial-gradient(circle at 24% 64%, rgba(94, 234, 212, 0.48) 0 1px, transparent 1.8px);
-  opacity: 0.35;
-  animation: photo-stars 5.5s ease-in-out infinite;
-}
-
-.cosmic-shutter-scan {
-  position: absolute;
-  inset: -20% auto -20% -45%;
-  width: 32%;
-  pointer-events: none;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), rgba(94, 234, 212, 0.14), transparent);
-  filter: blur(5px);
-  /* left をアニメすると毎フレームレイアウトが走るため transform で流す */
-  transform: translateX(0) skewX(-14deg);
-  opacity: 0;
-  animation: shutter-scan 8s ease-in-out infinite;
-}
-
-.cosmic-image-placeholder {
-  position: relative;
-  overflow: hidden;
-  background:
-    linear-gradient(130deg, rgba(8, 13, 26, 0.96), rgba(20, 30, 58, 0.86) 46%, rgba(6, 12, 24, 0.96)),
-    radial-gradient(circle, rgba(255, 255, 255, 0.58) 0 1px, transparent 1.8px),
-    radial-gradient(circle, rgba(94, 234, 212, 0.32) 0 1px, transparent 1.7px),
-    radial-gradient(circle, rgba(251, 191, 36, 0.3) 0 1px, transparent 1.7px);
-  background-position: 0 0, 18px 22px, 76px 94px, 138px 48px;
-  background-size: 100% 100%, 150px 150px, 220px 220px, 280px 280px;
-}
-
-.cosmic-image-placeholder::before {
-  content: "";
-  position: absolute;
-  inset: 14%;
-  border: 1px solid rgba(94, 234, 212, 0.22);
-  border-left-color: transparent;
-  border-right-color: transparent;
-  transform: rotate(-11deg);
-}
-
-.cosmic-image-placeholder::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background:
-    linear-gradient(115deg, transparent 0 43%, rgba(255, 255, 255, 0.1) 49%, transparent 55%),
-    linear-gradient(180deg, transparent, rgba(0, 0, 0, 0.34));
-}
-
-.cosmic-rule {
-  border-color: rgba(148, 163, 184, 0.16);
-}
-
-.reveal-up {
-  position: relative;
-}
-
-.delay-100 {
-  animation-delay: 100ms;
-}
-
-.delay-200 {
-  animation-delay: 200ms;
-}
-
-.delay-300 {
-  animation-delay: 300ms;
-}
-
-.delay-400 {
-  animation-delay: 400ms;
-}
-
-.mission-line {
-  position: relative;
-}
-
-.mission-line::before {
-  content: "";
-  position: absolute;
-  bottom: 0;
-  left: 1rem;
-  top: 2.5rem;
-  width: 1px;
-  background: linear-gradient(180deg, rgba(252, 211, 77, 0.7), rgba(94, 234, 212, 0.18), transparent);
-}
-
-@media (min-width: 640px) {
-  .mission-line::before {
-    left: 50%;
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 8rem;
+    color-scheme: light;
+  }
+  body {
+    background: var(--color-paper);
+    color: var(--color-ink);
+    font-family: var(--font-body), "Hiragino Kaku Gothic ProN", sans-serif;
+    word-break: auto-phrase;
+    line-break: strict;
+  }
+  h1,
+  h2,
+  h3,
+  h4 {
+    text-wrap: balance;
+  }
+  p,
+  li,
+  blockquote,
+  figcaption {
+    text-wrap: pretty;
+  }
+  button,
+  summary {
+    -webkit-tap-highlight-color: transparent;
+  }
+  button:not(:disabled),
+  summary {
+    cursor: pointer;
+  }
+  summary {
+    list-style: none;
+  }
+  summary::-webkit-details-marker {
+    display: none;
+  }
+  input,
+  select,
+  textarea {
+    accent-color: var(--color-accent);
+  }
+  ::selection {
+    background: #c9ded6;
+    color: var(--color-ink);
+  }
+  :focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 5px;
+  }
+  dialog[data-gallery-dialog] :focus-visible {
+    outline-color: white;
   }
 }
 
-@supports (animation-timeline: view()) {
+@layer components {
+  .site-container {
+    width: 100%;
+    max-width: 1240px;
+    margin-inline: auto;
+    padding-inline: clamp(1.25rem, 4.5vw, 4rem);
+  }
+  .cosmic-page {
+    min-height: 100vh;
+  }
+  .cosmic-section {
+    position: relative;
+    padding-block: clamp(3.5rem, 7vw, 6rem);
+  }
+  .cosmic-band {
+    background: var(--color-mist);
+  }
+  .cosmic-panel {
+    border: 1px solid var(--color-line);
+    background: white;
+  }
+  .cosmic-panel-hover {
+    transition:
+      border-color 220ms ease,
+      transform 220ms ease;
+  }
+  .cosmic-panel-hover:hover {
+    border-color: #9bb4a8;
+    transform: translateY(-3px);
+  }
+  .cosmic-rule {
+    border-color: var(--color-line);
+  }
+  .cosmic-progress {
+    background: var(--color-accent);
+    transform-origin: left;
+  }
+  .cosmic-title {
+    color: var(--color-ink);
+    font-family: var(--font-display), serif;
+    font-weight: 500;
+    line-height: 1.55;
+  }
+  .cosmic-kicker,
+  .eyebrow {
+    color: var(--color-accent);
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.22em;
+    line-height: 1.8;
+  }
+  .cosmic-link {
+    color: var(--color-accent);
+    transition: color 160ms ease;
+  }
+  .cosmic-link:hover {
+    color: var(--color-ink);
+  }
+  .cosmic-image-placeholder {
+    background: var(--color-mist);
+  }
   .reveal-up {
-    animation: reveal-up both;
-    animation-timeline: view();
-    animation-range: entry 0% cover 32%;
+    position: relative;
+  }
+
+  .site-header {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    border-bottom: 1px solid var(--color-line);
+    background: rgb(245 247 245 / 96%);
+    backdrop-filter: blur(12px);
+    transition: transform 240ms ease;
+  }
+  .site-brand {
+    display: inline-flex;
+    flex-shrink: 0;
+    align-items: center;
+    gap: 0.7rem;
+    color: var(--color-ink);
+  }
+  .brand-wordmark {
+    display: block;
+    font-family: var(--font-display), serif;
+    font-size: 23px;
+    letter-spacing: 0.12em;
+    line-height: 1.2;
+  }
+  .brand-caption {
+    display: block;
+    margin-top: 5px;
+    font-size: 8px;
+    letter-spacing: 0.25em;
+  }
+  .header-link {
+    padding-block: 1.5rem;
+    font-size: 12px;
+    color: var(--color-ink-soft);
+    transition: color 180ms ease;
+  }
+  .header-link:hover,
+  .header-link[aria-current="page"] {
+    color: var(--color-accent);
+    text-decoration: underline;
+    text-underline-offset: 8px;
+  }
+
+  .ui-button {
+    display: inline-flex;
+    min-height: 3.25rem;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    padding: 0.85rem 1.6rem;
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    line-height: 1.6;
+    transition:
+      background 180ms ease,
+      border-color 180ms ease;
+  }
+  .ui-button-primary {
+    background: var(--color-accent);
+    color: var(--color-on-accent);
+  }
+  .ui-button-primary:hover {
+    background: var(--color-accent-hover);
+  }
+  .ui-button-outline {
+    border-color: #a9bcb2;
+    background: transparent;
+    color: var(--color-accent);
+  }
+  .ui-button-outline:hover {
+    background: var(--color-mist);
+    border-color: var(--color-accent);
+  }
+  .section-heading {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: end;
+    justify-content: space-between;
+    gap: 1.5rem;
+  }
+  .section-heading h2 {
+    font-size: clamp(1.65rem, 3vw, 2.2rem);
+  }
+  .section-heading-link {
+    display: inline-flex;
+    min-height: 44px;
+    align-items: center;
+    gap: 1.5rem;
+    border-bottom: 1px solid #a9bcb2;
+    color: var(--color-accent);
+    font-size: 12px;
+  }
+
+  .plan-card {
+    display: flex;
+    height: 100%;
+    flex-direction: column;
+    overflow: hidden;
+    border-radius: 6px;
+  }
+  .plan-card-image {
+    position: relative;
+    aspect-ratio: 4 / 3;
+    overflow: hidden;
+    background: var(--color-night);
+  }
+  .plan-card-image img {
+    transition: transform 500ms ease;
+  }
+  .plan-card:hover .plan-card-image img {
+    transform: scale(1.035);
+  }
+  .plan-card-badge {
+    position: absolute;
+    top: 14px;
+    left: 14px;
+    border-radius: 2px;
+    background: var(--color-paper);
+    padding: 7px 11px;
+    color: var(--color-accent);
+    font-size: 10px;
+  }
+  .plan-card-content {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    padding: 1.5rem;
+  }
+  .plan-card-price {
+    margin-top: 1.5rem;
+    padding-block: 1.2rem;
+    border-block: 1px solid var(--color-line);
+  }
+  .plans-grid {
+    display: grid;
+    gap: 1.5rem;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .booking-cta {
+    position: relative;
+    overflow: hidden;
+    border-radius: 6px;
+    background: var(--color-night);
+    padding: clamp(2.25rem, 6vw, 5rem);
+  }
+  .booking-cta .ui-button-primary {
+    background: white;
+    color: var(--color-accent);
+  }
+  .booking-cta .ui-button-primary:hover {
+    background: #e6eee9;
+  }
+  .booking-cta .ui-button-outline {
+    border-color: #96b3ac;
+    color: white;
+  }
+  .booking-cta .ui-button-outline:hover {
+    background: rgb(255 255 255 / 10%);
+  }
+  .site-footer {
+    margin-top: auto;
+    border-top: 1px solid var(--color-line);
+    background: var(--color-mist);
+    color: var(--color-muted);
+    padding-bottom: 5rem;
+  }
+  .site-footer a {
+    overflow-wrap: anywhere;
   }
 }
 
-@keyframes reveal-up {
-  from {
-    opacity: 0;
-    transform: translateY(28px) scale(0.985);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
+@media (max-width: 1023px) {
+  .plans-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
-
-@keyframes meteor-flight {
-  0% {
-    opacity: 0;
-    transform: translate3d(0, 0, 0) rotate(-13deg);
-  }
-  9% {
-    opacity: 0.9;
-  }
-  22% {
-    opacity: 0;
-    transform: translate3d(-420px, 120px, 0) rotate(-13deg);
-  }
-  100% {
-    opacity: 0;
-    transform: translate3d(-420px, 120px, 0) rotate(-13deg);
-  }
-}
-
-@keyframes orbit-breathe {
-  0%,
-  100% {
-    opacity: 0.3;
-    transform: rotate(-8deg) scale(0.98);
-  }
-  50% {
-    opacity: 0.72;
-    transform: rotate(-8deg) scale(1.02);
-  }
-}
-
-@keyframes aurora-conduct {
-  0% {
-    opacity: 0.08;
-    transform: translate3d(-4%, -3%, 0) rotate(var(--aurora-start-angle)) scale(0.92, 0.8);
-  }
-  55% {
-    opacity: 0.2;
-  }
-  100% {
-    opacity: 0.12;
-    transform: translate3d(15%, 7%, 0) rotate(var(--aurora-end-angle)) scale(1.12, 1);
-  }
-}
-
-@keyframes focus-lock {
-  0%,
-  100% {
-    opacity: 0.3;
-    transform: translate(-50%, -50%) rotate(0deg) scale(1.08);
-  }
-  45% {
-    opacity: 0.8;
-    transform: translate(-50%, -50%) rotate(110deg) scale(0.88);
-  }
-  58% {
-    opacity: 0.95;
-    transform: translate(-50%, -50%) rotate(135deg) scale(0.9);
-  }
-}
-
-@keyframes focus-dot {
-  0%,
-  42%,
-  100% {
-    opacity: 0.25;
-    transform: translate(-50%, -50%) scale(0.7);
-  }
-  50%,
-  58% {
-    opacity: 1;
-    transform: translate(-50%, -50%) scale(1.8);
-  }
-}
-
-@keyframes score-flow {
-  to {
-    stroke-dashoffset: -0.46;
-  }
-}
-
-@keyframes star-note {
-  0%,
-  100% {
-    opacity: 0.35;
-    transform: scale(0.72);
-  }
-  45% {
-    opacity: 1;
-    transform: scale(1.55);
-  }
-}
-
-@keyframes photo-stars {
-  0%,
-  100% {
-    opacity: 0.18;
-  }
-  45% {
-    opacity: 0.58;
-  }
-}
-
-@keyframes shutter-scan {
-  0%,
-  58% {
-    transform: translateX(0) skewX(-14deg);
-    opacity: 0;
-  }
-  64% {
-    opacity: 0.68;
-  }
-  78%,
-  100% {
-    /* 自身の幅（親の32%）基準で親幅の約163%ぶん右へ＝画面外まで掃く */
-    transform: translateX(510%) skewX(-14deg);
-    opacity: 0;
-  }
-}
-
-@media (max-width: 639px) {
-  .cosmic-score {
-    inset: 19% -30% auto;
-    width: 160%;
-    opacity: 0.34;
-  }
-
-  .cosmic-aurora {
-    width: 110vw;
-    filter: blur(38px);
-  }
-
-  .cosmic-viewfinder {
-    inset: 12% 6% 9%;
-    opacity: 0.26;
-  }
-
-  .cosmic-meteor {
-    width: 7rem;
-  }
-}
-
-/* ───────── モバイルヘッダーの自動格納 ─────────
-   スマホはロゴ行(4rem)＋タブナビ(3rem)で計7remが常時固定され画面を圧迫するため、
-   下スクロール中はヘッダーごと4rem持ち上げてタブナビだけを画面上端に残す。
-   状態は HeaderAutoHide（client）が <html data-header-collapsed> で切り替える。 */
-.site-header {
-  transition: transform 260ms ease;
-}
-
 @media (max-width: 767px) {
-  html[data-header-collapsed="true"] .site-header {
-    transform: translateY(-4rem);
+  html[data-header-collapsed="true"] .site-header:not(:focus-within) {
+    transform: translateY(-4.5rem);
   }
 }
-
-/* キーボード操作時のフォーカスリング（マウス操作では出さない） */
-:focus-visible {
-  outline: 2px solid #5eead4;
-  outline-offset: 2px;
-  border-radius: 6px;
+@media (max-width: 639px) {
+  .plans-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .brand-wordmark {
+    font-size: 19px;
+  }
+  .brand-caption {
+    font-size: 7px;
+  }
 }
-
-/* モーション軽減を希望するユーザーにはアニメーションを無効化 */
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
@@ -712,5 +342,18 @@ body {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+  }
+}
+
+@media (max-width: 380px) {
+  .brand-wordmark {
+    font-size: 16px;
+  }
+  .brand-caption {
+    font-size: 6px;
+  }
+  .site-brand svg {
+    width: 26px;
+    height: 32px;
   }
 }

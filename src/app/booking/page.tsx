@@ -20,11 +20,9 @@ export const metadata: Metadata = buildMetadata({
 });
 
 const steps = [
-  "フォームに予約内容を入力",
-  "自動生成された送信文を確認",
-  "「内容をコピーする」を押す",
-  "「公式LINEを開く」を押す",
-  "LINEに貼り付けて送信",
+  { title: "予約内容を入力", text: "日程・プラン・人数を選択" },
+  { title: "送信文をコピー", text: "内容を確認してコピー" },
+  { title: "LINEで相談", text: "トークに貼り付けて送信" },
 ];
 
 export default async function BookingPage({
@@ -48,24 +46,24 @@ export default async function BookingPage({
     <Section>
       <Breadcrumbs items={[{ name: "予約フォーム", path: "/booking" }]} />
 
-      <h1 className="cosmic-title mt-6 text-3xl font-bold sm:text-4xl">
+      <h1 className="cosmic-title mt-6 text-3xl sm:text-4xl">
         LINEで予約・相談する
       </h1>
-      <p className="mt-4 max-w-2xl text-sm leading-relaxed text-zinc-400">
+      <p className="mt-4 max-w-2xl text-sm leading-relaxed text-muted">
         下のフォームに入力すると、公式LINEへ送る文章が自動で作られます。「内容をコピーする」→「公式LINEを開く」の順に進み、トークに貼り付けて送信してください。
       </p>
 
       {/* 手順 */}
-      <ol className="mt-8 flex flex-wrap gap-2 text-xs">
+      <ol className="mt-8 grid grid-cols-3 gap-3 rounded-md border border-line bg-white p-4 sm:max-w-2xl sm:gap-6 sm:p-6">
         {steps.map((s, i) => (
-          <li
-            key={s}
-            className="cosmic-panel flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-zinc-300"
-          >
-            <span className="flex h-5 w-5 items-center justify-center rounded-md bg-amber-300 text-[11px] font-bold text-zinc-950">
+          <li key={s.title} className="text-ink-soft">
+            <span className="flex h-5 w-5 items-center justify-center rounded-md bg-accent text-[11px] font-bold text-on-accent">
               {i + 1}
             </span>
-            {s}
+            <p className="mt-3 text-xs font-medium leading-6 text-ink">
+              {s.title}
+            </p>
+            <p className="mt-1 text-[10px] leading-5 text-muted">{s.text}</p>
           </li>
         ))}
       </ol>

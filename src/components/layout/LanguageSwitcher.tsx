@@ -50,14 +50,14 @@ export function LanguageSwitcher({ className = "" }: { className?: string }) {
       {order.map((locale, i) => (
         <span key={locale} className="flex items-center gap-1">
           {i > 0 && (
-            <span aria-hidden className="text-zinc-600">
+            <span aria-hidden className="text-muted">
               /
             </span>
           )}
           {locale === current ? (
-            <span className="font-semibold text-teal-200">{LOCALE_LABELS[locale]}</span>
+            <span className="font-semibold text-accent">{LOCALE_LABELS[locale]}</span>
           ) : (
-            <Link href={links[locale]} className="text-zinc-400 hover:text-teal-200">
+            <Link href={links[locale]} className="text-muted hover:text-accent">
               {LOCALE_LABELS[locale]}
             </Link>
           )}

@@ -37,7 +37,7 @@ export default function AboutPage() {
       <p className="cosmic-kicker mt-6 text-sm font-semibold tracking-[0.2em]">
         代表挨拶
       </p>
-      <h1 className="cosmic-title mt-3 text-3xl font-bold leading-tight sm:text-4xl md:text-5xl">
+      <h1 className="cosmic-title mt-3 text-3xl leading-tight sm:text-4xl md:text-5xl">
         一度は星になりかけた僕が、
         <br className="hidden sm:block" />
         星空写真家になるまで。
@@ -51,7 +51,7 @@ export default function AboutPage() {
             priority
           />
         </figure>
-        <div className="space-y-4 leading-relaxed text-zinc-300">
+        <div className="space-y-4 leading-relaxed text-ink-soft">
           {/* JSXの改行は半角スペースとして描画され文中に不自然な空きができるため、
               各段落はひと続きの文字列で書く */}
           <p>
@@ -77,10 +77,10 @@ export default function AboutPage() {
             <p className="cosmic-kicker text-sm font-semibold tracking-[0.2em]">
               01
             </p>
-            <h2 className="mt-2 text-2xl font-bold text-teal-100 sm:text-3xl">
+            <h2 className="mt-2 text-2xl font-bold text-accent sm:text-3xl">
               17歳、星になりかけた夜。
             </h2>
-            <div className="mt-4 space-y-4 leading-relaxed text-zinc-300">
+            <div className="mt-4 space-y-4 leading-relaxed text-ink-soft">
               <p>
                 今でも忘れない、高校2年生の11月。おうし座流星群が流れる夜でした。寿司屋のバイトで貯めて買ったお気に入りの原付バイクにまたがり、僕はワクワクしながら大阪の星空スポットへと山道を走らせていました。
               </p>
@@ -113,10 +113,10 @@ export default function AboutPage() {
           <p className="cosmic-kicker text-sm font-semibold tracking-[0.2em]">
             02
           </p>
-          <h2 className="mt-2 text-2xl font-bold text-teal-100 sm:text-3xl">
+          <h2 className="mt-2 text-2xl font-bold text-accent sm:text-3xl">
             とてつもなく濃かった、ベッドの上の3ヶ月。
           </h2>
-          <div className="mt-4 max-w-3xl space-y-4 leading-relaxed text-zinc-300">
+          <div className="mt-4 max-w-3xl space-y-4 leading-relaxed text-ink-soft">
             <p>
               それから3ヶ月間、ベッドの上での寝たきり生活が始まりました。今振り返っても、あの入院期間は人生でトップクラスに濃い思い出です。隣のベッドの人が幻覚を見て「あいつが銃を構えてこっちを狙ってる！」と言いがかりをつけられたり、年末年始に見事インフルエンザにかかったり。極めつけは、高校時代に好きだった子に入院中に彼氏ができたという大失恋。
             </p>
@@ -132,10 +132,10 @@ export default function AboutPage() {
             <p className="cosmic-kicker text-sm font-semibold tracking-[0.2em]">
               03
             </p>
-            <h2 className="mt-2 text-2xl font-bold text-teal-100 sm:text-3xl">
+            <h2 className="mt-2 text-2xl font-bold text-accent sm:text-3xl">
               20歳、宮古島の星空との出会い。
             </h2>
-            <div className="mt-4 space-y-4 leading-relaxed text-zinc-300">
+            <div className="mt-4 space-y-4 leading-relaxed text-ink-soft">
               <p>
                 時は流れ20歳のとき、「少しの間だけ」という軽い気持ちで、住み込みの仕事を得て宮古島へ短期移住をしました。そのときに見上げた夜空が、僕の人生で一番綺麗な星空でした。あの17歳の夜、見届けることができなかった星たちが、時を越えて僕を温かく迎えてくれているような気がしたのです。
               </p>
@@ -148,7 +148,7 @@ export default function AboutPage() {
                 asset={aboutShooting}
                 sizes="(max-width: 768px) 100vw, 60vw"
               />
-              <figcaption className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent px-4 py-3 text-xs text-zinc-300">
+              <figcaption className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent px-4 py-3 text-xs text-on-photo">
                 宮古島の夜、三脚を立てて星を追う
               </figcaption>
             </figure>
@@ -166,10 +166,10 @@ export default function AboutPage() {
           <p className="cosmic-kicker text-sm font-semibold tracking-[0.2em]">
             04
           </p>
-          <h2 className="mt-2 text-2xl font-bold text-teal-100 sm:text-3xl">
+          <h2 className="mt-2 text-2xl font-bold text-accent sm:text-3xl">
             まさか、自分が書籍に載る人生になるなんて。
           </h2>
-          <div className="mt-4 max-w-3xl space-y-4 leading-relaxed text-zinc-300">
+          <div className="mt-4 max-w-3xl space-y-4 leading-relaxed text-ink-soft">
             <p>
               星空を追い続けてきた僕ですが、自分の人生にこんな未来が待っているとは夢にも思っていませんでした。2026年5月、新しく出版された星空に関する書籍『LIFE CHANGING — 人生を変える星空体験』に、プロカメラマンとして僕の活動を掲載していただきました。
             </p>
@@ -198,10 +198,10 @@ export default function AboutPage() {
           <p className="cosmic-kicker text-sm font-semibold tracking-[0.2em]">
             05
           </p>
-          <h2 className="mt-2 text-2xl font-bold text-teal-100 sm:text-3xl">
+          <h2 className="mt-2 text-2xl font-bold text-accent sm:text-3xl">
             この先も、ずっとこの星が見えますように。
           </h2>
-          <div className="mt-4 max-w-3xl space-y-4 leading-relaxed text-zinc-300">
+          <div className="mt-4 max-w-3xl space-y-4 leading-relaxed text-ink-soft">
             <p>
               宮古島は、日本一星がきれいに撮れる場所です。星空の晴れ舞台である「南の空」に光害（街の明かり）が少なく、何よりハブがいない。そして年中あたたかい。これ以上の可能性を秘めた場所はありません。
             </p>
@@ -216,20 +216,20 @@ export default function AboutPage() {
 
         {/* プロフィール */}
         <section>
-          <h2 className="text-xl font-bold text-teal-100">プロフィール</h2>
+          <h2 className="text-xl font-bold text-accent">プロフィール</h2>
           <dl className="cosmic-panel mt-4 grid gap-x-8 gap-y-3 rounded-xl p-6 text-sm sm:grid-cols-[auto_1fr] sm:p-8">
-            <dt className="font-semibold text-amber-200">氏名</dt>
-            <dd className="text-zinc-300">
+            <dt className="font-semibold text-accent">氏名</dt>
+            <dd className="text-ink-soft">
               {siteConfig.author.name}（いなだ・けいいち）
             </dd>
-            <dt className="font-semibold text-amber-200">生年月日</dt>
-            <dd className="text-zinc-300">1998年3月14日</dd>
-            <dt className="font-semibold text-amber-200">出身</dt>
-            <dd className="text-zinc-300">大阪府</dd>
-            <dt className="font-semibold text-amber-200">学歴</dt>
-            <dd className="text-zinc-300">大阪芸術大学 建築学部 中退</dd>
-            <dt className="font-semibold text-amber-200">経歴</dt>
-            <dd className="leading-relaxed text-zinc-300">
+            <dt className="font-semibold text-accent">生年月日</dt>
+            <dd className="text-ink-soft">1998年3月14日</dd>
+            <dt className="font-semibold text-accent">出身</dt>
+            <dd className="text-ink-soft">大阪府</dd>
+            <dt className="font-semibold text-accent">学歴</dt>
+            <dd className="text-ink-soft">大阪芸術大学 建築学部 中退</dd>
+            <dt className="font-semibold text-accent">経歴</dt>
+            <dd className="leading-relaxed text-ink-soft">
               2018年、20歳で沖縄県宮古島へ移住。リゾートホテルでの勤務を経て、2020年に独立。星空写真家としての活動を軸に、島の自然と人をつなぐ多角的なクリエイティブ事業を展開している。
             </dd>
           </dl>
@@ -237,10 +237,10 @@ export default function AboutPage() {
 
         {/* チームメンバー */}
         <section>
-          <h2 className="cosmic-title text-2xl font-bold sm:text-3xl">
+          <h2 className="cosmic-title text-2xl sm:text-3xl">
             チームメンバー
           </h2>
-          <p className="mt-2 text-sm text-zinc-400">
+          <p className="mt-2 text-sm text-muted">
             星空の下で一緒にシャッターを切る、頼れる仲間たち。
           </p>
           <div className="mt-6 grid gap-6 sm:grid-cols-2">
@@ -256,21 +256,21 @@ export default function AboutPage() {
                   />
                 </figure>
                 <div className="min-w-0">
-                  <h3 className="text-lg font-bold text-teal-100">
+                  <h3 className="text-lg font-bold text-accent">
                     {member.name}
-                    <span className="ml-2 text-xs font-normal text-amber-200">
+                    <span className="ml-2 text-xs font-normal text-accent">
                       {member.role}
                     </span>
                   </h3>
-                  <p className="mt-1 text-xs text-zinc-400">{member.origin}</p>
-                  <ul className="mt-3 space-y-1 text-sm text-zinc-300">
+                  <p className="mt-1 text-xs text-muted">{member.origin}</p>
+                  <ul className="mt-3 space-y-1 text-sm text-ink-soft">
                     {member.notes.map((note) => (
                       <li key={note}>・{note}</li>
                     ))}
                   </ul>
-                  <p className="mt-3 text-xs text-zinc-400">
+                  <p className="mt-3 text-xs text-muted">
                     特技：
-                    <span className="text-teal-200">{member.specialty}</span>
+                    <span className="text-accent">{member.specialty}</span>
                   </p>
                 </div>
               </article>
@@ -281,8 +281,8 @@ export default function AboutPage() {
         {/* 撮影の様子（動画） */}
         {shootingVideo.src && (
           <section>
-            <h2 className="text-xl font-bold text-teal-100">撮影の様子</h2>
-            <p className="mt-2 max-w-3xl leading-relaxed text-zinc-300">
+            <h2 className="text-xl font-bold text-accent">撮影の様子</h2>
+            <p className="mt-2 max-w-3xl leading-relaxed text-ink-soft">
               天候を読み、月齢を計算し、その日その時間にしか撮れない一枚を狙います。緊張せず自然体でいられる空気づくりも、僕たちが大切にしていることのひとつです。
             </p>
             <div className="cosmic-panel mt-6 overflow-hidden rounded-xl bg-black">

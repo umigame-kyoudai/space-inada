@@ -30,7 +30,7 @@ export function ImageSlot({
         alt={asset.alt}
         fill
         sizes={sizes}
-        priority={priority}
+        preload={priority}
         placeholder={blurDataURL ? "blur" : "empty"}
         blurDataURL={blurDataURL}
         className={`object-cover ${className}`}
@@ -43,7 +43,7 @@ export function ImageSlot({
       aria-hidden
       className={`cosmic-image-placeholder flex h-full w-full items-center justify-center ${className}`}
     >
-      <span className="relative z-10 block h-12 w-12 rotate-[-18deg] border-y border-teal-200/35" />
+      <span className="relative z-10 block h-12 w-12 rotate-[-18deg] border-y border-line" />
     </div>
   );
 }

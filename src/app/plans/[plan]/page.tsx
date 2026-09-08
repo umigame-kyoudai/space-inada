@@ -55,31 +55,31 @@ export default async function PlanDetailPage({ params }: Props) {
 
       <div className="mt-6 flex flex-wrap items-center gap-2">
         {plan.badge && (
-          <span className="rounded-md border border-amber-200/70 bg-amber-300 px-3 py-1 text-xs font-bold text-zinc-950 shadow-lg shadow-amber-300/15">
+          <span className="rounded-md border border-line bg-accent px-3 py-1 text-xs font-bold text-on-accent shadow-none">
             {plan.badge}
           </span>
         )}
         {plan.forWhom.map((w) => (
           <span
             key={w}
-            className="rounded-md border border-teal-200/15 bg-teal-300/10 px-3 py-1 text-xs text-teal-200"
+            className="rounded-md border border-line bg-mist px-3 py-1 text-xs text-accent"
           >
             {w}
           </span>
         ))}
       </div>
 
-      <h1 className="cosmic-title mt-4 text-3xl font-bold sm:text-4xl">{plan.name}</h1>
-      <p className="mt-4 max-w-2xl text-base leading-relaxed text-zinc-300">
+      <h1 className="cosmic-title mt-4 text-3xl sm:text-4xl">{plan.name}</h1>
+      <p className="mt-4 max-w-2xl text-base leading-relaxed text-ink-soft">
         {plan.tagline}
       </p>
 
       {plan.comingSoon ? (
-        <div className="mt-6 flex flex-col items-start gap-3 rounded-xl border border-amber-200/25 bg-amber-300/[0.06] p-5">
-          <p className="text-sm font-semibold tracking-[0.28em] text-amber-200">
+        <div className="mt-6 flex flex-col items-start gap-3 rounded-xl border border-line bg-mist p-5">
+          <p className="text-sm font-semibold tracking-[0.28em] text-accent">
             COMING SOON ／ 近日公開
           </p>
-          <p className="max-w-2xl text-sm leading-relaxed text-zinc-300">
+          <p className="max-w-2xl text-sm leading-relaxed text-ink-soft">
             こちらのプランは現在準備中です。公開までしばらくお待ちください。
             公式LINEにご登録いただくと、公開・先行案内をいち早くお届けします。
           </p>
@@ -110,10 +110,10 @@ export default async function PlanDetailPage({ params }: Props) {
       {/* 概要 */}
       <dl className="mt-10 grid gap-4 sm:grid-cols-3">
         <div className="cosmic-panel rounded-xl p-5">
-          <dt className="text-xs text-zinc-500">料金</dt>
+          <dt className="text-xs text-muted">料金</dt>
           <dd className="mt-1">
-            <p className="text-xl font-bold text-white">{planPriceLabel(plan)}</p>
-            <ul className="mt-2 space-y-0.5 text-xs text-zinc-400">
+            <p className="text-xl font-bold text-ink">{planPriceLabel(plan)}</p>
+            <ul className="mt-2 space-y-0.5 text-xs text-muted">
               {plan.pricingDetail.map((line) => (
                 <li key={line}>{line}</li>
               ))}
@@ -121,16 +121,16 @@ export default async function PlanDetailPage({ params }: Props) {
           </dd>
         </div>
         <div className="cosmic-panel rounded-xl p-5">
-          <dt className="text-xs text-zinc-500">撮影時間の目安</dt>
-          <dd className="mt-1 text-xl font-bold text-white">
+          <dt className="text-xs text-muted">撮影時間の目安</dt>
+          <dd className="mt-1 text-xl font-bold text-ink">
             {plan.durationMin ? `約${plan.durationMin}分` : "応相談"}
           </dd>
         </div>
         <div className="cosmic-panel rounded-xl p-5">
-          <dt className="text-xs text-zinc-500">納品</dt>
-          <dd className="mt-1 text-base font-semibold text-white">{plan.deliveryCount}</dd>
+          <dt className="text-xs text-muted">納品</dt>
+          <dd className="mt-1 text-base font-semibold text-ink">{plan.deliveryCount}</dd>
           {!plan.comingSoon && (
-            <p className="mt-1 text-xs font-medium text-amber-100/80">
+            <p className="mt-1 text-xs font-medium text-accent">
               {DELIVERY_TIME_LABEL}
             </p>
           )}
@@ -138,11 +138,11 @@ export default async function PlanDetailPage({ params }: Props) {
       </dl>
 
       {/* 含まれる内容 */}
-      <h2 className="mt-14 text-2xl font-bold text-teal-100">プランに含まれる内容</h2>
+      <h2 className="mt-14 text-2xl font-bold text-accent">プランに含まれる内容</h2>
       <ul className="mt-6 space-y-3">
         {plan.features.map((f) => (
-          <li key={f} className="flex gap-3 text-zinc-300">
-            <span aria-hidden className="text-amber-300">
+          <li key={f} className="flex gap-3 text-ink-soft">
+            <span aria-hidden className="text-accent">
               ✦
             </span>
             <span>{f}</span>
@@ -155,10 +155,10 @@ export default async function PlanDetailPage({ params }: Props) {
           <p className="cosmic-kicker text-xs font-semibold tracking-[0.2em]">
             BOOKING FLOW
           </p>
-          <h2 className="mt-3 text-2xl font-bold text-teal-100">
+          <h2 className="mt-3 text-2xl font-bold text-accent">
             プロポーズ撮影のご予約・ご相談イメージ
           </h2>
-          <p className="mt-3 max-w-2xl text-sm leading-relaxed text-zinc-400">
+          <p className="mt-3 max-w-2xl text-sm leading-relaxed text-muted">
             ご予約フォームから公式LINEへ相談するまでの流れをご覧いただけます。
             当日の演出や段取りも、事前に相談しながら一緒に組み立てます。
           </p>
@@ -169,7 +169,7 @@ export default async function PlanDetailPage({ params }: Props) {
       )}
 
       {/* 関連プラン */}
-      <h2 className="mt-14 text-xl font-bold text-teal-100">ほかのプランも見る</h2>
+      <h2 className="mt-14 text-xl font-bold text-accent">ほかのプランも見る</h2>
       <div className="mt-5 flex flex-wrap gap-2">
         {getPlans()
           .filter((p) => p.slug !== plan.slug)
@@ -180,7 +180,7 @@ export default async function PlanDetailPage({ params }: Props) {
               data-ga-event="plan_click"
               data-ga-button="plan_detail_related"
               data-ga-plan={p.name}
-              className="rounded-lg border border-teal-200/15 bg-slate-950/40 px-4 py-2 text-sm text-zinc-300 hover:border-amber-200/60 hover:text-amber-100"
+              className="rounded-lg border border-line bg-mist px-4 py-2 text-sm text-ink-soft hover:border-line hover:text-accent"
             >
               {p.name}
             </Link>

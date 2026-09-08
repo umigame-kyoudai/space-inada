@@ -8,18 +8,18 @@ export function IntlFaqPage({ locale }: { locale: Locale }) {
 
   return (
     <Section>
-      <h1 className="cosmic-title mt-6 text-3xl font-bold sm:text-4xl">{dict.faq.title}</h1>
-      <p className="mt-4 max-w-2xl text-sm leading-relaxed text-zinc-400">{dict.faq.lead}</p>
+      <h1 className="cosmic-title mt-6 text-3xl sm:text-4xl">{dict.faq.title}</h1>
+      <p className="mt-4 max-w-2xl text-sm leading-relaxed text-muted">{dict.faq.lead}</p>
 
       <div className="mt-10 space-y-4">
         {dict.faq.items.map((item) => (
           <details key={item.q} className="cosmic-panel group rounded-xl p-5">
-            <summary className="cursor-pointer list-none text-base font-bold text-white marker:content-none">
-              <span className="mr-2 text-amber-300">Q.</span>
+            <summary className="cursor-pointer list-none text-base font-bold text-ink marker:content-none">
+              <span className="mr-2 text-accent">Q.</span>
               {item.q}
             </summary>
-            <p className="mt-3 text-sm leading-relaxed text-zinc-300">
-              <span className="mr-2 font-bold text-teal-200">A.</span>
+            <p className="mt-3 text-sm leading-relaxed text-ink-soft">
+              <span className="mr-2 font-bold text-accent">A.</span>
               {item.a}
             </p>
           </details>

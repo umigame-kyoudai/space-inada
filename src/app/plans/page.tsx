@@ -42,32 +42,32 @@ export default function PlansPage() {
     <Section>
       <JsonLd data={itemList} />
       <Breadcrumbs items={[{ name: "撮影プラン", path: "/plans" }]} />
-      <h1 className="cosmic-title mt-6 text-3xl font-bold sm:text-4xl">
+      <h1 className="cosmic-title mt-6 text-3xl sm:text-4xl">
         宮古島の星空フォト 撮影プラン
       </h1>
-      <p className="mt-4 max-w-2xl text-sm leading-relaxed text-zinc-400">
+      <p className="mt-4 max-w-2xl text-sm leading-relaxed text-muted">
         気軽なカジュアルから、記念日・プロポーズの特別な撮影まで。ご希望や人数、シーンに合わせてお選びいただけます。
       </p>
-      <p className="mt-3 max-w-2xl text-sm font-medium text-amber-100/80">
+      <p className="mt-3 max-w-2xl text-sm font-medium text-accent">
         撮影データは全プラン{DELIVERY_TIME_LABEL}にオンラインで納品します。
       </p>
 
       <div
         aria-label="撮影プラン一覧"
-        className="-mx-5 mt-12 flex snap-x snap-mandatory gap-4 overflow-x-auto scroll-px-5 px-5 pb-5 [-webkit-overflow-scrolling:touch] [scrollbar-width:none] sm:mx-0 sm:grid sm:grid-cols-2 sm:gap-5 sm:overflow-visible sm:px-0 sm:pb-0 lg:grid-cols-3 [&::-webkit-scrollbar]:hidden"
+        className="plans-grid mt-12"
       >
         {plans.map((plan) => (
           <div
             key={plan.slug}
-            className="w-[78%] max-w-[20rem] shrink-0 snap-start sm:w-auto sm:max-w-none sm:shrink"
+            className="min-w-0"
           >
             <PlanCard plan={plan} />
           </div>
         ))}
       </div>
 
-      <h2 className="mt-20 text-2xl font-bold text-teal-100">料金・内容の比較</h2>
-      <p className="mt-3 text-sm text-zinc-400">
+      <h2 className="mt-20 text-2xl font-bold text-accent">料金・内容の比較</h2>
+      <p className="mt-3 text-sm text-muted">
         各プランの料金・撮影時間・納品内容を一覧で比較できます。
       </p>
       <div className="mt-6">
@@ -75,8 +75,8 @@ export default function PlansPage() {
       </div>
 
       {/* オプション・追加料金 */}
-      <h2 className="mt-20 text-2xl font-bold text-teal-100">オプション・追加料金</h2>
-      <p className="mt-3 text-sm text-zinc-400">
+      <h2 className="mt-20 text-2xl font-bold text-accent">オプション・追加料金</h2>
+      <p className="mt-3 text-sm text-muted">
         ご予約時に選べるオプションと、撮影時間に応じてかかる追加料金です。
       </p>
       <div className="mt-6 grid gap-5 sm:grid-cols-2">
@@ -86,14 +86,14 @@ export default function PlansPage() {
             className="cosmic-panel rounded-lg p-6"
           >
             <div className="flex items-baseline justify-between gap-3">
-              <h3 className="text-lg font-bold text-white">{opt.name}</h3>
-              <span className="text-base font-bold text-amber-200">
+              <h3 className="text-lg font-bold text-ink">{opt.name}</h3>
+              <span className="text-base font-bold text-accent">
                 {typeof opt.priceFrom === "number"
                   ? `${formatPrice(opt.priceFrom)}${opt.priceSuffix ?? "〜"}`
                   : opt.priceNote}
               </span>
             </div>
-            <ul className="mt-3 space-y-1 text-sm text-zinc-400">
+            <ul className="mt-3 space-y-1 text-sm text-muted">
               {opt.detail.map((d) => (
                 <li key={d}>{d}</li>
               ))}

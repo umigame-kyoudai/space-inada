@@ -22,7 +22,7 @@ export type ImageAsset = {
 
 /* ───────────── トップ ヒーロー ───────────── */
 export const heroImage: ImageAsset = {
-  // src: "/images/hero/hero.jpg", // 推奨: 横長 1920×1080 以上
+  src: "/images/plans/standard-13-couple-deck-milkyway-arch.jpg",
   alt: "宮古島の満天の星空と天の川を背景にしたカップルの星空フォト",
 };
 

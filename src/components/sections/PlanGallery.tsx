@@ -37,7 +37,7 @@ export function PlanGallery({
             priority={priority && i === 0}
             sizes="(max-width: 1024px) 88vw, 620px"
           />
-          <span className="absolute bottom-2 right-2 rounded-md bg-black/55 px-2 py-0.5 text-xs font-semibold text-white backdrop-blur">
+          <span className="absolute bottom-2 right-2 rounded-md bg-black/55 px-2 py-0.5 text-xs font-semibold text-on-photo backdrop-blur">
             {i + 1} / {images.length}
           </span>
         </figure>

@@ -27,16 +27,16 @@ export function IntlBookingPage({
 
   return (
     <Section>
-      <h1 className="cosmic-title mt-6 text-3xl font-bold sm:text-4xl">{dict.booking.title}</h1>
-      <p className="mt-4 max-w-2xl text-sm leading-relaxed text-zinc-400">{dict.booking.lead}</p>
+      <h1 className="cosmic-title mt-6 text-3xl sm:text-4xl">{dict.booking.title}</h1>
+      <p className="mt-4 max-w-2xl text-sm leading-relaxed text-muted">{dict.booking.lead}</p>
 
       <ol className="mt-8 flex flex-wrap gap-2 text-xs">
         {dict.booking.steps.map((s, i) => (
           <li
             key={s}
-            className="cosmic-panel flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-zinc-300"
+            className="cosmic-panel flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-ink-soft"
           >
-            <span className="flex h-5 w-5 items-center justify-center rounded-md bg-amber-300 text-[11px] font-bold text-zinc-950">
+            <span className="flex h-5 w-5 items-center justify-center rounded-md bg-accent text-[11px] font-bold text-on-accent">
               {i + 1}
             </span>
             {s}

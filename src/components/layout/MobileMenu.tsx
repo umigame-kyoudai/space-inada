@@ -1,22 +1,17 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { createPortal } from "react-dom";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import { Brand } from "@/components/ui/Brand";
 import { LanguageSwitcher } from "./LanguageSwitcher";
 
-type NavItem = { href: string; label: string };
-
 type Props = {
-  items: NavItem[];
-  /** 予約導線のリンク先・ラベル（翻訳ページ用）。未指定は日本語版の既定値。 */
+  items: { href: string; label: string }[];
   bookingHref?: string;
   bookingLabel?: string;
-  /** 翻訳ページかどうか（true のとき、下部の日本語専用リーガルリンクを隠す） */
   backToJapaneseHref?: string;
 };
 
-/** スマホ用ハンバーガーメニュー（md未満で表示）。 */
 export function MobileMenu({
   items,
   bookingHref = "/booking?from=mobile-menu",
@@ -24,109 +19,117 @@ export function MobileMenu({
   backToJapaneseHref,
 }: Props) {
   const [open, setOpen] = useState(false);
+  const dialogRef = useRef<HTMLDialogElement>(null);
 
-  // Escで閉じる + 開いている間はスクロールロック
   useEffect(() => {
-    function onKey(e: KeyboardEvent) {
-      if (e.key === "Escape") setOpen(false);
-    }
-    if (open) {
-      document.addEventListener("keydown", onKey);
-      document.body.style.overflow = "hidden";
-    }
+    const dialog = dialogRef.current;
+    if (!dialog || !open) return;
+    dialog.showModal();
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    const desktop = window.matchMedia("(min-width: 1280px)");
+    const closeOnDesktop = () => {
+      if (desktop.matches) setOpen(false);
+    };
+    desktop.addEventListener("change", closeOnDesktop);
     return () => {
-      document.removeEventListener("keydown", onKey);
-      document.body.style.overflow = "";
+      dialog.close();
+      document.body.style.overflow = previousOverflow;
+      desktop.removeEventListener("change", closeOnDesktop);
     };
   }, [open]);
 
   return (
-    <div className="md:hidden">
+    <div className="xl:hidden">
       <button
         type="button"
         onClick={() => setOpen(true)}
         aria-label="メニューを開く"
         aria-expanded={open}
         aria-controls="mobile-menu"
-        className="flex h-10 w-10 items-center justify-center rounded-lg border border-teal-200/10 text-zinc-200 hover:border-teal-200/40 hover:bg-white/10"
+        className="flex h-11 w-11 items-center justify-center rounded border border-line text-ink"
       >
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden>
-          <path d="M3 6h18M3 12h18M3 18h18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+        <svg
+          width="21"
+          height="21"
+          viewBox="0 0 24 24"
+          fill="none"
+          aria-hidden="true"
+        >
+          <path d="M4 8h16M4 16h16" stroke="currentColor" strokeWidth="1.4" />
         </svg>
       </button>
-
-      {open &&
-        createPortal(
-        <div
-          id="mobile-menu"
-          // body 直下に portal する。ヘッダーの backdrop-blur が fixed の包含ブロックに
-          // なってしまい 64px の帯に閉じ込められる問題を回避する。完全不透明で背景は透けない。
-          className="fixed inset-0 z-[60] overflow-y-auto bg-[#03040a] md:hidden"
-          role="dialog"
-          aria-modal="true"
-          aria-label="サイトメニュー"
-        >
-          <div className="flex h-16 items-center justify-between px-5">
-            <span className="text-base font-bold text-white">メニュー</span>
-            <button
-              type="button"
-              onClick={() => setOpen(false)}
-              aria-label="メニューを閉じる"
-              className="flex h-10 w-10 items-center justify-center rounded-lg border border-teal-200/10 text-zinc-200 hover:border-teal-200/40 hover:bg-white/10"
-            >
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden>
-                <path d="M6 6l12 12M18 6L6 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-              </svg>
-            </button>
-          </div>
-
-          <nav className="px-5 pt-4" aria-label="モバイルナビ">
-            <ul className="flex flex-col divide-y divide-teal-200/10">
-              {items.map((item) => (
-                <li key={item.href}>
-                  <Link
-                    href={item.href}
-                    onClick={() => setOpen(false)}
-                    className="flex items-center justify-between py-4 text-lg font-medium text-zinc-100 hover:text-teal-200"
+      <dialog
+        ref={dialogRef}
+        id="mobile-menu"
+        onClose={() => setOpen(false)}
+        aria-label="サイトメニュー"
+        className="m-0 h-dvh max-h-none w-screen max-w-none overflow-y-auto bg-paper p-0 text-ink backdrop:bg-night/50"
+      >
+        <div className="flex h-20 items-center justify-between border-b border-line px-6">
+          <Brand />
+          <button
+            type="button"
+            onClick={() => setOpen(false)}
+            aria-label="メニューを閉じる"
+            className="flex h-11 w-11 items-center justify-center rounded border border-line text-2xl"
+          >
+            ×
+          </button>
+        </div>
+        <nav className="px-6 pb-10 pt-8" aria-label="モバイルナビ">
+          <p className="eyebrow mb-5">EXPLORE KEY PHOTO</p>
+          <ul className="divide-y divide-line">
+            {items.map((item) => (
+              <li key={item.href}>
+                <Link
+                  href={item.href}
+                  onClick={() => setOpen(false)}
+                  className="flex items-center justify-between py-5 font-serif text-xl text-ink"
+                >
+                  {item.label}
+                  <span
+                    aria-hidden="true"
+                    className="font-sans text-sm text-accent"
                   >
-                    {item.label}
-                    <span aria-hidden className="text-amber-300">→</span>
-                  </Link>
-                </li>
-              ))}
-            </ul>
-
-            <Link
-              href={bookingHref}
-              data-ga-event="reservation_click"
-              data-ga-button="mobile_menu"
-              onClick={() => setOpen(false)}
-              className="mt-8 flex h-14 items-center justify-center rounded-lg border border-amber-300/70 bg-amber-300 text-base font-bold text-zinc-950 shadow-lg shadow-amber-300/15"
-            >
-              {bookingLabel}
-            </Link>
-
-            <div className="mt-8 border-t border-teal-200/10 pt-6">
-              <p className="mb-3 text-center text-[11px] font-semibold tracking-widest text-zinc-500">
-                LANGUAGE / 言語
-              </p>
-              <LanguageSwitcher className="justify-center gap-3 text-sm" />
+                    ↗
+                  </span>
+                </Link>
+              </li>
+            ))}
+          </ul>
+          <Link
+            href={bookingHref}
+            data-ga-event="reservation_click"
+            data-ga-button="mobile_menu"
+            onClick={() => setOpen(false)}
+            className="ui-button ui-button-primary mt-8 w-full"
+          >
+            {bookingLabel}
+            <span aria-hidden="true">↗</span>
+          </Link>
+          <div
+            className="mt-8 border-t border-line pt-6"
+            onClick={(event) => {
+              if (event.target instanceof Element && event.target.closest("a"))
+                setOpen(false);
+            }}
+          >
+            <p className="eyebrow mb-4 text-center">LANGUAGE / 言語</p>
+            <LanguageSwitcher className="justify-center gap-5 text-sm" />
+          </div>
+          {!backToJapaneseHref && (
+            <div className="mt-8 flex flex-wrap justify-center gap-5 text-xs text-muted">
+              <Link href="/privacy" onClick={() => setOpen(false)}>
+                プライバシーポリシー
+              </Link>
+              <Link href="/legal" onClick={() => setOpen(false)}>
+                特定商取引法に基づく表記
+              </Link>
             </div>
-
-            {backToJapaneseHref ? null : (
-              <div className="mt-6 flex justify-center gap-5 text-xs text-zinc-500">
-                <Link href="/privacy" onClick={() => setOpen(false)}>
-                  プライバシーポリシー
-                </Link>
-                <Link href="/legal" onClick={() => setOpen(false)}>
-                  特定商取引法に基づく表記
-                </Link>
-              </div>
-            )}
-          </nav>
-        </div>,
-          document.body,
-        )}
+          )}
+        </nav>
+      </dialog>
     </div>
   );
 }

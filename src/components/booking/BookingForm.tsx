@@ -192,11 +192,11 @@ ${formatReferralMessageLines(v.referralStaff)}` : ""}
 }
 
 const inputClass =
-  "min-w-0 w-full max-w-full rounded-lg border border-teal-200/15 bg-[#050814]/80 px-4 py-3 text-base text-white placeholder:text-zinc-500 outline-none transition-colors focus:border-teal-200/70 sm:text-sm";
+  "min-w-0 w-full max-w-full rounded-lg border border-line bg-white px-4 py-3 text-base text-ink placeholder:text-muted outline-none transition-colors focus:border-accent focus:ring-2 focus:ring-accent/20 sm:text-sm";
 
 function RequiredBadge({ label = "必須" }: { label?: string }) {
   return (
-    <span className="ml-2 rounded bg-rose-500/15 px-1.5 py-0.5 text-[10px] font-semibold text-rose-300">
+    <span className="ml-2 rounded bg-rose-500/15 px-1.5 py-0.5 text-[10px] font-semibold text-rose-700">
       {label}
     </span>
   );
@@ -224,7 +224,7 @@ function ParticipantNumberInput({
 }) {
   return (
     <div>
-      <label htmlFor={id} className="mb-1.5 block text-xs font-medium text-zinc-300">
+      <label htmlFor={id} className="mb-1.5 block text-xs font-medium text-ink-soft">
         {label}
       </label>
       <div className="relative">
@@ -244,7 +244,7 @@ function ParticipantNumberInput({
           className={`${inputClass} pr-10`}
         />
         {unit && (
-          <span className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-sm text-zinc-500">
+          <span className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-sm text-muted">
             {unit}
           </span>
         )}
@@ -764,8 +764,8 @@ export function BookingForm({
         onFocus={handleFormStart}
         className="cosmic-panel min-w-0 max-w-full rounded-2xl p-6 sm:p-8"
       >
-        <h2 className="text-lg font-bold text-white">{t ? t.formHeading : "予約内容を入力"}</h2>
-        <p className="mt-1 text-xs text-zinc-500">
+        <h2 className="text-lg font-bold text-ink">{t ? t.formHeading : "予約内容を入力"}</h2>
+        <p className="mt-1 text-xs text-muted">
           {t ? t.formSubtext : "入力すると右（スマホは下）の送信文が自動で作られます。"}
         </p>
 
@@ -774,15 +774,15 @@ export function BookingForm({
           className={`mt-4 rounded-xl border p-4 ${
             incompleteRequiredItems.length === 0
               ? "border-emerald-300/25 bg-emerald-400/[0.08]"
-              : "border-amber-200/20 bg-amber-300/[0.06]"
+              : "border-line bg-mist"
           }`}
         >
           <div className="flex items-center justify-between gap-3">
             <p
               className={`text-sm font-bold ${
                 incompleteRequiredItems.length === 0
-                  ? "text-emerald-200"
-                  : "text-amber-100"
+                  ? "text-emerald-700"
+                  : "text-accent"
               }`}
             >
               {incompleteRequiredItems.length === 0
@@ -793,7 +793,7 @@ export function BookingForm({
                   ? formatTemplate(t.progressRemaining, { n: incompleteRequiredItems.length })
                   : `必須項目はあと${incompleteRequiredItems.length}個です`}
             </p>
-            <span className="shrink-0 text-xs font-semibold text-zinc-400">
+            <span className="shrink-0 text-xs font-semibold text-muted">
               {completedRequiredCount}/{requiredItems.length}
             </span>
           </div>
@@ -803,17 +803,17 @@ export function BookingForm({
             aria-valuemin={0}
             aria-valuemax={requiredItems.length}
             aria-valuenow={completedRequiredCount}
-            className="mt-3 h-1.5 overflow-hidden rounded-full bg-white/10"
+            className="mt-3 h-1.5 overflow-hidden rounded-full bg-mist"
           >
             <div
               className={`h-full rounded-full transition-all duration-300 ${
-                incompleteRequiredItems.length === 0 ? "bg-emerald-300" : "bg-amber-300"
+                incompleteRequiredItems.length === 0 ? "bg-emerald-300" : "bg-accent"
               }`}
               style={{ width: `${(completedRequiredCount / requiredItems.length) * 100}%` }}
             />
           </div>
           {incompleteRequiredItems.length > 0 && (
-            <p className="mt-2 text-xs leading-relaxed text-zinc-400">
+            <p className="mt-2 text-xs leading-relaxed text-muted">
               {t ? t.missingPrefix : "未入力："}
               {incompleteRequiredItems.map((item) => item.label).join("・")}
             </p>
@@ -822,7 +822,7 @@ export function BookingForm({
 
         <div className="mt-6 space-y-5">
           <div>
-            <label htmlFor="date" className="mb-1.5 block text-sm font-medium text-zinc-200">
+            <label htmlFor="date" className="mb-1.5 block text-sm font-medium text-ink">
               {t ? t.dateLabel : "撮影希望日"}
               <RequiredBadge label={requiredText} />
             </label>
@@ -834,10 +834,10 @@ export function BookingForm({
               onChange={(e) => selectDate(e.target.value)}
               min={todayDateKey}
               required
-              className={`${inputClass} [color-scheme:dark]`}
+              className={`${inputClass} [color-scheme:light]`}
             />
             {isSelectedDateClosed && (
-              <p role="alert" className="mt-2 text-xs font-medium text-rose-300">
+              <p role="alert" className="mt-2 text-xs font-medium text-rose-700">
                 {t
                   ? t.dateClosedNotice
                   : "この日は満月期間のため、星空フォトの撮影をお休みしています。別の日程をお選びください。"}
@@ -849,19 +849,19 @@ export function BookingForm({
               monthIndex={availabilityMonthIndex}
               onMonthChange={setAvailabilityMonthIndex}
             />
-            <div className="mt-4 rounded-xl border border-teal-200/20 bg-teal-200/[0.06] p-4">
+            <div className="mt-4 rounded-xl border border-line bg-mist p-4">
               <div className="flex items-start gap-3">
                 <span
                   aria-hidden="true"
-                  className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-teal-200/15 text-base"
+                  className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-mist text-base"
                 >
                   📍
                 </span>
                 <div>
-                  <p className="text-sm font-bold text-teal-100">
+                  <p className="text-sm font-bold text-accent">
                     {t ? t.locationsHintTitle : "主な撮影候補地があります"}
                   </p>
-                  <p className="mt-1 text-xs leading-relaxed text-zinc-300">
+                  <p className="mt-1 text-xs leading-relaxed text-ink-soft">
                     {t
                       ? t.locationsHintText
                       : "前浜・友利博愛・白鳥岬周辺が主な候補です。最終的な集合場所は、その日の雲や風などを確認し、最もきれいに撮影できる場所を当日にLINEでご案内します。"}
@@ -878,11 +878,11 @@ export function BookingForm({
           </div>
 
           <fieldset>
-            <legend className="mb-1.5 block text-sm font-medium text-zinc-200">
+            <legend className="mb-1.5 block text-sm font-medium text-ink">
               {t ? t.timeWindowLabel : "希望時間帯"}
               <RequiredBadge label={requiredText} />
             </legend>
-            <p id="preferred-time-help" className="mb-3 text-xs leading-relaxed text-zinc-400">
+            <p id="preferred-time-help" className="mb-3 text-xs leading-relaxed text-muted">
               {t ? t.timeWindowHelp : "ご希望に近い時間帯を1つ選んでください。"}
             </p>
             <div className="grid gap-2 sm:grid-cols-3">
@@ -892,10 +892,10 @@ export function BookingForm({
                 return (
                   <label
                     key={option.value}
-                    className={`flex min-h-24 cursor-pointer flex-col justify-center rounded-lg border px-4 py-3 transition-all focus-within:ring-2 focus-within:ring-teal-200/70 ${
+                    className={`flex min-h-24 cursor-pointer flex-col justify-center rounded-lg border px-4 py-3 transition-all focus-within:ring-2 focus-within:ring-accent ${
                       selected
-                        ? "border-teal-200/80 bg-teal-200/15 shadow-sm shadow-teal-300/10"
-                        : "border-teal-200/15 bg-[#050814]/60 hover:border-teal-200/45 hover:bg-teal-200/[0.06]"
+                        ? "border-line bg-mist shadow-sm shadow-none"
+                        : "border-line bg-white hover:border-line hover:bg-mist"
                     }`}
                   >
                     <input
@@ -908,12 +908,12 @@ export function BookingForm({
                       aria-describedby="preferred-time-help preferred-time-notice"
                       className="sr-only"
                     />
-                    <span className={`text-base font-bold ${selected ? "text-teal-100" : "text-white"}`}>
+                    <span className={`text-base font-bold ${selected ? "text-accent" : "text-ink"}`}>
                       {translated?.label ?? option.label}
                     </span>
                     <span
                       className={`mt-1 text-[11px] leading-relaxed ${
-                        option.value === "24:00〜翌4:00" ? "text-amber-200" : "text-zinc-400"
+                        option.value === "24:00〜翌4:00" ? "text-accent" : "text-muted"
                       }`}
                     >
                       {translated?.note ?? option.note}
@@ -924,9 +924,9 @@ export function BookingForm({
             </div>
             <div
               id="preferred-time-notice"
-              className="mt-3 rounded-lg border border-amber-200/20 bg-amber-300/[0.06] p-3 text-xs leading-relaxed text-zinc-300"
+              className="mt-3 rounded-lg border border-line bg-mist p-3 text-xs leading-relaxed text-ink-soft"
             >
-              <p className="font-semibold text-amber-100">
+              <p className="font-semibold text-accent">
                 {t ? t.timeWindowNoticeTitle : "選択した時間帯は、あくまでご希望枠です。"}
               </p>
               <p className="mt-1">
@@ -938,7 +938,7 @@ export function BookingForm({
           </fieldset>
 
           <div>
-            <label htmlFor="plan" className="mb-1.5 block text-sm font-medium text-zinc-200">
+            <label htmlFor="plan" className="mb-1.5 block text-sm font-medium text-ink">
               {t ? t.planLabel : "希望プラン"}
               <RequiredBadge label={requiredText} />
             </label>
@@ -947,7 +947,7 @@ export function BookingForm({
               value={plan}
               onChange={(e) => setPlan(e.target.value)}
               required
-              className={`${inputClass} [color-scheme:dark]`}
+              className={`${inputClass} [color-scheme:light]`}
             >
               <option value="">{t ? t.planPlaceholder : "選択してください"}</option>
               {planOptions.map((p) => (
@@ -960,7 +960,7 @@ export function BookingForm({
           </div>
 
           <div>
-            <label htmlFor="name" className="mb-1.5 block text-sm font-medium text-zinc-200">
+            <label htmlFor="name" className="mb-1.5 block text-sm font-medium text-ink">
               {t ? t.nameLabel : "お名前"}
               <RequiredBadge label={requiredText} />
             </label>
@@ -975,21 +975,21 @@ export function BookingForm({
             />
           </div>
 
-          <fieldset className="rounded-lg border border-teal-200/15 bg-[#050814]/45 p-4">
-            <legend className="px-1 text-sm font-medium text-zinc-200">
+          <fieldset className="rounded-lg border border-line bg-white p-4">
+            <legend className="px-1 text-sm font-medium text-ink">
               {t ? t.participantsLabel : "参加人数"}
               <RequiredBadge label={requiredText} />
             </legend>
-            <p id="participant-count-help" className="mb-4 text-xs leading-relaxed text-zinc-400">
+            <p id="participant-count-help" className="mb-4 text-xs leading-relaxed text-muted">
               {t ? t.participantsHelp : "男女別の人数を入力すると、大人・子どもの人数と合計が自動で計算されます。"}
             </p>
             <div className="space-y-4">
-              <div className="rounded-lg border border-white/5 bg-white/[0.025] p-3">
+              <div className="rounded-lg border border-line bg-mist p-3">
                 <div className="mb-3 flex items-center justify-between gap-3">
-                  <p className="text-sm font-semibold text-white">
+                  <p className="text-sm font-semibold text-ink">
                     {t ? t.adultsHeading : "大人（16才以上）"}
                   </p>
-                  <p className="text-sm font-semibold text-teal-200">
+                  <p className="text-sm font-semibold text-accent">
                     {t ? `${t.totalLabel} ${adultsNum}` : `計 ${adultsNum}人`}
                   </p>
                 </div>
@@ -1015,12 +1015,12 @@ export function BookingForm({
                 </div>
               </div>
 
-              <div className="rounded-lg border border-white/5 bg-white/[0.025] p-3">
+              <div className="rounded-lg border border-line bg-mist p-3">
                 <div className="mb-3 flex items-center justify-between gap-3">
-                  <p className="text-sm font-semibold text-white">
+                  <p className="text-sm font-semibold text-ink">
                     {t ? t.childrenHeading : "子ども（0〜15才）"}
                   </p>
-                  <p className="text-sm font-semibold text-teal-200">
+                  <p className="text-sm font-semibold text-accent">
                     {t ? `${t.totalLabel} ${childrenNum}` : `計 ${childrenNum}人`}
                   </p>
                 </div>
@@ -1049,8 +1049,8 @@ export function BookingForm({
               aria-live="polite"
               className={`mt-4 rounded-lg px-3 py-2 text-sm font-semibold ${
                 participantCountComplete
-                  ? "bg-emerald-400/10 text-emerald-300"
-                  : "bg-amber-300/10 text-amber-200"
+                  ? "bg-emerald-400/10 text-emerald-700"
+                  : "bg-mist text-accent"
               }`}
             >
               {participantCount <= 0
@@ -1068,7 +1068,7 @@ export function BookingForm({
           </fieldset>
 
           <div>
-            <label htmlFor="phone" className="mb-1.5 block text-sm font-medium text-zinc-200">
+            <label htmlFor="phone" className="mb-1.5 block text-sm font-medium text-ink">
               {t ? t.phoneLabel : "携帯番号"}
               <RequiredBadge label={requiredText} />
             </label>
@@ -1085,7 +1085,7 @@ export function BookingForm({
           </div>
 
           <div>
-            <label htmlFor="hotel" className="mb-1.5 block text-sm font-medium text-zinc-200">
+            <label htmlFor="hotel" className="mb-1.5 block text-sm font-medium text-ink">
               {t ? t.hotelLabel : "宿泊施設名"}
             </label>
             <input
@@ -1099,7 +1099,7 @@ export function BookingForm({
           </div>
 
           <div>
-            <label htmlFor="stay" className="mb-1.5 block text-sm font-medium text-zinc-200">
+            <label htmlFor="stay" className="mb-1.5 block text-sm font-medium text-ink">
               {t ? t.stayLabel : "滞在期間"}
             </label>
             <input
@@ -1114,28 +1114,28 @@ export function BookingForm({
 
           {/* オプション */}
           <fieldset>
-            <legend className="mb-1.5 block text-sm font-medium text-zinc-200">
+            <legend className="mb-1.5 block text-sm font-medium text-ink">
               {t ? t.optionsLabel : "オプション（任意）"}
             </legend>
             <div className="space-y-2">
-              <label className="flex min-w-0 items-center justify-between gap-2 rounded-lg border border-teal-200/15 bg-[#050814]/60 px-4 py-3 text-sm text-zinc-200">
+              <label className="flex min-w-0 items-center justify-between gap-2 rounded-lg border border-line bg-white px-4 py-3 text-sm text-ink">
                 <span className="flex min-w-0 items-center gap-2">
                   <input
                     type="checkbox"
                     checked={pickup}
                     onChange={(e) => setPickup(e.target.checked)}
-                    className="h-4 w-4 rounded border-teal-200/20 bg-[#050814] accent-teal-300"
+                    className="h-4 w-4 rounded border-line bg-white accent-accent"
                   />
                   {t ? t.pickupLabel : "送迎（3名まで）"}
                 </span>
-                <span className="shrink-0 text-amber-200">
+                <span className="shrink-0 text-accent">
                   +{formatPrice(pickupPrice)}
                 </span>
               </label>
-              <div className="rounded-lg border border-teal-200/15 bg-[#050814]/60 px-4 py-3">
+              <div className="rounded-lg border border-line bg-white px-4 py-3">
                 <label
                   htmlFor="staff-name"
-                  className="mb-2 block text-sm font-medium text-zinc-200"
+                  className="mb-2 block text-sm font-medium text-ink"
                 >
                   {t ? t.nominationLabel : "カメラマン指名"}
                 </label>
@@ -1143,7 +1143,7 @@ export function BookingForm({
                   id="staff-name"
                   value={staffName}
                   onChange={(e) => setStaffName(e.target.value)}
-                  className={`${inputClass} [color-scheme:dark]`}
+                  className={`${inputClass} [color-scheme:light]`}
                 >
                   <option value="">{t ? t.nominationNone : "指名なし（おまかせ） ¥0"}</option>
                   <option value="稲田">
@@ -1155,20 +1155,20 @@ export function BookingForm({
                     </option>
                   ))}
                 </select>
-                <p className="mt-2 text-xs text-zinc-400">
+                <p className="mt-2 text-xs text-muted">
                   {t
                     ? t.nominationNote
                     : `稲田の指名のみ＋${formatPrice(staffNominationPrice)}、その他のカメラマンは指名料無料です。`}
                 </p>
-                <p className="mt-1 text-[11px] leading-relaxed text-zinc-500">
+                <p className="mt-1 text-[11px] leading-relaxed text-muted">
                   {t ? t.nominationNote2 : "※担当カメラマンによって写真のクオリティは変わりません。"}
                 </p>
               </div>
             </div>
           </fieldset>
 
-          <div className="rounded-lg border border-amber-200/20 bg-amber-300/5 p-4 text-sm leading-relaxed text-zinc-300">
-            <p className="font-semibold text-amber-100">
+          <div className="rounded-lg border border-line bg-mist p-4 text-sm leading-relaxed text-ink-soft">
+            <p className="font-semibold text-accent">
               {t ? t.lateNightTitle : "⚠️ 深夜料金について"}
             </p>
             <p id="late-night-fee-description" className="mt-1">
@@ -1176,19 +1176,19 @@ export function BookingForm({
                 ? t.lateNightText
                 : `0:00〜0:59の撮影はお一人につき＋${formatPrice(LATE_NIGHT_FEES.midnight)}、1:00以降の撮影はお一人につき＋${formatPrice(LATE_NIGHT_FEES.afterOne)}の追加料金がかかります。`}
             </p>
-            <p className="mt-1 text-xs text-zinc-500">
+            <p className="mt-1 text-xs text-muted">
               {t
                 ? t.lateNightNote
                 : "※撮影時間は月齢や当日の空模様に合わせて確定するため、ご希望の時間帯に関わらず全てのご予約で事前確認をお願いしています。"}
             </p>
-            <label className="mt-3 flex items-start gap-3 rounded-lg border border-amber-200/25 bg-[#050814]/60 p-3 text-sm text-zinc-200">
+            <label className="mt-3 flex items-start gap-3 rounded-lg border border-line bg-white p-3 text-sm text-ink">
               <input
                 type="checkbox"
                 checked={lateNightConsent}
                 onChange={(e) => setLateNightConsent(e.target.checked)}
                 required
                 aria-describedby="late-night-fee-description"
-                className="mt-0.5 h-4 w-4 shrink-0 rounded border-teal-200/20 bg-[#050814] accent-teal-300"
+                className="mt-0.5 h-4 w-4 shrink-0 rounded border-line bg-white accent-accent"
               />
               <span>
                 {t ? t.lateNightConsent : "深夜帯になった場合の追加料金について了承しました"}
@@ -1198,7 +1198,7 @@ export function BookingForm({
           </div>
 
           <div>
-            <label htmlFor="instagram" className="mb-1.5 block text-sm font-medium text-zinc-200">
+            <label htmlFor="instagram" className="mb-1.5 block text-sm font-medium text-ink">
               {t ? t.instagramLabel : "Instagram（任意）"}
             </label>
             <input
@@ -1209,12 +1209,12 @@ export function BookingForm({
               placeholder={t ? t.instagramPlaceholder : "instagram_id（@は不要）"}
               className={inputClass}
             />
-            <label className="mt-3 flex items-center gap-2 text-sm text-zinc-300">
+            <label className="mt-3 flex items-center gap-2 text-sm text-ink-soft">
               <input
                 type="checkbox"
                 checked={story}
                 onChange={(e) => setStory(e.target.checked)}
-                className="h-4 w-4 rounded border-teal-200/20 bg-[#050814] accent-teal-300"
+                className="h-4 w-4 rounded border-line bg-white accent-accent"
               />
               {t ? t.storyConsent : "ストーリーへのタグ付けOK"}
             </label>
@@ -1222,7 +1222,7 @@ export function BookingForm({
 
           {/* クーポン */}
           <div>
-            <label htmlFor="coupon" className="mb-1.5 block text-sm font-medium text-zinc-200">
+            <label htmlFor="coupon" className="mb-1.5 block text-sm font-medium text-ink">
               {t ? t.couponLabel : "クーポンコード（任意）"}
             </label>
             <input
@@ -1240,34 +1240,34 @@ export function BookingForm({
             />
             <div aria-live="polite" className="mt-1.5 min-h-[1.25rem] text-xs">
               {coupon && discountAmount > 0 && (
-                <p className="font-medium text-emerald-300">
+                <p className="font-medium text-emerald-700">
                   {t ? t.couponApplied : "適用"}：{coupon.code} −{formatPrice(discountAmount)}
                 </p>
               )}
               {coupon && discountAmount === 0 && subtotal == null && (
-                <p className="text-amber-200">
+                <p className="text-accent">
                   {t ? t.couponQuoteOnly : "このプランは概算が出ないため、お見積り時に適用します"}
                 </p>
               )}
               {couponInvalid && (
-                <p className="text-rose-300">{t ? t.couponInvalid : "クーポンが見つかりません"}</p>
+                <p className="text-rose-700">{t ? t.couponInvalid : "クーポンが見つかりません"}</p>
               )}
             </div>
           </div>
         </div>
 
         {/* お会計（概算） */}
-        <div className="mt-6 rounded-lg border border-amber-200/25 bg-amber-300/5 p-5">
+        <div className="mt-6 rounded-lg border border-line bg-mist p-5">
           <div className="flex items-baseline justify-between gap-3">
-            <span className="text-sm font-medium text-zinc-200">
+            <span className="text-sm font-medium text-ink">
               {t ? t.totalHeading : "お会計（概算）"}
             </span>
-            <span className="text-right text-xl font-bold text-amber-200">
+            <span className="text-right text-xl font-bold text-accent">
               {plan && total != null ? formatPrice(total) : t ? t.totalPlaceholder : totalText}
             </span>
           </div>
           {breakdown.length > 0 && (
-            <ul className="mt-3 space-y-0.5 text-xs text-zinc-400">
+            <ul className="mt-3 space-y-0.5 text-xs text-muted">
               {breakdown.map((b) => (
                 <li key={b}>・{b}</li>
               ))}
@@ -1275,31 +1275,31 @@ export function BookingForm({
           )}
           {selectedPlan?.kind === "perGroup" && (
             <p
-              className={`mt-2 text-xs ${exceedsParticipantLimit ? "font-medium text-amber-200" : "text-zinc-500"}`}
+              className={`mt-2 text-xs ${exceedsParticipantLimit ? "font-medium text-accent" : "text-muted"}`}
             >
               {selectedPlan.maxParticipants != null
                 ? `※${selectedPlan.name}は1組${selectedPlan.maxParticipants}名までです。${selectedPlan.maxParticipants + 1}名以上はLINEでご相談ください。`
                 : `※${selectedPlan.name}は人数に関わらず1組あたりの料金です。`}
             </p>
           )}
-          <p className="mt-3 text-xs font-medium text-amber-100/80">
+          <p className="mt-3 text-xs font-medium text-accent">
             {t ? t.cashOnlyNote : "💴 お支払いは「現地にて現金決済のみ」です。"}
           </p>
-          <p className="mt-1 text-xs text-zinc-500">
+          <p className="mt-1 text-xs text-muted">
             {t
               ? t.lateNightExcludedNote
               : "※上記の概算には深夜料金は含まれていません。撮影時間の確定後、LINEで最終金額をご案内します。"}
           </p>
         </div>
 
-        <div className="mt-6 flex items-center justify-between gap-3 border-t border-teal-200/10 pt-5">
-          <p className="text-xs text-zinc-500">
+        <div className="mt-6 flex items-center justify-between gap-3 border-t border-line pt-5">
+          <p className="text-xs text-muted">
             {t ? t.autoSaveNote : "入力内容はこの端末に自動保存されます"}
           </p>
           <button
             type="button"
             onClick={handleClear}
-            className="rounded-lg border border-teal-200/15 bg-slate-950/40 px-4 py-1.5 text-xs text-zinc-300 transition-colors hover:border-amber-200/60 hover:text-amber-100"
+            className="rounded-lg border border-line bg-mist px-4 py-1.5 text-xs text-ink-soft transition-colors hover:border-line hover:text-accent"
           >
             {t ? t.clearButton : "入力内容をクリア"}
           </button>
@@ -1309,8 +1309,8 @@ export function BookingForm({
       {/* プレビュー + アクション */}
       <div className="min-w-0 max-w-full lg:sticky lg:top-20 lg:self-start">
         <div className="cosmic-panel min-w-0 max-w-full rounded-2xl p-6 sm:p-8">
-          <h2 className="text-lg font-bold text-white">{t ? t.previewHeading : "送信内容プレビュー"}</h2>
-          <p className="mt-1 text-xs text-zinc-500">
+          <h2 className="text-lg font-bold text-ink">{t ? t.previewHeading : "送信内容プレビュー"}</h2>
+          <p className="mt-1 text-xs text-muted">
             {t ? t.previewSubtext : "この内容をコピーして、公式LINEのトークに貼り付けて送信してください。"}
           </p>
 
@@ -1322,18 +1322,18 @@ export function BookingForm({
             value={message}
             rows={18}
             aria-label={t ? t.previewHeading : "送信内容プレビュー"}
-            className="mt-4 min-w-0 w-full max-w-full resize-none rounded-lg border border-teal-200/15 bg-[#03040a]/85 p-4 text-base leading-relaxed text-zinc-200 outline-none max-h-56 sm:max-h-none sm:text-xs"
+            className="mt-4 min-w-0 w-full max-w-full resize-none rounded-lg border border-line bg-white p-4 text-base leading-relaxed text-ink focus:border-accent focus:ring-2 focus:ring-accent/20 outline-none max-h-56 sm:max-h-none sm:text-xs"
           />
 
           {/* ステータス表示 */}
           <div aria-live="polite" className="mt-4 min-h-[1.5rem]">
             {effectiveStatus === "copied" && (
-              <p className="rounded-lg bg-emerald-500/15 px-3 py-2 text-sm font-medium text-emerald-300">
+              <p className="rounded-lg bg-emerald-500/15 px-3 py-2 text-sm font-medium text-emerald-700">
                 {t ? t.copiedNotice : "コピーしました。LINEで貼り付けて送信してください。"}
               </p>
             )}
             {effectiveStatus === "error" && (
-              <p className="rounded-lg bg-rose-500/15 px-3 py-2 text-sm font-medium text-rose-300">
+              <p className="rounded-lg bg-rose-500/15 px-3 py-2 text-sm font-medium text-rose-700">
                 {t
                   ? t.copyErrorNotice
                   : "自動コピーできませんでした。プレビューを長押し／選択して手動でコピーしてください。"}
@@ -1346,9 +1346,9 @@ export function BookingForm({
             <button
               type="button"
               onClick={handleCopy}
-              className="flex h-14 w-full items-center justify-center gap-2 rounded-lg border border-amber-200/70 bg-amber-300 text-base font-bold text-zinc-950 shadow-lg shadow-amber-300/15 transition-colors hover:bg-amber-200"
+              className="flex h-14 w-full items-center justify-center gap-2 rounded-lg border border-line bg-accent text-base font-bold text-on-accent shadow-none transition-colors hover:bg-accent-hover"
             >
-              {t ? t.copyButton : "📋 内容をコピーする"}
+              {t ? t.copyButton : "内容をコピーする"}
             </button>
 
             <a
@@ -1358,14 +1358,14 @@ export function BookingForm({
               onClick={(e) => handleLineClick(e, "booking_form")}
               className={`flex h-14 w-full items-center justify-center gap-2 rounded-lg text-base font-bold transition-all ${
                 effectiveStatus === "copied"
-                  ? "scale-[1.02] bg-[#06C755] text-white shadow-lg shadow-[#06C755]/30 animate-pulse"
-                  : "border border-[#06C755]/60 bg-[#06C755]/10 text-[#5fe39a]"
+                  ? "scale-[1.02] bg-[#06C755] text-ink shadow-sm"
+                  : "border border-[#06C755]/60 bg-[#06C755]/10 text-[#17613b]"
               }`}
             >
-              {t ? t.lineButton : "💬 公式LINEを開く"}
+              {t ? t.lineButton : "公式LINEを開く"}
             </a>
 
-            <p className="text-center text-xs text-zinc-500">
+            <p className="text-center text-xs text-muted">
               {t
                 ? t.lineFinalNote
                 : "※自動では送信されません。LINEを開いたら、トークに貼り付け（ペースト）して送信してください。"}
@@ -1378,13 +1378,13 @@ export function BookingForm({
           長いフォームのどこからでも進捗確認とコピー→LINEに進めるようにする。
           本来のアクションボタンが見えている間は重複するため非表示。 */}
       {!actionsInView && (
-        <div className="fixed inset-x-0 bottom-0 z-40 border-t border-teal-200/15 bg-[#03040a]/95 px-4 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-2.5 lg:hidden">
+        <div className="fixed inset-x-0 bottom-0 z-40 border-t border-line bg-white px-4 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-2.5 lg:hidden">
           <p
             aria-live="polite"
             className={`text-center text-xs font-semibold ${
               incompleteRequiredItems.length === 0
-                ? "text-emerald-300"
-                : "text-amber-200"
+                ? "text-emerald-700"
+                : "text-accent"
             }`}
           >
             {incompleteRequiredItems.length === 0
@@ -1399,9 +1399,9 @@ export function BookingForm({
             <button
               type="button"
               onClick={handleCopy}
-              className="flex h-12 items-center justify-center gap-1.5 rounded-lg border border-amber-200/70 bg-amber-300 text-sm font-bold text-zinc-950 transition-colors hover:bg-amber-200"
+              className="flex h-12 items-center justify-center gap-1.5 rounded-lg border border-line bg-accent text-sm font-bold text-on-accent transition-colors hover:bg-accent-hover"
             >
-              {t ? t.stickyCopy : "📋 内容をコピー"}
+              {t ? t.stickyCopy : "内容をコピー"}
             </button>
             <a
               href={LINE_URL}
@@ -1410,11 +1410,11 @@ export function BookingForm({
               onClick={(e) => handleLineClick(e, "booking_form_sticky")}
               className={`flex h-12 items-center justify-center gap-1.5 rounded-lg text-sm font-bold transition-all ${
                 effectiveStatus === "copied"
-                  ? "bg-[#06C755] text-white shadow-lg shadow-[#06C755]/30"
-                  : "border border-[#06C755]/60 bg-[#06C755]/10 text-[#5fe39a]"
+                  ? "bg-[#06C755] text-ink shadow-lg shadow-[#06C755]/30"
+                  : "border border-[#06C755]/60 bg-[#06C755]/10 text-[#17613b]"
               }`}
             >
-              {t ? t.stickyLine : "💬 LINEを開く"}
+              {t ? t.stickyLine : "LINEを開く"}
             </a>
           </div>
         </div>
