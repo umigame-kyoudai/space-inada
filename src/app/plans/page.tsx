@@ -17,7 +17,7 @@ import {
 import { absoluteUrl } from "@/lib/seo";
 
 export const metadata: Metadata = buildMetadata({
-  title: "撮影プラン一覧",
+  title: "宮古島の星空フォト料金・撮影プラン",
   description:
     "宮古島の星空フォト撮影プラン。カジュアル・スタンダード・ファミリー・クリエイティブ・プロポーズと送迎・カメラマン指名・深夜料金をご紹介します。",
   path: "/plans",

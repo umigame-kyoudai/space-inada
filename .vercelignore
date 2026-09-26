@@ -1,0 +1,8 @@
+# Keep private reports and local credentials out of deployment uploads.
+.git
+node_modules
+.next
+output
+tmp
+docs/SEO-ANALYTICS-AUDIT-*.md
+.env*

@@ -1,4 +1,4 @@
-import { siteConfig, absoluteUrl, mapLink } from "./seo";
+import { siteConfig, absoluteUrl } from "./seo";
 import { getPriceRange, formatPrice, type Plan } from "@/data/plans";
 import type { Post } from "@/data/posts";
 import type { Testimonial } from "@/data/testimonials";
@@ -56,12 +56,7 @@ export function localBusinessJsonLd(): Json {
       addressLocality: siteConfig.contact.locality,
       addressCountry: "JP",
     },
-    geo: {
-      "@type": "GeoCoordinates",
-      latitude: siteConfig.geo.latitude,
-      longitude: siteConfig.geo.longitude,
-    },
-    hasMap: mapLink(),
+    // 出張撮影の対応エリアと所在地を区別する。未確認の座標・店舗の地図は出力しない。
     ...(range
       ? { priceRange: `${formatPrice(range.min)}〜${formatPrice(range.max)}` }
       : {}),

@@ -57,10 +57,13 @@ export const metadata: Metadata = {
     statusBarStyle: "black-translucent",
   },
   robots: { index: true, follow: true },
-  // Google Search Console のHTMLタグ確認（環境変数で設定）
-  verification: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION
-    ? { google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION }
-    : undefined,
+  verification: {
+    ...(process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION
+      ? { google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION }
+      : {}),
+    // Bing Webmaster Tools が発行した公開用の所有権確認タグ（秘密キーではない）。
+    other: { "msvalidate.01": "8478AB7A16CEF438842329249C798D0F" },
+  },
 };
 
 export const viewport: Viewport = {

@@ -35,11 +35,6 @@ export const siteConfig = {
     telephone: "090-9279-9586",
     email: "miyako.keyphoto@gmail.com",
   },
-  /** 位置情報（ローカルSEO）。宮古島の中心付近。集合場所は撮影当日案内のため一般的な座標 */
-  geo: {
-    latitude: 24.8055,
-    longitude: 125.2811,
-  },
   /** 撮影時間（星空撮影は月齢・天候により変動するため固定の終了時刻を表示しない） */
   hours: {
     label: "日没後〜深夜",
