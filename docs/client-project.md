@@ -30,8 +30,17 @@
 - Google Search Console：新旧ドメインとも確認済み。2026-07-15から旧→新のアドレス変更が進行中。
 - 新ドメインの `sitemap.xml`（59URL）・`feed.xml` は送信・取得成功済み。
 - Bing：`src/app/layout.tsx` の `verification.other["msvalidate.01"]` は公開用の所有権確認値。検証後も削除しない。API秘密キーではない。
+- 2026-09-27にBingの所有権確認、サイトマップ送信、主要10URLの手動送信を完了。Googleにも未登録7URLの登録をリクエストし、受付を確認。検索結果への反映とは区別する。
 - Googleマップには「宮古島星空フォトツアーkey photo」の既存プロフィールがある。電話番号・Instagramで公式サイトとの対応を確認。新規の重複プロフィールは作らない。
+- Googleマップのウェブサイトを公式URLに変更する提案は2026-09-27受付済み・審査待ち。プロフィール全体の管理権限は現在のアカウントにない。
 - 日時別アクセスの分析資料は非公開Google Driveとローカル `output/` に保存。定期実行は設定していない。
+
+## 2026-09-27のSEO公開記録
+
+- 実装commit：`7d6ccb4`（GitHub mainへ反映済み）
+- 本番Deployment：`dpl_2R7mVJovwjNAm6LzkZL5xzc7Xj1f`
+- 公開先：既存 `keyphotomiyakojima.com`。Project・DNSの変更なし。
+- 検証：lint/build成功、本番8ページのメタデータ、390pxのモバイル表示、予約画面への遷移、GA4タグの読み込み。
 
 ## 引き渡し手順
 

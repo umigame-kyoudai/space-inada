@@ -127,7 +127,7 @@ src/
 Metadata API は `<script>` を出せないため、**コンポーネントで描画**する。型ごとにビルダー関数を用意:
 - 全ページ共通: **`LocalBusiness`/`Organization`**（屋号・所在地（宮古島）・連絡先・営業時間・SNS）。
 - `/plans/[plan]`: **`Service`/`Product`**（プラン名・提供内容・価格帯・エリア=宮古島）。
-- `/faq`: **`FAQPage`**（Q&Aをそのまま構造化 → リッチリザルト狙い）。
+- `/faq`: **`FAQPage`**（Q&Aをそのまま構造化。一般の撮影事業者についてFAQリッチリザルトの表示を約束しない）。
 - `/blog/[slug]`: **`Article`/`BlogPosting`**（見出し・公開日・更新日・著者=稲田圭市・画像）。
 - 全下層: **`BreadcrumbList`**（パンくず。内部リンク強化 + 検索結果のパンくず表示）。
 
