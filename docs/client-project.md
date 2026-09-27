@@ -51,6 +51,8 @@
 - LINE URLスキームの対象はスマートフォンのiOS/Android版。パソコンや内容が引き継がれない場合向けに、コピー・公式LINEを開く補助操作を残す。
 - 検証：lint/build成功。ブラウザで必須チェック、予約全文と特殊文字の引き継ぎURL、編集・復元後の内容、撮影休止日・人数上限、補助コピー、4言語、320/390/1440px幅を確認。スマートフォンのLINEアプリ内の最終表示・送信は未確認。
 - 公開先は既存Projectの更新として扱い、Cloudflareへの移行やDNS切替は行わない。
+- 実装commit：`af717e8`（GitHub main反映済み）。本番Deployment：`dpl_GWvhDTVjndpYKwsXnxNY82ZGmjxk`、状態READY。
+- 公開後の `https://keyphotomiyakojima.com/booking` はHTTPS 200。本番でも上記フォーム動作と画像読み込みを確認し、ブラウザの実行時エラーは0件。確認時点の当該Deploymentのエラーログは0件。
 - 仕様：https://developers.line.biz/ja/docs/line-login/using-line-url-scheme/
 
 ## 引き渡し手順
