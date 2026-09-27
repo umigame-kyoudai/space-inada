@@ -63,6 +63,8 @@
 - 選択日を予約文・自動保存・必須チェックに連携。過去日・休止日・不正な日付が端末に保存されていても、LINEへ進む前に選び直す。
 - 年間データを更新する際は、`AVAILABILITY_YEAR`と休止日一覧をあわせて更新する。
 - 検証：lint/build成功。Chrome・WebKit 26.5で320/375/390/430pxの左右位置、1440px表示、4言語、休止日・過去日の選択防止、未選択時の案内、保存・復元、キーボード操作、LINEに渡す日付を確認。
+- 実装commit：`ab6fb3f`（GitHub main反映済み）。本番Deployment：`dpl_2eXr3sKTAGRJ6Txgzm3tjLG6tMcD`、状態READY。
+- 公開後も予約ページのHTTPS 200、WebKitでの320/390px表示、休止日の選択防止、選択日入りのLINE引き継ぎURLを確認。ブラウザ実行時エラー・当該Deploymentのエラーログは確認時点で0件。
 
 ## 引き渡し手順
 
