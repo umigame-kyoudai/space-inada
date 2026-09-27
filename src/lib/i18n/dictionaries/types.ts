@@ -134,7 +134,6 @@ export type Dictionary = {
     items: { q: string; a: string }[];
   };
   booking: {
-    calendarToggle: string;
     optionalDetailsTitle: string;
     optionalDetailsHint: string;
     optionalDetailsFilled: string;
@@ -158,8 +157,8 @@ export type Dictionary = {
       available: string;
       closed: string;
       past: string;
-      closedShort: string;
       selected: string;
+      selectPrompt: string;
       note: string;
     };
     title: string;
@@ -173,6 +172,7 @@ export type Dictionary = {
     missingPrefix: string;
     dateLabel: string;
     dateClosedNotice: string;
+    dateRequiredNotice: string;
     locationsHintTitle: string;
     locationsHintText: string;
     locationsHintLink: string;

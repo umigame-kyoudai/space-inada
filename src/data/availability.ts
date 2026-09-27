@@ -34,6 +34,16 @@ export function isFullMoonClosureDate(value: string): boolean {
   return fullMoonClosureDates.has(value);
 }
 
+/** 登録済みの年間カレンダーから選択できる日付か。保存済み入力の再検証にも使う。 */
+export function isSelectableBookingDate(value: string, today: string): boolean {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return false;
+  if (!value.startsWith(`${AVAILABILITY_YEAR}-`) || value < today) return false;
+  const parsed = new Date(`${value}T00:00:00Z`);
+  return !Number.isNaN(parsed.getTime())
+    && parsed.toISOString().slice(0, 10) === value
+    && !isFullMoonClosureDate(value);
+}
+
 /** 日本時間の今日を YYYY-MM-DD で返す。 */
 export function getTodayInJapanDateKey(now = new Date()): string {
   const parts = new Intl.DateTimeFormat("ja-JP", {

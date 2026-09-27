@@ -19,6 +19,7 @@ import {
   AVAILABILITY_YEAR,
   getTodayInJapanDateKey,
   isFullMoonClosureDate,
+  isSelectableBookingDate,
 } from "@/data/availability";
 import { AvailabilityCalendar } from "@/components/booking/AvailabilityCalendar";
 import type { Dictionary } from "@/lib/i18n/dictionaries/types";
@@ -285,6 +286,7 @@ export function BookingForm({
     planOptions.find((p) => p.slug === defaultPlan)?.name ?? "";
 
   const [date, setDate] = useState("");
+  const [dateError, setDateError] = useState(false);
   const [preferredTimeWindow, setPreferredTimeWindow] =
     useState<PreferredTimeWindow>("");
   const [plan, setPlan] = useState(defaultPlanName);
@@ -320,7 +322,7 @@ export function BookingForm({
   }, []);
 
   const formRef = useRef<HTMLFormElement>(null);
-  const dateInputRef = useRef<HTMLInputElement>(null);
+  const dateFieldRef = useRef<HTMLFieldSetElement>(null);
   const adultMaleRef = useRef<HTMLInputElement>(null);
   const previewRef = useRef<HTMLTextAreaElement>(null);
   // モバイル固定バーの出し分け用。本来のアクションボタンが見えている間はバーを隠す。
@@ -340,6 +342,7 @@ export function BookingForm({
     Math.min(11, Math.max(0, Number(todayDateKey.slice(5, 7)) - 1)),
   );
   const isSelectedDateClosed = isFullMoonClosureDate(date);
+  const isSelectedDateValid = isSelectableBookingDate(date, todayDateKey);
   const adultMaleNum = Math.max(0, parseInt(adultMale, 10) || 0);
   const adultFemaleNum = Math.max(0, parseInt(adultFemale, 10) || 0);
   const childMaleNum = Math.max(0, parseInt(childMale, 10) || 0);
@@ -352,7 +355,7 @@ export function BookingForm({
   const requiredItems = [
     {
       label: t ? t.dateLabel : "撮影希望日",
-      complete: Boolean(date) && date >= todayDateKey && !isSelectedDateClosed,
+      complete: isSelectedDateValid,
     },
     {
       label: t ? t.timeWindowLabel : "希望時間帯",
@@ -387,21 +390,12 @@ export function BookingForm({
 
   function selectDate(value: string) {
     setDate(value);
+    setDateError(false);
     const [year, month] = value.split("-").map(Number);
-    if (year === AVAILABILITY_YEAR && month >= 1 && month <= 12) {
+    if (year === AVAILABILITY_YEAR && month >= 1 && month <= 12 && value >= todayDateKey) {
       setAvailabilityMonthIndex(month - 1);
     }
   }
-
-  useEffect(() => {
-    dateInputRef.current?.setCustomValidity(
-      isSelectedDateClosed
-        ? t
-          ? t.dateClosedNotice
-          : "この日は満月期間のため、星空フォトの撮影をお休みしています。別の日程をお選びください。"
-        : "",
-    );
-  }, [isSelectedDateClosed, t]);
 
   useEffect(() => {
     const message =
@@ -754,6 +748,7 @@ export function BookingForm({
 
   function handleClear() {
     setDate("");
+    setDateError(false);
     setPreferredTimeWindow("");
     setPlan(defaultPlanName);
     setName("");
@@ -798,6 +793,13 @@ export function BookingForm({
   }
 
   function validateRequiredFields(): boolean {
+    if (!isSelectedDateValid) {
+      setDateError(true);
+      const field = dateFieldRef.current;
+      field?.focus({ preventScroll: true });
+      field?.scrollIntoView({ block: "center", behavior: "instant" });
+      return false;
+    }
     const form = formRef.current;
     if (!form) return false;
     const invalid = Array.from(form.elements).find(
@@ -943,49 +945,40 @@ export function BookingForm({
         </div>
 
         <div className="mt-5 space-y-6">
-          <div>
-            <label
-              htmlFor="date"
+          <fieldset
+            ref={dateFieldRef}
+            id="date"
+            tabIndex={-1}
+            aria-invalid={dateError || (Boolean(date) && !isSelectedDateValid)}
+            aria-describedby={dateError || isSelectedDateClosed ? "date-error" : undefined}
+            className="m-0 w-full min-w-0 max-w-full border-0 p-0 outline-none"
+          >
+            <legend
               className="mb-1.5 block text-sm font-medium text-ink"
             >
               {t ? t.dateLabel : "撮影希望日"}
               <RequiredBadge label={requiredText} />
-            </label>
-            <input
-              ref={dateInputRef}
-              id="date"
-              type="date"
-              value={date}
-              onChange={(e) => selectDate(e.target.value)}
-              min={todayDateKey}
-              required
-              className={`${inputClass} [color-scheme:light]`}
+            </legend>
+            <AvailabilityCalendar
+              selectedDate={date}
+              onSelectDate={selectDate}
+              monthIndex={availabilityMonthIndex}
+              onMonthChange={setAvailabilityMonthIndex}
+              labels={t?.calendar}
+              locale={locale}
             />
-            {isSelectedDateClosed && (
+            {(dateError || isSelectedDateClosed) && (
               <p
+                id="date-error"
                 role="alert"
                 className="mt-2 text-xs font-medium text-rose-700"
               >
-                {t
-                  ? t.dateClosedNotice
-                  : "この日は満月期間のため、星空フォトの撮影をお休みしています。別の日程をお選びください。"}
+                {isSelectedDateClosed
+                  ? (t?.dateClosedNotice ?? "この日は満月期間のため、星空フォトの撮影をお休みしています。別の日程をお選びください。")
+                  : (t?.dateRequiredNotice ?? "カレンダーから受付可能な日を選択してください。")}
               </p>
             )}
-            <details className="booking-disclosure mt-2">
-              <summary>
-                {t?.calendarToggle ?? "撮影可能日をカレンダーで確認"}
-                <span aria-hidden="true">＋</span>
-              </summary>
-              <AvailabilityCalendar
-                selectedDate={date}
-                onSelectDate={selectDate}
-                monthIndex={availabilityMonthIndex}
-                onMonthChange={setAvailabilityMonthIndex}
-                labels={t?.calendar}
-                locale={locale}
-              />
-            </details>
-          </div>
+          </fieldset>
 
           <div>
             <label
