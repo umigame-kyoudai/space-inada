@@ -14,12 +14,12 @@ import {
 export const metadata: Metadata = buildMetadata({
   title: "予約フォーム",
   description:
-    "宮古島の星空フォト撮影の予約フォーム。入力内容をコピーして公式LINEから簡単に予約相談できます。",
+    "宮古島の星空フォト撮影の予約フォーム。入力内容を公式LINEのトークに引き継いで簡単に予約相談できます。",
   path: "/booking",
   languages: hreflangAlternates("booking"),
 });
 
-const steps = ["予約内容を入力", "送信文をコピー", "LINEで送信"];
+const steps = ["予約内容を入力", "ボタンでLINEへ", "内容を確認して送信"];
 
 export default async function BookingPage({
   searchParams,
@@ -46,7 +46,7 @@ export default async function BookingPage({
         LINEで予約・相談する
       </h1>
       <p className="mt-3 max-w-2xl text-sm leading-relaxed text-muted">
-        予約内容を入力したら、作成された文章をコピーしてLINEのトークに貼り付けて送信してください。
+        予約内容を入力して「予約内容をLINEに引き継ぐ」を押すと、公式LINEのトークに内容が入ります。あとは内容を確認して送信するだけです。
       </p>
 
       {/* 手順 */}

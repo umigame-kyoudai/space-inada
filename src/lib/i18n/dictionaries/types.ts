@@ -233,10 +233,12 @@ export type Dictionary = {
     copiedNotice: string;
     copyErrorNotice: string;
     lineFinalNote: string;
+    lineFallbackHeading: string;
+    lineFallbackNote: string;
+    lineFallbackButton: string;
     /** "{n}" を残り必須項目数で置換するテンプレート。formatTemplate で展開する */
     stickyRemaining: string;
     stickyComplete: string;
-    stickyCopy: string;
     stickyLine: string;
   };
 };

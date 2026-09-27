@@ -32,6 +32,8 @@ import {
 
 /** 公式LINE（予約相談） */
 const LINE_URL = "https://lin.ee/5z6HX4S";
+// 上記の友だち追加URLの転送先で確認した公式アカウント。
+const LINE_CHAT_URL = "https://line.me/R/oaMessage/%40066lfrkd";
 
 /** 入力内容の自動保存キー（離脱しても復元する） */
 const STORAGE_KEY = "booking-form-v2";
@@ -828,25 +830,32 @@ export function BookingForm({
     return false;
   }
 
-  // 公式LINEを開くリンク（メイン／モバイル固定バー共通）。
-  // 未入力があれば遷移させずフォームの該当箇所へ誘導する。
-  function handleLineClick(
-    e: React.MouseEvent<HTMLAnchorElement>,
-    buttonName: string,
-  ) {
-    if (!validateRequiredFields()) {
-      e.preventDefault();
-      return;
-    }
-    // CV計測：公式LINEを開いた（実質CV）
+  // クリック内で同期的に遷移し、スマートフォンのLINEへ予約文を引き継ぐ。
+  function handleLineClick(buttonName: string) {
+    if (!validateRequiredFields()) return;
+
+    // 個人情報を含むURLはhrefや解析イベントに載せない。
+    // GAの自動外部リンク計測に予約文が収集されないよう、通常のbuttonを使う。
     trackEvent("line_click", {
       button_name: buttonName,
-      link_url: LINE_URL,
+      link_url: LINE_CHAT_URL,
       plan_name: plan || "未選択",
       copied: effectiveStatus === "copied",
       coupon: coupon?.code ?? "なし",
       from: from || "direct",
     });
+    if (effectiveStatus !== "copied") {
+      trackEvent("form_submit", {
+        form_name: "booking",
+        button_name: buttonName,
+        plan_name: plan || "未選択",
+        coupon: coupon?.code ?? "なし",
+        from: from || "direct",
+      });
+    }
+    // https://developers.line.biz/ja/docs/line-login/using-line-url-scheme/
+    // LINE上での送信はお客様が行う。コピー処理や通信の完了は待たない。
+    window.location.assign(`${LINE_CHAT_URL}/?${encodeURIComponent(message)}`);
   }
 
   async function handleCopy() {
@@ -1549,7 +1558,7 @@ export function BookingForm({
           <p className="mt-1 text-xs text-muted">
             {t
               ? t.previewSubtext
-              : "この内容をコピーして、公式LINEのトークに貼り付けて送信してください。"}
+              : "ボタンを押すと、下の内容が公式LINEのトーク入力欄に入ります。内容を確認して送信してください。"}
           </p>
 
           {/* モバイルは max-h で圧縮（中はスクロール可）。長大な全文でボタンが
@@ -1585,37 +1594,45 @@ export function BookingForm({
           <div ref={actionsRef} className="mt-2 space-y-3">
             <button
               type="button"
-              onClick={handleCopy}
-              className="flex h-14 w-full items-center justify-center gap-2 rounded-lg border border-line bg-accent text-base font-bold text-on-accent shadow-none transition-colors hover:bg-accent-hover"
+              onClick={() => handleLineClick("booking_form")}
+              className="flex min-h-14 w-full items-center justify-center gap-2 rounded-lg bg-[#06C755] px-4 py-3 text-base font-bold text-ink shadow-sm transition-colors hover:bg-[#05b34c]"
             >
-              {t ? t.copyButton : "内容をコピーする"}
+              {t ? t.lineButton : "予約内容をLINEに引き継ぐ"}
             </button>
-
-            <a
-              href={LINE_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={(e) => handleLineClick(e, "booking_form")}
-              className={`flex h-14 w-full items-center justify-center gap-2 rounded-lg text-base font-bold transition-all ${
-                effectiveStatus === "copied"
-                  ? "scale-[1.02] bg-[#06C755] text-ink shadow-sm"
-                  : "border border-[#06C755]/60 bg-[#06C755]/10 text-[#17613b]"
-              }`}
-            >
-              {t ? t.lineButton : "公式LINEを開く"}
-            </a>
 
             <p className="text-center text-xs text-muted">
               {t
                 ? t.lineFinalNote
-                : "※自動では送信されません。LINEを開いたら、トークに貼り付け（ペースト）して送信してください。"}
+                : "スマートフォンのLINEが開き、予約内容が入力されます。最後にLINEの送信ボタンを押してください。"}
             </p>
+
+            <details className="booking-disclosure">
+              <summary>{t ? t.lineFallbackHeading : "内容が入らない・パソコンからご利用の場合"}</summary>
+              <p className="mt-3 text-xs leading-relaxed text-muted">
+                {t ? t.lineFallbackNote : "下のボタンで内容をコピーし、公式LINEのトークに貼り付けて送信してください。"}
+              </p>
+              <button
+                type="button"
+                onClick={handleCopy}
+                className="mt-3 flex min-h-11 w-full items-center justify-center rounded-lg border border-line bg-white px-4 py-2 text-sm font-semibold text-ink hover:bg-mist"
+              >
+                {t ? t.copyButton : "内容をコピーする"}
+              </button>
+              <a
+                href={LINE_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-2 flex min-h-11 items-center justify-center text-sm font-semibold text-[#17613b] underline underline-offset-4"
+              >
+                {t ? t.lineFallbackButton : "公式LINEを開く"}
+              </a>
+            </details>
           </div>
         </div>
       </div>
 
       {/* モバイル用の固定アクションバー。
-          長いフォームのどこからでも進捗確認とコピー→LINEに進めるようにする。
+          長いフォームのどこからでも進捗確認とLINEへの引き継ぎができるようにする。
           本来のアクションボタンが見えている間は重複するため非表示。 */}
       {!actionsInView && !formFocused && (
         <div className="booking-sticky-actions fixed inset-x-0 bottom-0 z-40 border-t border-line bg-white px-4 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-2.5 lg:hidden">
@@ -1630,7 +1647,7 @@ export function BookingForm({
             {incompleteRequiredItems.length === 0
               ? t
                 ? t.stickyComplete
-                : "✓ 必須項目の入力が完了しました。コピーして送信へ"
+                : "✓ 入力完了。LINEで内容を確認して送信してください"
               : t
                 ? formatTemplate(t.stickyRemaining, {
                     n: incompleteRequiredItems.length,
@@ -1649,28 +1666,13 @@ export function BookingForm({
               </span>
             </button>
           ) : (
-            <div className="mt-2 grid grid-cols-2 gap-2">
-              <button
-                type="button"
-                onClick={handleCopy}
-                className="flex h-12 items-center justify-center gap-1.5 rounded-lg border border-line bg-accent text-sm font-bold text-on-accent transition-colors hover:bg-accent-hover"
-              >
-                {t ? t.stickyCopy : "内容をコピー"}
-              </button>
-              <a
-                href={LINE_URL}
-                target="_blank"
-                rel="noopener noreferrer"
-                onClick={(e) => handleLineClick(e, "booking_form_sticky")}
-                className={`flex h-12 items-center justify-center gap-1.5 rounded-lg text-sm font-bold transition-all ${
-                  effectiveStatus === "copied"
-                    ? "bg-[#06C755] text-ink shadow-lg shadow-[#06C755]/30"
-                    : "border border-[#06C755]/60 bg-[#06C755]/10 text-[#17613b]"
-                }`}
-              >
-                {t ? t.stickyLine : "LINEを開く"}
-              </a>
-            </div>
+            <button
+              type="button"
+              onClick={() => handleLineClick("booking_form_sticky")}
+              className="mt-2 flex min-h-12 w-full items-center justify-center gap-1.5 rounded-lg bg-[#06C755] px-4 py-2 text-sm font-bold text-ink shadow-sm transition-colors hover:bg-[#05b34c]"
+            >
+              {t ? t.stickyLine : "予約内容をLINEに引き継ぐ"}
+            </button>
           )}
         </div>
       )}
