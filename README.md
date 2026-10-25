@@ -1,11 +1,13 @@
-# 星空フォト宮古島
+# KEY PHOTO 宮古島
 
 宮古島の星空フォト撮影サービス向けの Next.js サイトです。
+
+2026-10-25：本番は顧客所有のCloudflareへ切替済み。受領後は [はじめに.md](はじめに.md)、[引き継ぎ手順](docs/HANDOVER.md)、[本番更新・GitHub連携](docs/CLOUDFLARE.md) を参照してください。
 SEO、予約導線、プラン詳細、ブログ、FAQ、ギャラリー、お客様の声を App Router で構成しています。
 
 ## 技術構成
 
-- Next.js `16.2.7`
+- Next.js `16.4.3`
 - React `19.2.4`
 - TypeScript
 - Tailwind CSS v4
@@ -67,7 +69,7 @@ npm run start
 
 ## 環境変数
 
-`.env*` は Git 管理外です。ローカルでは `.env.local` を作成し、本番では Vercel などの環境変数に設定してください。
+`.env*` は Git 管理外です。Cloudflareの本番ビルドでは `config/site-public.json` から公開用URL・GA測定IDを設定します。非公開の値はCloudflare Secretsで管理してください。
 
 | 変数名 | 用途 |
 |---|---|

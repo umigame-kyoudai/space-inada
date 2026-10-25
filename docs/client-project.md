@@ -1,5 +1,22 @@
 # KEY PHOTO 宮古島 管理台帳
 
+## 現在の状態（2026-10-25 最終更新）
+
+以下の最新状態を優先し、後半の記録は過去の作業履歴として扱う。
+
+- 本番：顧客所有Cloudflare Worker `keyphoto-miyakojima`、https://keyphotomiyakojima.com/ 。旧/wwwは308転送。
+- 顧客Account ID：`c1db2261f1b54c87010621b814be41a6`。
+- 本番Zone ID：`726b6df9635c3d4084cf5539b72abe1d`。旧Zone ID：`8490f1a04e2f435cd5018ab0bf7d51d4`。
+- 両NS：`maxim.ns.cloudflare.com` / `sima.ns.cloudflare.com`。DNSと公開先の切替済み。Vercel公開先は移行中の予備として保持。
+- ドメインの契約・更新料はまだ旧管理側。認証コード取得・解除反映・Cloudflareで両方の移管準備完了まで確認。本人が登録者情報・支払い・移管申請を行う。
+- ローカルソースはユーザーが本人へ受け渡し済み。本人がGitHubに保存し、既存本番Workerへ直接接続する。自動公開は未接続。
+- 元Repository `umigame-kyoudai/space-inada` は移管しない。最新引き継ぎ設定は `codex/cloudflare-handover-preview`。mainは従来公開時点のまま。
+- 追加設定・受け取り手順：[HANDOVER.md](HANDOVER.md)、[CLOUDFLARE.md](CLOUDFLARE.md)。
+- ユーザー指示により予約台帳・管理アプリの照合を終了。既存運用を継続し、予約管理・解析権限の移管は今回完了扱いにしない。
+- 有料プランの契約・ドメイン移管の決済・相手へのメッセージ送信は実施していない。
+
+---
+
 確認日：2026-09-27。秘密値・顧客のアクセス実績はこの公開Repositoryに保存しない。
 
 ## 基本情報

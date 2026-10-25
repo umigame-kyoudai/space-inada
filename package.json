@@ -8,9 +8,12 @@
     "start": "next start",
     "lint": "eslint",
     "gen:blur": "node scripts/gen-blur-placeholders.mjs",
-    "build:cloudflare": "NEXT_PUBLIC_DEPLOYMENT_STAGE=preview opennextjs-cloudflare build && node scripts/prepare-cloudflare-env.mjs",
-    "preview:cloudflare": "opennextjs-cloudflare preview",
-    "deploy:cloudflare": "opennextjs-cloudflare deploy"
+    "build:cloudflare": "node scripts/cloudflare.mjs build preview",
+    "preview:cloudflare": "node scripts/cloudflare.mjs preview preview",
+    "deploy:cloudflare": "node scripts/cloudflare.mjs deploy preview",
+    "build:production": "node scripts/cloudflare.mjs build production",
+    "preview:production": "node scripts/cloudflare.mjs preview production",
+    "deploy:production": "node scripts/cloudflare.mjs deploy production"
   },
   "dependencies": {
     "next": "16.4.3",

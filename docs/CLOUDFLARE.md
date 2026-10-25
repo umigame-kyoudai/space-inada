@@ -1,52 +1,66 @@
-# Cloudflare確認用サイト
+# Cloudflare公開・更新
 
-更新：2026-10-25。独自ドメインの本番は従来の公開先を継続する。
+更新：2026-10-25。本人のCloudflareで本番を公開。GitHubの接続は本人が行う。
 
-## 公開先
+## 対応表
 
-- URL: https://keyphoto-miyakojima-preview.miyako-keyphoto.workers.dev/
-- Worker: `keyphoto-miyakojima-preview`
-- Account: `wrangler.jsonc` の `account_id` で固定した顧客所有アカウント。
-- 更新ブランチ: `codex/cloudflare-handover-preview`。`main` は既存本番用。
-- Next.js 16.4.3 / OpenNext Cloudflare 1.20.13 / Wrangler 4.152.0。
-- 有料プラン、R2、Images契約は追加していない。静的生成データはWorkerの静的アセットに格納する。
+|用途|Worker / URL|設定|
+|---|---|---|
+|本番|`keyphoto-miyakojima` / https://keyphotomiyakojima.com/|`wrangler.production.jsonc`|
+|確認用|`keyphoto-miyakojima-preview` / https://keyphoto-miyakojima-preview.miyako-keyphoto.workers.dev/|`wrangler.jsonc`|
 
-## ビルドと手動公開
+- Account ID: `c1db2261f1b54c87010621b814be41a6`（顧客所有）。
+- 本番Workerに `keyphotomiyakojima.com`、`www.keyphotomiyakojima.com`、`space-inada.com`、`www.space-inada.com` を接続済み。
+- www・旧ドメインから正規URLへ308転送し、パス・クエリを保持する。
+- 両ドメインのNS: `maxim.ns.cloudflare.com` / `sima.ns.cloudflare.com`。DNS管理は顧客側へ変更済み。登録契約・更新料の移管は本人の決済待ち。
+- Next.js 16.4.3 / OpenNext Cloudflare 1.20.13 / Wrangler 4.152.0 / Node.js 24系。
+- Freeプラン。有料プラン・R2・Images契約の追加なし。利用増加時は本人が使用量と必要プランを判断する。
+
+## 本人のGitHubを接続
+
+1. 本人の `keyphoto-miyakojima` アカウントに `space-inada` Repositoryを作成する（Private推奨）。元の制作側Repositoryの移管は不要。
+2. 受領済みフォルダへ追加分を適用し、`package.json` がRepository直下に来るよう保存する。追加分はファイル単位で上書き・結合し、既存フォルダ丸ごとの置換で写真等を消さない。
+3. `.env*`、`.git/`、`node_modules/`、`.next/`、`.open-next/`、`output/`、ドメイン移管コードを登録しない。GitHub Desktop等で `.gitignore` を含めて保存する。
+4. Cloudflareで既存本番Worker `keyphoto-miyakojima` →「設定」→「ビルド / Builds」→ Gitリポジトリを接続。GitHubは本人アカウントの対象Repositoryだけを認可する。
+5. 次の値を設定する。
+
+|項目|値|
+|---|---|
+|Repository|`keyphoto-miyakojima/space-inada`|
+|Production branch|`main`|
+|Root directory|Repository直下（`package.json` のある場所）|
+|Build command|`npm run build:production`|
+|Deploy command|`npm run deploy:production`|
+|Build variable|`NODE_VERSION=24`|
+|その他のブランチの自動ビルド|初回は無効。本番用のコマンドを流用しない|
+
+6. 最初のビルドが成功し、既存Workerと公開URLに反映されたら接続完了。以後は本人のGitHub更新で自動公開する。
+
+既存の確認用Workerへ本番コマンドを設定しない。旧管理側OrganizationのCloudflare連携も変更しない。
+
+## ローカルから更新する場合
 
 ```sh
 npm ci
+npx wrangler login
+npx wrangler whoami
 npm run lint
-npm run build:cloudflare
-npm run deploy:cloudflare
+npm run build:production
+npm run deploy:production
 ```
 
-`build:cloudflare` は `NEXT_PUBLIC_DEPLOYMENT_STAGE=preview` を設定し、全ページをnoindexにしてGA4を無効化する。既存の `npm run build` は従来のNext.jsビルドのまま。
+認証先が上記Account IDと一致することを確認する。本番用ビルド・公開の組合せはスクリプトで検査する。サイトURLと公開用GA測定IDは `config/site-public.json` にある。現在のサイト公開に制作側の秘密キーは不要。
 
-OpenNextはローカル `.env` の値も出力へコピーする。そのためビルドの最終工程で `prepare-cloudflare-env.mjs` を実行し、Worker出力から非公開環境変数を除去する。プレビューではGA4 IDも除去する。サーバー用秘密値が必要になった場合はCloudflareのSecretとして設定し、コード・環境ファイル・資料へ保存しない。
+確認用は `npm run build:cloudflare` → `npm run deploy:cloudflare`。確認用はnoindex・GA無効。本番Workerの `workers.dev` URLにもnoindexヘッダーを付け、GAを停止する。本番独自ドメインは検索登録・既存GA測定IDを継続する。
 
-ローカルのWorker確認は `npm run preview:cloudflare`。相手への確認URLには上記HTTPS URLを使用する。
+ビルドの最後に `scripts/prepare-cloudflare-env.mjs` がOpenNext出力から非公開環境変数を除去する。将来秘密値が必要になった場合は顧客側のCloudflare Secretsで管理する。
 
-## GitHub連携は任意（現在はファイル納品）
+## 確認と復旧
 
-2026-10-25：ユーザーの方針変更により、本人へのGitHub移管申請を取り消し、元の `umigame-kyoudai/space-inada` へ戻した。現在はソース一式をファイル納品し、本人のCloudflareへ手動公開する構成。GitHubからの自動公開は未接続。以下は将来自動公開を希望する場合の参考手順。
+- 本番・4言語・予約ページ・画像・動画・robots・sitemapをHTTPSで確認。旧/www転送はパス・クエリを保持。
+- スマホ390pxでトップ・予約画面の横はみ出しなし、写真・動画とGAタグの読込を確認。LINEの実送信・予約登録は行っていない。
+- DNS切替直後は旧キャッシュ経由でVercelへ到達する環境が残る。旧公開先は移行中の予備として残している。
+- DNSの `vercel-origin-backup` は元の接続先を保存した予備レコード。`*` は旧来の汎用サブドメイン設定を保持。4つの正式ホストはWorkerへ直接接続しており、これら予備レコードには依存しない。
+- 更新で不具合が出た場合、Cloudflareの本番Worker「デプロイ」から正常な直前バージョンへ戻す。独自ドメインやDNSを削除する必要はない。
 
-1. 本人のGitHubに `space-inada` Repositoryを作り、納品ソースを保存する。既存Repositoryの移管は不要。
-2. 本人のGitHubでCloudflare Workers and Pagesアプリを認可する。対象Repositoryは `space-inada` だけを選ぶ。
-3. 顧客のCloudflareで既存Worker `keyphoto-miyakojima-preview` を開き、設定のBuildsからRepositoryを接続する。新しいWorkerを重複作成しない。
-4. リポジトリは `keyphoto-miyakojima/space-inada`、公開ブランチは `codex/cloudflare-handover-preview`、ルートはRepository直下。
-5. ビルドコマンド: `npm run build:cloudflare`。デプロイコマンド: `npm run deploy:cloudflare`。Node.jsは24系を使用する。
-6. このブランチへのpushが既存Workerへ反映されたことを、CloudflareのBuilds結果と公開ページで確認する。
-
-旧管理側のGitHub Organizationは別のCloudflareアカウントで他サイトにも利用されている。顧客接続のために既存OrganizationのCloudflare連携を付け替えない。
-
-## 確認済み・本番切替前の確認事項
-
-- 公開HTTPSで日本語・英語・繁体字・韓国語、予約ページ、記事、OG画像、写真、動画のHTTP 200を確認。
-- 320/390pxのスマホ幅で横はみ出しなし。トップ写真・動画の読込、予約ページへの画面遷移、予約文の生成、noindex、GAタグ未読込を確認。テスト入力は消去済み。
-- 正しい紹介コードのみCookieを保存し、既存Cookieがある場合は再設定しないことを確認。
-- OpenNextのNode.js Proxy対応は実験的扱い。紹介コードの回帰確認を本番切替時にも行う。
-- このプレビューの画像は元画像の配信。Cloudflare Imagesによる有料の画像変換は設定していない。本番切替前にスマホ回線の表示速度を評価する。
-- LINE上での実際の送信・予約登録はテストしていない。予約確定・カレンダー操作は既存運用を継続する。
-- DNS、独自ドメイン、本番GA4、請求先の切替は別工程。
-
-参考：[Cloudflare OpenNext](https://developers.cloudflare.com/workers/framework-guides/web-apps/opennext/)、[OpenNextの導入手順](https://opennext.js.org/cloudflare/get-started)、[CloudflareとGitHubの連携](https://developers.cloudflare.com/workers/ci-cd/builds/git-integration/github-integration/)。
+参考：[Workers Builds設定](https://developers.cloudflare.com/workers/ci-cd/builds/configuration/)、[GitHub連携](https://developers.cloudflare.com/workers/ci-cd/builds/git-integration/github-integration/)。

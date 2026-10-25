@@ -1,5 +1,7 @@
 # 環境変数
 
+2026-10-25更新：現在のCloudflare公開設定は [CLOUDFLARE.md](CLOUDFLARE.md) を優先してください。本番用URL・GA測定IDは `config/site-public.json` で設定します。以下のVercel記述は以前の環境の参考です。
+
 `.env*` は `.gitignore` で除外されています。ローカルでは `.env.local` を作成し、
 本番では Vercel のプロジェクト設定（Environment Variables）に登録してください。
 

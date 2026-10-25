@@ -34,6 +34,7 @@ export function isGaEnabled(): boolean {
   const vercelEnv = process.env.NEXT_PUBLIC_VERCEL_ENV;
   if (vercelEnv && vercelEnv !== "production") return false;
   if (typeof window === "undefined") return false;
+  if (window.location.hostname.endsWith(".workers.dev")) return false;
   return !LOCAL_HOSTNAMES.has(window.location.hostname);
 }
 
