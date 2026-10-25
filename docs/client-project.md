@@ -8,7 +8,8 @@
 - 顧客Account ID：`c1db2261f1b54c87010621b814be41a6`。
 - 本番Zone ID：`726b6df9635c3d4084cf5539b72abe1d`。旧Zone ID：`8490f1a04e2f435cd5018ab0bf7d51d4`。
 - 両NS：`maxim.ns.cloudflare.com` / `sima.ns.cloudflare.com`。DNSと公開先の切替済み。Vercel公開先は移行中の予備として保持。
-- ドメインの契約・更新料はまだ旧管理側。認証コード取得・解除反映・Cloudflareで両方の移管準備完了まで確認。本人が登録者情報・支払い・移管申請を行う。
+- 本番ドメイン keyphotomiyakojima.com の契約・更新料はまだ旧管理側。本人が登録者情報・支払い・移管申請を行う。
+- 2026-10-25追記：ユーザーの指示で旧 space-inada.com は自動更新を停止。API再読取で renew=false、期限2027-06-06を確認。本番ドメインはrenew=trueのまま。旧ドメインは移管対象外、期限後は転送も終了。
 - ローカルソースはユーザーが本人へ受け渡し済み。本人がGitHubに保存し、既存本番Workerへ直接接続する。自動公開は未接続。
 - 元Repository `umigame-kyoudai/space-inada` は移管しない。最新引き継ぎ設定は `codex/cloudflare-handover-preview`。mainは従来公開時点のまま。
 - 追加設定・受け取り手順：[HANDOVER.md](HANDOVER.md)、[CLOUDFLARE.md](CLOUDFLARE.md)。

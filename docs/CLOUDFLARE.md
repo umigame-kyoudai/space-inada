@@ -12,7 +12,7 @@
 - Account ID: `c1db2261f1b54c87010621b814be41a6`（顧客所有）。
 - 本番Workerに `keyphotomiyakojima.com`、`www.keyphotomiyakojima.com`、`space-inada.com`、`www.space-inada.com` を接続済み。
 - www・旧ドメインから正規URLへ308転送し、パス・クエリを保持する。
-- 両ドメインのNS: `maxim.ns.cloudflare.com` / `sima.ns.cloudflare.com`。DNS管理は顧客側へ変更済み。登録契約・更新料の移管は本人の決済待ち。
+- 両ドメインのNS: `maxim.ns.cloudflare.com` / `sima.ns.cloudflare.com`。DNS管理は顧客側へ変更済み。本番ドメインの登録契約・更新料の移管は本人の決済待ち。旧 `space-inada.com` は自動更新OFF（期限2027-06-06）、移管不要。期限後は旧URLの転送も終了する。
 - Next.js 16.4.3 / OpenNext Cloudflare 1.20.13 / Wrangler 4.152.0 / Node.js 24系。
 - Freeプラン。有料プラン・R2・Images契約の追加なし。利用増加時は本人が使用量と必要プランを判断する。
 
