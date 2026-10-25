@@ -9,7 +9,7 @@
     "lint": "eslint",
     "gen:blur": "node scripts/gen-blur-placeholders.mjs",
     "build:cloudflare": "NEXT_PUBLIC_DEPLOYMENT_STAGE=preview opennextjs-cloudflare build && node scripts/prepare-cloudflare-env.mjs",
-    "preview:cloudflare": "wrangler dev",
+    "preview:cloudflare": "opennextjs-cloudflare preview",
     "deploy:cloudflare": "opennextjs-cloudflare deploy"
   },
   "dependencies": {
