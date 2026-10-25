@@ -107,3 +107,11 @@
 - Next.jsを維持し、OpenNext経由でWorkersに公開。86ページの静的生成、動的予約ページ、写真・動画、4言語を確認。プレビューはnoindex・GA4無効。
 - 設定・GitHub直接連携の手順・本番切替前の確認事項は [CLOUDFLARE.md](CLOUDFLARE.md)。GitHubの自動公開は未接続。
 - 既存本番・独自ドメイン・DNSは変更していない。有料プラン・R2・Images契約は追加していない。
+
+## 2026-10-25 GitHub移管の申請
+
+- Cloudflare用コードを `codex/cloudflare-handover-preview` に保存・push済み。`main` は変更していない。
+- GitHubの制約でOrganizationから他の個人へ直接移管できないため、Repositoryを管理担当者本人 `umigamekyoudai/space-inada` へ移し、その後 `keyphoto-miyakojima` への移管を申請した。Repository IDは同一で履歴を維持。
+- GitHub設定画面で `This repository is being transferred to @keyphoto-miyakojima.` を確認。本人の受け取り承認待ち。移管確認メールの期限は1日。
+- Cloudflare WorkerのGitHub接続は、本人の移管承認とGitHubアプリの認可後に完了させる。現時点の公開は手動デプロイ。
+- 本番トップ200、旧ドメインの現ドメインへの308転送を移管申請後にも確認。

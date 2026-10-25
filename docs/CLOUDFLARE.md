@@ -28,6 +28,8 @@ OpenNextはローカル `.env` の値も出力へコピーする。そのため�
 
 ## GitHubの直接連携（受取先の認証が必要）
 
+2026-10-25：コードを専用ブランチへ保存し、`keyphoto-miyakojima` への所有権移管を申請済み。現在は `umigamekyoudai/space-inada` から本人への承認待ち。自動公開はまだ接続されていない。
+
 1. GitHub Repositoryの所有権を `keyphoto-miyakojima` が受け取る。
 2. 本人のGitHubでCloudflare Workers and Pagesアプリを認可する。対象Repositoryは `space-inada` だけを選ぶ。
 3. 顧客のCloudflareで既存Worker `keyphoto-miyakojima-preview` を開き、設定のBuildsからRepositoryを接続する。新しいWorkerを重複作成しない。
@@ -40,7 +42,7 @@ OpenNextはローカル `.env` の値も出力へコピーする。そのため�
 ## 確認済み・本番切替前の確認事項
 
 - 公開HTTPSで日本語・英語・繁体字・韓国語、予約ページ、記事、OG画像、写真、動画のHTTP 200を確認。
-- 390pxのスマホ幅で横はみ出しなし。トップ写真・動画の読込、予約ページへの画面遷移、noindex、GAタグ未読込を確認。
+- 320/390pxのスマホ幅で横はみ出しなし。トップ写真・動画の読込、予約ページへの画面遷移、予約文の生成、noindex、GAタグ未読込を確認。テスト入力は消去済み。
 - 正しい紹介コードのみCookieを保存し、既存Cookieがある場合は再設定しないことを確認。
 - OpenNextのNode.js Proxy対応は実験的扱い。紹介コードの回帰確認を本番切替時にも行う。
 - このプレビューの画像は元画像の配信。Cloudflare Imagesによる有料の画像変換は設定していない。本番切替前にスマホ回線の表示速度を評価する。

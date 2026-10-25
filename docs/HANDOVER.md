@@ -4,6 +4,8 @@
 
 確認URL：https://keyphoto-miyakojima-preview.miyako-keyphoto.workers.dev/ 。公開設定・GitHub直接連携手順は [CLOUDFLARE.md](CLOUDFLARE.md) を参照。
 
+GitHubは `keyphoto-miyakojima` へ移管申請済みで、本人の受け取り承認待ち。受け取り後にCloudflareのGitHub連携を認可して自動公開を接続する。
+
 ## 引き継ぎの到達点
 
 いなちゃんが自分のアカウントで、サイトの所有・更新・公開・ドメイン更新・予約管理・アクセス解析・支払いを管理できる状態にする。コードは顧客専用GitHub Repositoryを引き継ぎ、公開先・ドメイン・DNSは本人管理のCloudflareへまとめる。既存URL、記事、写真、予約導線、旧ドメインの転送、計測履歴を維持する。
