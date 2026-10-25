@@ -26,11 +26,11 @@ OpenNextはローカル `.env` の値も出力へコピーする。そのため�
 
 ローカルのWorker確認は `npm run preview:cloudflare`。相手への確認URLには上記HTTPS URLを使用する。
 
-## GitHubの直接連携（受取先の認証が必要）
+## GitHub連携は任意（現在はファイル納品）
 
-2026-10-25：コードを専用ブランチへ保存し、`keyphoto-miyakojima` への所有権移管を申請済み。現在は `umigamekyoudai/space-inada` から本人への承認待ち。自動公開はまだ接続されていない。
+2026-10-25：ユーザーの方針変更により、本人へのGitHub移管申請を取り消し、元の `umigame-kyoudai/space-inada` へ戻した。現在はソース一式をファイル納品し、本人のCloudflareへ手動公開する構成。GitHubからの自動公開は未接続。以下は将来自動公開を希望する場合の参考手順。
 
-1. GitHub Repositoryの所有権を `keyphoto-miyakojima` が受け取る。
+1. 本人のGitHubに `space-inada` Repositoryを作り、納品ソースを保存する。既存Repositoryの移管は不要。
 2. 本人のGitHubでCloudflare Workers and Pagesアプリを認可する。対象Repositoryは `space-inada` だけを選ぶ。
 3. 顧客のCloudflareで既存Worker `keyphoto-miyakojima-preview` を開き、設定のBuildsからRepositoryを接続する。新しいWorkerを重複作成しない。
 4. リポジトリは `keyphoto-miyakojima/space-inada`、公開ブランチは `codex/cloudflare-handover-preview`、ルートはRepository直下。

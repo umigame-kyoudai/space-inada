@@ -115,3 +115,10 @@
 - GitHub設定画面で `This repository is being transferred to @keyphoto-miyakojima.` を確認。本人の受け取り承認待ち。移管確認メールの期限は1日。
 - Cloudflare WorkerのGitHub接続は、本人の移管承認とGitHubアプリの認可後に完了させる。現時点の公開は手動デプロイ。
 - 本番トップ200、旧ドメインの現ドメインへの308転送を移管申請後にも確認。
+
+## 2026-10-25 GitHub移管取り消し・ファイル納品への変更
+
+- ユーザーから「GitHubは移動しなくてよい、ローカルファイルを渡す形でよい」と方針の見直しがあり、本人への移管申請を取り消した。
+- Repositoryは元の `umigame-kyoudai/space-inada` へ戻し、同じRepository ID・コード・履歴を保持。ローカルremoteも元のURLへ復元。
+- Cloudflare確認用サイトは公開を継続。GitHub自動公開の接続は進めない。
+- ソース納品は `space-inada` フォルダ名のままで問題ない。KEY PHOTOの表示名とは独立している。秘密値・依存パッケージ・ビルド出力・個別作業記録を除外したZIPと、手動更新手順を用意する。

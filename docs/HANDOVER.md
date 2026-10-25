@@ -1,14 +1,14 @@
 # KEY PHOTO 宮古島 引き継ぎ資料
 
-作成日：2026-10-25。状態：Cloudflare確認用サイトを公開済み。所有権移管・本番公開先切替・請求先変更は未完了。
+作成日：2026-10-25。状態：Cloudflare確認用サイトを公開済み。本番公開先切替・ドメイン・請求先変更は未完了。GitHub移管は取り消し、コード一式のファイル納品を基本とする。
 
 確認URL：https://keyphoto-miyakojima-preview.miyako-keyphoto.workers.dev/ 。公開設定・GitHub直接連携手順は [CLOUDFLARE.md](CLOUDFLARE.md) を参照。
 
-GitHubは `keyphoto-miyakojima` へ移管申請済みで、本人の受け取り承認待ち。受け取り後にCloudflareのGitHub連携を認可して自動公開を接続する。
+GitHubは元の `umigame-kyoudai/space-inada` に保持する。本人は納品された `space-inada` フォルダを保管し、手元からCloudflareへ更新できる。本人のGitHubへの移管・接続は必須ではない。
 
 ## 引き継ぎの到達点
 
-いなちゃんが自分のアカウントで、サイトの所有・更新・公開・ドメイン更新・予約管理・アクセス解析・支払いを管理できる状態にする。コードは顧客専用GitHub Repositoryを引き継ぎ、公開先・ドメイン・DNSは本人管理のCloudflareへまとめる。既存URL、記事、写真、予約導線、旧ドメインの転送、計測履歴を維持する。
+いなちゃんが自分のアカウントで、サイトの所有・更新・公開・ドメイン更新・予約管理・アクセス解析・支払いを管理できる状態にする。コードはサイト一式のファイルとして納品し、公開先・ドメイン・DNSは本人管理のCloudflareへまとめる。既存URL、記事、写真、予約導線、旧ドメインの転送、計測履歴を維持する。
 
 ## 受け取り先と準備状況
 
@@ -24,8 +24,8 @@ GitHubは `keyphoto-miyakojima` へ移管申請済みで、本人の受け取り
 
 | 対象 | 確認できた現状 | 引き継ぎで行うこと |
 | --- | --- | --- |
-| サイトのコード・履歴 | GitHub `umigame-kyoudai/space-inada`、公開Repository、既定ブランチ `main` | 本人のアカウントまたは本人所有Organizationへ移管。履歴・画像・動画も含める |
-| サイト公開 | Vercel `umigame-kyoudai / space-inada`。本番URLはHTTPS 200 | 本人のCloudflareに構築し、GitHubと直接連携。HTTPSプレビュー確認後に本番切替 |
+| サイトのコード・履歴 | GitHub `umigame-kyoudai/space-inada`、公開Repository、既定ブランチ `main` | GitHubの移管は行わず、コード・画像・動画・設定・更新手順をファイル納品 |
+| サイト公開 | Vercel `umigame-kyoudai / space-inada`。本番URLはHTTPS 200。本人のCloudflareに確認用サイトを公開済み | ファイルからの更新手順を納品し、HTTPSプレビュー確認後に本番切替 |
 | 現ドメイン | `keyphotomiyakojima.com`。Vercel管理、自動更新ON、期限2027-07-15 | 登録者・連絡先・請求・DNS・SSLを確認して本人管理へ移す |
 | 旧ドメイン | `space-inada.com`。Vercel管理、自動更新ON、期限2027-06-06 | 移管後も現ドメインへの恒久転送を維持。旧URLを開ける状態を保つ |
 | 予約台帳 | 確認できる「星空フォト予約管理」は引き継ぎ元の所有。本人が現在使う台帳との一致は未確認 | 本人の台帳URLと、稼働中Apps Scriptの接続先を照合。同一台帳なら所有権・共有範囲の移行方法を決める |
@@ -43,7 +43,7 @@ GitHubは `keyphoto-miyakojima` へ移管申請済みで、本人の受け取り
 
 1. 確認済みのCloudflare受取先アカウントを使用する。対象ごとの管理者・請求先・引き継ぎ先を非公開台帳にそろえ、現在使われている予約台帳・アプリを照合する。コード、素材、DNS全レコード、環境変数、移行対象データを退避する。秘密値はGitに保存しない。
 2. 本人のCloudflareでプレビューを用意する。Next.js構成・画像最適化・OG画像・紹介コード・4言語・LINE予約・解析を確認する。Workers/Pagesの選定は互換性確認後に確定する。
-3. GitHub移管とCloudflareのリポジトリ接続を同じ作業枠で行い、本人側の更新がプレビューへ反映されることを確認する。GitHubの受け取り操作は本人に行ってもらう。
+3. `space-inada` のソース一式と更新手順を納品し、本人側の端末または依頼先からCloudflareへ更新できることを確認する。GitHub移管は行わない。自動公開を後から希望する場合は本人のRepositoryを新規作成する方法も選べる。
 4. スマホのモバイル回線からHTTPSプレビューを確認し、画像・動画・主要操作・予約導線を検証する。プレビューのnoindexとGA4の本番データへの混入防止を確認する。
 5. 対象ドメイン・DNSレコード・メール用レコード・SSL・戻し方を確認した上で、本番をCloudflareへ切り替える。新旧ドメインのwwwを含む転送とパス・クエリの保持を検証する。
 6. ドメインの移管可否と実額を確認し、有料操作は料金承認後に実施する。登録者・連絡先・支払い・自動更新を本人側へそろえる。
@@ -66,7 +66,7 @@ GitHubは `keyphoto-miyakojima` へ移管申請済みで、本人の受け取り
 | 撮影休止日 | `src/data/availability.ts`。予約管理アプリの「休止日」と整合を確認 |
 | 英語・繁体字・韓国語 | `src/lib/i18n/dictionaries/` の対応データ |
 
-通常の更新は、変更用ブランチで編集 → `npm run lint` / `npm run build` → HTTPSプレビューをスマホで確認 → `main`へ反映 → 本番確認。移管後のプレビューURLと実際の公開操作をこの資料に追記する。
+通常の更新は、納品ファイルをバックアップ → 編集 → `npm run lint` / `npm run build:cloudflare` → `npm run deploy:cloudflare` → HTTPS確認用サイトをスマホで確認。本番への公開手順は独自ドメイン切替時に追記する。GitHubを利用する場合は更新履歴の保存にも使える。
 
 休止日カレンダーは現時点で2026年限定。2027年の予約受付前に、年と休止日を確認・更新する。現行の予約カレンダー表示はリアルタイムの満席管理ではなく、予約の確定はLINEで行う。
 
@@ -80,7 +80,7 @@ GitHubは `keyphoto-miyakojima` へ移管申請済みで、本人の受け取り
 
 ## 完了確認
 
-- [ ] 本人がGitHubの所有者としてコード・履歴・素材・設定を管理できる
+- [ ] 本人が納品ファイルでコード・素材・設定を保管し、更新・再公開できる
 - [ ] 本人がCloudflareの公開・DNS・ドメイン・請求を管理できる
 - [ ] 現URL・旧URL・wwwのHTTPSと転送、主要ページ、4言語、写真・動画、LINE導線を確認済み
 - [ ] 本人側でサイトを1か所更新し、本番反映と復旧方法を確認済み
