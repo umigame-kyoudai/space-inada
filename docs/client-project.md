@@ -72,3 +72,38 @@
 2. ドメインの登録名義、Googleビジネスプロフィールの所有者、各検索サービスの所有権を確認する。
 3. 引き渡し先への権限付与と環境変数の移設は、移管時の承認の下で行う。秘密値はGitやこの台帳に記録しない。
 4. 旧ドメインの転送、canonical、サイトマップ、GA4計測を移管後にも検証する。
+
+## 2026-10-25 全管理の引き継ぎ準備
+
+- ユーザー意向：いなちゃんへサイトと管理全体を引き継ぐ。コード・公開・ドメイン・予約管理・解析・請求を本人が管理できる状態を目標とする。
+- 受け取り先：GitHub・Cloudflareは未作成の可能性あり。Googleアカウントは持っているはずとの回答。正確なアカウント・メールアドレスは未確認。
+- GitHub APIで公開Repository `umigame-kyoudai/space-inada` と管理権限、既定ブランチ `main` を確認。リモートmainは `b8aeb3b1ddad49b59c26e6900f08d022067e7e41`。
+- Vercel APIとHTTPS応答で、現行Projectと本番Deployment `dpl_2eXr3sKTAGRJ6Txgzm3tjLG6tMcD` を再確認。本番トップは200、旧ドメインのトップは現URLへ308。
+- 新旧ドメインともVercel管理、DNSはVercelのネームサーバー、自動更新ON。確認時点の期限は新ドメイン2027-07-15、旧ドメイン2027-06-06。登録名義・移管ロック・移管料・更新料は未確認。
+- 予約台帳「星空フォト予約管理」の存在と所有権をDriveで確認。個別の所有者・共有情報は公開Repositoryへ追加せず非公開記録に保存する。Apps Script公開版とカレンダーの実稼働状態は未確認。
+- 引き継ぎ手順・更新方法・完了条件は [HANDOVER.md](HANDOVER.md) を参照。
+- 今回は資料準備まで。所有権・権限・請求・DNS・公開先は変更していない。Cloudflareプレビューも未作成。
+
+## 2026-10-25 受け取り先回答の反映
+
+- 本人からGoogle・GitHub・Cloudflareの準備情報を受領。メールアドレスは非公開台帳に記録。
+- GitHub受け取り先は `keyphoto-miyakojima`。公開APIでユーザーの存在を確認。公開リポジトリ一覧は空だが、非公開の同名Repositoryがないことまでは確認していない。
+- 本人回答：予約カレンダー「星空予約管理」（本人アカウントのメインカレンダー）、連携Apps Script、公式LINE `@066lfrkd` は本人が管理・運用。既存運用を継続し、移管・再作成を前提にしない。
+- Driveで再確認した予約台帳「星空フォト予約管理」は引き継ぎ元所有。本人が現在使う予約台帳・公開アプリのURLと接続先を照合するまで、データのコピーや共有変更は行わない。
+- Cloudflareは登録メール受領済みだが、対象Account ID・作業権限・GitHub接続は未確認。
+- 本体Repositoryは引き続き `umigame-kyoudai/space-inada` 所有。GitHub移管、招待、DNS切替、請求変更、顧客へのメッセージ送信は未実施。
+
+## 2026-10-25 Cloudflare招待の受け取り確認
+
+- ユーザーから招待受け取りの連絡・画面を受領。Cloudflare管理画面で本人側アカウントにアクセスできることを確認。
+- 作業担当はアクティブで、権限ポリシーは `Administrator`、適用先はアカウント全体。新しい権限の追加や変更は実施していない。
+- 引き継ぎ先のAccount ID・メンバー情報は非公開台帳に記録。旧管理側アカウントと混同しない。
+- 招待・作業権限の準備は完了。GitHub接続・Cloudflareプレビュー・サイト公開先・DNS・ドメイン登録・請求の移行は未実施。
+
+## 2026-10-25 Cloudflare確認用サイトの公開
+
+- 顧客所有CloudflareアカウントにWorker `keyphoto-miyakojima-preview` を作成。
+- 確認URL: https://keyphoto-miyakojima-preview.miyako-keyphoto.workers.dev/
+- Next.jsを維持し、OpenNext経由でWorkersに公開。86ページの静的生成、動的予約ページ、写真・動画、4言語を確認。プレビューはnoindex・GA4無効。
+- 設定・GitHub直接連携の手順・本番切替前の確認事項は [CLOUDFLARE.md](CLOUDFLARE.md)。GitHubの自動公開は未接続。
+- 既存本番・独自ドメイン・DNSは変更していない。有料プラン・R2・Images契約は追加していない。

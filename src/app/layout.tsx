@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Noto_Sans_JP, Shippori_Mincho } from "next/font/google";
 import "./globals.css";
 import { siteConfig } from "@/lib/seo";
+import { isPreviewDeployment } from "@/lib/deployment";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { JsonLd } from "@/components/seo/JsonLd";
@@ -56,7 +57,7 @@ export const metadata: Metadata = {
     title: siteConfig.shortName,
     statusBarStyle: "black-translucent",
   },
-  robots: { index: true, follow: true },
+  robots: { index: !isPreviewDeployment, follow: !isPreviewDeployment },
   verification: {
     ...(process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION
       ? { google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION }

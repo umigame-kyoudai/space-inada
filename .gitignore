@@ -44,3 +44,8 @@ next-env.d.ts
 /output/
 /tmp/
 /docs/SEO-ANALYTICS-AUDIT-*.md
+
+# Cloudflare build and local secrets
+.open-next/
+.wrangler/
+.dev.vars*

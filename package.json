@@ -7,10 +7,13 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "gen:blur": "node scripts/gen-blur-placeholders.mjs"
+    "gen:blur": "node scripts/gen-blur-placeholders.mjs",
+    "build:cloudflare": "NEXT_PUBLIC_DEPLOYMENT_STAGE=preview opennextjs-cloudflare build && node scripts/prepare-cloudflare-env.mjs",
+    "preview:cloudflare": "wrangler dev",
+    "deploy:cloudflare": "opennextjs-cloudflare deploy"
   },
   "dependencies": {
-    "next": "16.2.7",
+    "next": "16.4.3",
     "react": "19.2.4",
     "react-dom": "19.2.4"
   },
@@ -20,8 +23,10 @@
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",
-    "eslint-config-next": "16.2.7",
+    "eslint-config-next": "16.4.3",
     "tailwindcss": "^4",
-    "typescript": "^5"
+    "typescript": "^5",
+    "@opennextjs/cloudflare": "1.20.13",
+    "wrangler": "4.152.0"
   }
 }

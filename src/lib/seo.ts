@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { isPreviewDeployment } from "@/lib/deployment";
 
 /**
  * SEO設定の単一の真実 (Single Source of Truth)。
@@ -123,7 +124,7 @@ export function buildMetadata({
       types: { "application/rss+xml": "/feed.xml" },
       ...(languages ? { languages } : {}),
     },
-    robots: noindex
+    robots: noindex || isPreviewDeployment
       ? { index: false, follow: false }
       : {
           index: true,

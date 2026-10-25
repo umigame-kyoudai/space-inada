@@ -13,6 +13,7 @@
  */
 
 import { getReferralStaffFromCookieString } from "@/lib/referrals";
+import { isPreviewDeployment } from "@/lib/deployment";
 
 declare global {
   interface Window {
@@ -27,6 +28,7 @@ const LOCAL_HOSTNAMES = new Set(["localhost", "127.0.0.1", "[::1]", "::1"]);
 
 /** この環境で GA4 に送信してよいか（クライアントでのみ true になり得る） */
 export function isGaEnabled(): boolean {
+  if (isPreviewDeployment) return false;
   if (!GA_MEASUREMENT_ID) return false;
   if (process.env.NODE_ENV !== "production") return false;
   const vercelEnv = process.env.NEXT_PUBLIC_VERCEL_ENV;
